@@ -5,12 +5,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -22,6 +26,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * The Undead Staff's servants: ordinary skeletons and zombies whose own target
@@ -32,6 +37,8 @@ public final class Minions {
     public static final String OWNER = "tinyrelics_minion_owner";
     /** Servants live for one minute. */
     private static final int LIFETIME = 1200;
+    /** Climbing out of the ground takes a second and a half. */
+    private static final int RISE_TICKS = 30;
     private static final int SKELETONS = 2;
     private static final int ZOMBIES = 3;
 
@@ -91,9 +98,16 @@ public final class Minions {
             }
             mob.setCustomName(Component.translatable("entity.tinyrelics.minion", owner.getDisplayName()));
 
-            ACTIVE.put(mob, new Servant(owner.getUUID(), LIFETIME));
+            // Start buried under the spot and climb out. Until it is out it does not move,
+            // collide or take damage, so it cannot suffocate in the ground.
+            double groundY = mob.getY();
+            mob.setNoAi(true);
+            mob.setInvulnerable(true);
+            mob.noPhysics = true;
+            mob.setPos(mob.getX(), groundY - mob.getBbHeight(), mob.getZ());
+
+            ACTIVE.put(mob, new Servant(owner.getUUID(), LIFETIME, groundY));
             level.addFreshEntity(mob);
-            puff(level, mob);
         }
     }
 
@@ -116,9 +130,39 @@ public final class Minions {
                 it.remove();
                 continue;
             }
+            if (servant.rise > 0) {
+                rise(mob, servant);
+                continue;
+            }
             if (servant.ticksLeft % 10 == 0) {
                 command(mob, owner);
             }
+        }
+    }
+
+    /** One tick of climbing out of the ground: a little higher, with dirt flying. */
+    private static void rise(Mob mob, Servant servant) {
+        servant.rise--;
+        double buried = mob.getBbHeight() * servant.rise / (double) RISE_TICKS;
+        mob.setPos(mob.getX(), servant.groundY - buried, mob.getZ());
+        if (!(mob.level() instanceof ServerLevel level)) {
+            return;
+        }
+        BlockPos below = BlockPos.containing(mob.getX(), servant.groundY - 0.5D, mob.getZ());
+        BlockState ground = level.getBlockState(below);
+        if (!ground.isAir()) {
+            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, ground),
+                    mob.getX(), servant.groundY + 0.1D, mob.getZ(), 6, 0.3D, 0.1D, 0.3D, 0.1D);
+        }
+        if (servant.rise % 6 == 0) {
+            level.playSound(null, mob.getX(), servant.groundY, mob.getZ(),
+                    SoundEvents.GRAVEL_BREAK, SoundSource.HOSTILE, 0.8F, 0.6F);
+        }
+        if (servant.rise == 0) {
+            mob.setNoAi(false);
+            mob.setInvulnerable(false);
+            mob.noPhysics = false;
+            puff(level, mob);
         }
     }
 
@@ -168,11 +212,16 @@ public final class Minions {
 
     private static final class Servant {
         final UUID owner;
+        /** The height of the ground the servant climbs out of. */
+        final double groundY;
         int ticksLeft;
+        /** Ticks of climbing still to go. */
+        int rise = RISE_TICKS;
 
-        Servant(UUID owner, int ticksLeft) {
+        Servant(UUID owner, int ticksLeft, double groundY) {
             this.owner = owner;
             this.ticksLeft = ticksLeft;
+            this.groundY = groundY;
         }
     }
 }
