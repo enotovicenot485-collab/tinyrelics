@@ -51,7 +51,7 @@ public final class ClientEffects {
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         while (ClientSetup.MENU_KEY.consumeClick()) {
-            if (mc.screen == null && mc.player != null) {
+            if (mc.screen == null && canConfigure(mc)) {
                 mc.setScreen(new RelicsScreen());
             }
         }
@@ -63,6 +63,23 @@ public final class ClientEffects {
         if (shatterTimer >= 0 && --shatterTimer < 0) {
             shatter();
         }
+    }
+
+    /**
+     * The settings menu is only for server operators, and for the owner of a
+     * single-player world. For everyone else the key does nothing. The server
+     * checks the same thing again before it accepts any change.
+     */
+    private static boolean canConfigure(Minecraft mc) {
+        LocalPlayer player = mc.player;
+        if (player == null) {
+            return false;
+        }
+        if (player.hasPermissions(2)) {
+            return true;
+        }
+        return mc.getSingleplayerServer() != null
+                && mc.getSingleplayerServer().isSingleplayerOwner(player.getGameProfile());
     }
 
     /** At the end of the animation the charm breaks into pieces in front of the camera. */
