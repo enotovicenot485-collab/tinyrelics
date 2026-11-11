@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "RTR",
+    "WSW",
+    "RBR"
+  ],
+  "key": {
+    "R": { "item": "minecraft:redstone_block" },
+    "T": { "item": "minecraft:ghast_tear" },
+    "W": { "item": "minecraft:wither_skeleton_skull" },
+    "S": { "item": "minecraft:netherite_sword" },
+    "B": { "item": "minecraft:blaze_rod" }
+  },
+  "result": {
+    "item": "tinyrelics:blood_blade"
+  }
+}

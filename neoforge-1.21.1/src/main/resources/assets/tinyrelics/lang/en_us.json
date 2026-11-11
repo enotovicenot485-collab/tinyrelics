@@ -2,7 +2,51 @@
   "item.tinyrelics.keeping_charm": "Charm of Keeping",
   "item.tinyrelics.keeping_charm.tooltip": "Returns your whole inventory after death",
   "item.tinyrelics.keeping_charm.tooltip2": "One charm breaks each time",
+
   "item.tinyrelics.thor_hammer": "Thor's Hammer",
-  "item.tinyrelics.thor_hammer.tooltip": "Right-click: lightning strikes everything in a 35×35 block area",
-  "item.tinyrelics.thor_hammer.tooltip2": "Creative mode only"
+  "item.tinyrelics.thor_hammer.tooltip": "Right-click: lightning strikes everything around",
+  "item.tinyrelics.thor_hammer.tooltip2": "Shift + right-click: throw the hammer",
+  "item.tinyrelics.thor_hammer.tooltip3": "Creative mode only",
+
+  "item.tinyrelics.chaos_boomerang": "Chaos Boomerang",
+  "item.tinyrelics.chaos_boomerang.tooltip": "Right-click: throw through a chain of enemies",
+  "item.tinyrelics.chaos_boomerang.tooltip2": "Shift + right-click: shield for 20 seconds",
+
+  "item.tinyrelics.blood_blade": "Blood Blade",
+  "item.tinyrelics.blood_blade.tooltip": "Hit: chance to cause bleeding",
+  "item.tinyrelics.blood_blade.tooltip2": "Right-click at one heart: drain life from enemies",
+
+  "entity.tinyrelics.thrown_relic": "Thrown Weapon",
+
+  "msg.tinyrelics.blade_health": "The blade only awakens when you are down to one heart",
+  "msg.tinyrelics.blade_no_enemies": "No enemies nearby",
+  "msg.tinyrelics.no_permission": "Only a server operator can change these settings",
+  "msg.tinyrelics.saved": "Tiny Relics settings saved",
+
+  "key.categories.tinyrelics": "Tiny Relics",
+  "key.tinyrelics.menu": "Settings menu",
+
+  "screen.tinyrelics.title": "Tiny Relics: settings",
+  "screen.tinyrelics.apply": "Apply",
+  "screen.tinyrelics.close": "Close",
+  "screen.tinyrelics.settings": "Settings",
+
+  "screen.tinyrelics.craft": "Crafting",
+  "screen.tinyrelics.craft.tip": "Turn it off and this item's recipe disappears for every player. Items that already exist stay.",
+  "screen.tinyrelics.hammer_radius": "Lightning radius: %s blocks",
+  "screen.tinyrelics.hammer_radius.tip": "How many blocks in every direction from the player the lightning reaches. Default is 32.",
+  "screen.tinyrelics.hammer_fire": "Set the ground on fire",
+  "screen.tinyrelics.hammer_fire.tip": "When on, fire appears under every target. Off by default.",
+  "screen.tinyrelics.hammer_monsters": "Monsters only",
+  "screen.tinyrelics.hammer_monsters.tip": "Off: the hammer hits everyone. On: only hostile mobs, animals and players are safe.",
+
+  "screen.tinyrelics.stats.keeping_charm": "Consumable · stacks to 16",
+  "screen.tinyrelics.stats.thor_hammer": "14 damage · creative mode only",
+  "screen.tinyrelics.stats.chaos_boomerang": "8 damage · unbreakable",
+  "screen.tinyrelics.stats.blood_blade": "6 damage · unbreakable",
+
+  "screen.tinyrelics.desc.keeping_charm": "Keep it in your inventory. When you die one charm breaks and all your items come back after you respawn. It does not keep experience.",
+  "screen.tinyrelics.desc.thor_hammer": "Right-click: lightning strikes everything in range, no cooldown. Shift + right-click: the hammer flies forward, strikes the first target with lightning and returns to your hand.",
+  "screen.tinyrelics.desc.chaos_boomerang": "Right-click: flies to the nearest enemy and jumps to the others like chain lightning, then returns. Shift + right-click: circles you for 20 seconds, knocks monsters back and blocks their hits. 10 second cooldown.",
+  "screen.tinyrelics.desc.blood_blade": "Hits have a 20% chance to cause bleeding for 5 seconds. Right-click at one heart with enemies nearby: the blade drains their life and heals you fully. 2 minute cooldown."
 }

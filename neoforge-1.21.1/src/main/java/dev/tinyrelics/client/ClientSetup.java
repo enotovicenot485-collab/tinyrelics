@@ -1,0 +1,30 @@
+package dev.tinyrelics.client;
+
+import dev.tinyrelics.TinyRelics;
+import net.minecraft.client.KeyMapping;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import org.lwjgl.glfw.GLFW;
+
+/** Client-only registration: the menu key and the renderer of flying weapons. */
+public final class ClientSetup {
+    public static final KeyMapping MENU_KEY =
+            new KeyMapping("key.tinyrelics.menu", GLFW.GLFW_KEY_K, "key.categories.tinyrelics");
+
+    private ClientSetup() {
+    }
+
+    public static void init(IEventBus modBus) {
+        modBus.addListener(ClientSetup::registerKeys);
+        modBus.addListener(ClientSetup::registerRenderers);
+    }
+
+    private static void registerKeys(RegisterKeyMappingsEvent event) {
+        event.register(MENU_KEY);
+    }
+
+    private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(TinyRelics.THROWN_RELIC.get(), ThrownRelicRenderer::new);
+    }
+}

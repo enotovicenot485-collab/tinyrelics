@@ -1,5 +1,6 @@
 package dev.tinyrelics.client;
 
+import dev.tinyrelics.RelicConfig;
 import dev.tinyrelics.TinyRelics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -15,13 +16,20 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/** Client-only visuals. Never touched on a dedicated server. */
+/** Client-only visuals and the menu key. Never touched on a dedicated server. */
 @Mod.EventBusSubscriber(modid = TinyRelics.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class ClientEffects {
+    /** The settings as the server last told us. */
+    public static RelicConfig config = new RelicConfig();
+
     /** Ticks left until the charm shatters; -1 when nothing is playing. */
     private static int shatterTimer = -1;
 
     private ClientEffects() {
+    }
+
+    public static void receiveConfig(RelicConfig received) {
+        config = received;
     }
 
     /** The charm floats up in front of the screen, like a totem of undying. */
@@ -40,13 +48,18 @@ public final class ClientEffects {
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || shatterTimer < 0) {
+        if (event.phase != TickEvent.Phase.END) {
             return;
         }
-        if (--shatterTimer >= 0) {
-            return;
+        Minecraft mc = Minecraft.getInstance();
+        while (ClientSetup.MENU_KEY.consumeClick()) {
+            if (mc.screen == null && mc.player != null) {
+                mc.setScreen(new RelicsScreen());
+            }
         }
-        shatter();
+        if (shatterTimer >= 0 && --shatterTimer < 0) {
+            shatter();
+        }
     }
 
     /** At the end of the animation the charm breaks into pieces in front of the camera. */

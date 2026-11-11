@@ -2,7 +2,51 @@
   "item.tinyrelics.keeping_charm": "Амулет сохранения",
   "item.tinyrelics.keeping_charm.tooltip": "После смерти вернёт весь инвентарь",
   "item.tinyrelics.keeping_charm.tooltip2": "Один амулет при этом ломается",
+
   "item.tinyrelics.thor_hammer": "Молот Тора",
-  "item.tinyrelics.thor_hammer.tooltip": "ПКМ: молнии по всем в области 35×35 блоков",
-  "item.tinyrelics.thor_hammer.tooltip2": "Только из творческого режима"
+  "item.tinyrelics.thor_hammer.tooltip": "ПКМ: молнии по всем вокруг",
+  "item.tinyrelics.thor_hammer.tooltip2": "Shift + ПКМ: бросок молота",
+  "item.tinyrelics.thor_hammer.tooltip3": "Только из творческого режима",
+
+  "item.tinyrelics.chaos_boomerang": "Бумеранг Хаоса",
+  "item.tinyrelics.chaos_boomerang.tooltip": "ПКМ: бросок по цепочке врагов",
+  "item.tinyrelics.chaos_boomerang.tooltip2": "Shift + ПКМ: щит на 20 секунд",
+
+  "item.tinyrelics.blood_blade": "Кровавый Клинок",
+  "item.tinyrelics.blood_blade.tooltip": "Удар: шанс вызвать кровотечение",
+  "item.tinyrelics.blood_blade.tooltip2": "ПКМ при одном сердце: высосать жизнь из врагов",
+
+  "entity.tinyrelics.thrown_relic": "Брошенное оружие",
+
+  "msg.tinyrelics.blade_health": "Клинок пробуждается, только когда осталось одно сердце",
+  "msg.tinyrelics.blade_no_enemies": "Рядом нет врагов",
+  "msg.tinyrelics.no_permission": "Настройки может менять только оператор сервера",
+  "msg.tinyrelics.saved": "Настройки Tiny Relics сохранены",
+
+  "key.categories.tinyrelics": "Tiny Relics",
+  "key.tinyrelics.menu": "Меню настроек",
+
+  "screen.tinyrelics.title": "Tiny Relics: настройки",
+  "screen.tinyrelics.apply": "Применить",
+  "screen.tinyrelics.close": "Закрыть",
+  "screen.tinyrelics.settings": "Настройки",
+
+  "screen.tinyrelics.craft": "Крафт",
+  "screen.tinyrelics.craft.tip": "Выключи, и рецепт этого предмета исчезнет у всех игроков. Уже созданные предметы останутся.",
+  "screen.tinyrelics.hammer_radius": "Радиус молний: %s блоков",
+  "screen.tinyrelics.hammer_radius.tip": "На сколько блоков в каждую сторону от игрока бьют молнии. По умолчанию 32.",
+  "screen.tinyrelics.hammer_fire": "Поджигать землю",
+  "screen.tinyrelics.hammer_fire.tip": "Если включить, под каждой целью загорится огонь. По умолчанию выключено.",
+  "screen.tinyrelics.hammer_monsters": "Только монстры",
+  "screen.tinyrelics.hammer_monsters.tip": "Выключено: молот бьёт всех. Включено: только враждебных мобов, животные и игроки в безопасности.",
+
+  "screen.tinyrelics.stats.keeping_charm": "Расходник · до 16 в стопке",
+  "screen.tinyrelics.stats.thor_hammer": "14 урона · только творческий режим",
+  "screen.tinyrelics.stats.chaos_boomerang": "8 урона · неразрушаемый",
+  "screen.tinyrelics.stats.blood_blade": "6 урона · неразрушаемый",
+
+  "screen.tinyrelics.desc.keeping_charm": "Лежит в инвентаре. Когда ты умираешь, один амулет ломается, а все вещи возвращаются после возрождения. Опыт не сохраняет.",
+  "screen.tinyrelics.desc.thor_hammer": "ПКМ: молнии бьют по всем в радиусе, перезарядки нет. Shift + ПКМ: молот летит вперёд, бьёт молнией первую цель и возвращается в руку.",
+  "screen.tinyrelics.desc.chaos_boomerang": "ПКМ: летит в ближайшего врага и перескакивает по остальным, как цепная молния, потом возвращается. Shift + ПКМ: 20 секунд кружит вокруг тебя, отбрасывает монстров и гасит их удары. Перезарядка 10 секунд.",
+  "screen.tinyrelics.desc.blood_blade": "Удар с шансом 20% вызывает кровотечение на 5 секунд. ПКМ, когда осталось одно сердце и рядом враги: клинок высасывает их жизнь и полностью лечит тебя. Перезарядка 2 минуты."
 }
