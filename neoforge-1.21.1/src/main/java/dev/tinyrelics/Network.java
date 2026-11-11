@@ -18,7 +18,7 @@ public final class Network {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("2");
+        PayloadRegistrar registrar = event.registrar("3");
         registrar.playToClient(CharmBroken.TYPE, CharmBroken.STREAM_CODEC,
                 (payload, context) -> ClientEffects.charmBroken());
         registrar.playToClient(ConfigSync.TYPE, ConfigSync.STREAM_CODEC,
@@ -29,6 +29,17 @@ public final class Network {
                         applyConfig(sender, payload.config());
                     }
                 });
+        registrar.playToServer(StaffSuper.TYPE, StaffSuper.STREAM_CODEC,
+                (payload, context) -> {
+                    if (context.player() instanceof ServerPlayer sender) {
+                        UndeadStaffItem.trySuper(sender);
+                    }
+                });
+    }
+
+    /** Called on the client when the super ability key is pressed. */
+    public static void requestStaffSuper() {
+        PacketDistributor.sendToServer(StaffSuper.INSTANCE);
     }
 
     public static void sendCharmBroken(ServerPlayer player) {
@@ -73,6 +84,18 @@ public final class Network {
         public static final CharmBroken INSTANCE = new CharmBroken();
         public static final CustomPacketPayload.Type<CharmBroken> TYPE = new CustomPacketPayload.Type<>(id("charm_broken"));
         public static final StreamCodec<ByteBuf, CharmBroken> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Client -> server: the super ability key was pressed. */
+    public record StaffSuper() implements CustomPacketPayload {
+        public static final StaffSuper INSTANCE = new StaffSuper();
+        public static final CustomPacketPayload.Type<StaffSuper> TYPE = new CustomPacketPayload.Type<>(id("staff_super"));
+        public static final StreamCodec<ByteBuf, StaffSuper> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

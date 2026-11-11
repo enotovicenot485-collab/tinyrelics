@@ -133,7 +133,8 @@ public class ThrownRelic extends Entity {
 
         boolean monstersOnly = isHammer() && RelicConfig.SERVER.hammerMonstersOnly;
         List<LivingEntity> touched = server.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(0.6D),
-                e -> e != owner && e.isAlive() && !(e instanceof ArmorStand) && (!monstersOnly || e instanceof Enemy));
+                e -> e != owner && e.isAlive() && !(e instanceof ArmorStand) && !Minions.isOwnedBy(e, owner)
+                        && (!monstersOnly || e instanceof Enemy));
         if (!touched.isEmpty()) {
             strike(server, touched.get(0), owner);
             this.mode = RETURN;
@@ -196,7 +197,7 @@ public class ThrownRelic extends Entity {
         if (this.life % 5 == 0) {
             List<LivingEntity> near = server.getEntitiesOfClass(LivingEntity.class,
                     owner.getBoundingBox().inflate(SHIELD_REACH),
-                    e -> e.isAlive() && e instanceof Enemy);
+                    e -> e.isAlive() && Minions.isEnemyOf(e, owner));
             for (LivingEntity enemy : near) {
                 enemy.hurt(server.damageSources().thrown(this, owner), SHIELD_DAMAGE);
                 enemy.knockback(0.9D, owner.getX() - enemy.getX(), owner.getZ() - enemy.getZ());
@@ -222,7 +223,7 @@ public class ThrownRelic extends Entity {
         Vec3 from = position();
         AABB box = new AABB(from, from).inflate(range);
         return server.getEntitiesOfClass(LivingEntity.class, box,
-                        e -> e != owner && e.isAlive() && e instanceof Enemy && !this.alreadyHit.contains(e.getId()))
+                        e -> e != owner && e.isAlive() && Minions.isEnemyOf(e, owner) && !this.alreadyHit.contains(e.getId()))
                 .stream()
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(from)))
                 .orElse(null);

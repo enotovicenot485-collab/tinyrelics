@@ -36,6 +36,9 @@ public class TinyRelics {
     public static final RegistryObject<Item> BLOOD_BLADE = ITEMS.register("blood_blade",
             () -> new BloodBladeItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
+    public static final RegistryObject<Item> UNDEAD_STAFF = ITEMS.register("undead_staff",
+            () -> new UndeadStaffItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+
     public static final RegistryObject<EntityType<ThrownRelic>> THROWN_RELIC = ENTITIES.register("thrown_relic",
             () -> EntityType.Builder.<ThrownRelic>of(ThrownRelic::new, MobCategory.MISC)
                     .sized(0.6F, 0.6F)
@@ -61,6 +64,7 @@ public class TinyRelics {
             event.accept(THOR_HAMMER);
             event.accept(CHAOS_BOOMERANG);
             event.accept(BLOOD_BLADE);
+            event.accept(UNDEAD_STAFF);
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(KEEPING_CHARM);

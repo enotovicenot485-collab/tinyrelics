@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "WNW",
+    "SBS",
+    " T "
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:wither_skeleton_skull"
+    },
+    "N": {
+      "item": "minecraft:nether_star"
+    },
+    "S": {
+      "item": "minecraft:soul_lantern"
+    },
+    "B": {
+      "item": "minecraft:bone_block"
+    },
+    "T": {
+      "item": "minecraft:netherite_ingot"
+    }
+  },
+  "result": {
+    "id": "tinyrelics:undead_staff",
+    "count": 1
+  }
+}

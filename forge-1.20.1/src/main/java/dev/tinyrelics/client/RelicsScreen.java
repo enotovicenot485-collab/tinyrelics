@@ -4,6 +4,8 @@ import dev.tinyrelics.Network;
 import dev.tinyrelics.RelicConfig;
 import dev.tinyrelics.TinyRelics;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
@@ -20,7 +22,7 @@ public class RelicsScreen extends Screen {
     private static final int TAB_WIDTH = 140;
     private static final int TAB_HEIGHT = 22;
     private static final int RIGHT_WIDTH = 234;
-    private static final String[] IDS = {"keeping_charm", "thor_hammer", "chaos_boomerang", "blood_blade"};
+    private static final String[] IDS = {"keeping_charm", "thor_hammer", "chaos_boomerang", "blood_blade", "undead_staff"};
 
     private final RelicConfig edit;
     private final ItemStack[] icons;
@@ -36,6 +38,7 @@ public class RelicsScreen extends Screen {
                 new ItemStack(TinyRelics.THOR_HAMMER.get()),
                 new ItemStack(TinyRelics.CHAOS_BOOMERANG.get()),
                 new ItemStack(TinyRelics.BLOOD_BLADE.get()),
+                new ItemStack(TinyRelics.UNDEAD_STAFF.get()),
         };
     }
 
@@ -65,14 +68,19 @@ public class RelicsScreen extends Screen {
         switch (this.selected) {
             case 0 -> addToggle(0, "craft", this.edit.charmCraft, value -> this.edit.charmCraft = value);
             case 1 -> {
-                RadiusSlider slider = new RadiusSlider(rightX(), rowY(0), RIGHT_WIDTH, 20);
-                slider.setTooltip(Tooltip.create(Component.translatable("screen.tinyrelics.hammer_radius.tip")));
-                addRenderableWidget(slider);
+                addSlider(0, "hammer_radius", RelicConfig.MIN_RADIUS, RelicConfig.MAX_RADIUS,
+                        () -> this.edit.hammerRadius, value -> this.edit.hammerRadius = value);
                 addToggle(1, "hammer_fire", this.edit.hammerFire, value -> this.edit.hammerFire = value);
                 addToggle(2, "hammer_monsters", this.edit.hammerMonstersOnly, value -> this.edit.hammerMonstersOnly = value);
             }
             case 2 -> addToggle(0, "craft", this.edit.boomerangCraft, value -> this.edit.boomerangCraft = value);
-            default -> addToggle(0, "craft", this.edit.bladeCraft, value -> this.edit.bladeCraft = value);
+            case 3 -> addToggle(0, "craft", this.edit.bladeCraft, value -> this.edit.bladeCraft = value);
+            default -> {
+                addSlider(0, "staff_kills", RelicConfig.MIN_KILLS, RelicConfig.MAX_KILLS,
+                        () -> this.edit.staffKills, value -> this.edit.staffKills = value);
+                addToggle(1, "staff_grief", this.edit.staffSkullGrief, value -> this.edit.staffSkullGrief = value);
+                addToggle(2, "craft", this.edit.staffCraft, value -> this.edit.staffCraft = value);
+            }
         }
 
         int buttonY = this.top + PANEL_HEIGHT - 26;
@@ -88,6 +96,12 @@ public class RelicsScreen extends Screen {
                 Component.translatable("screen.tinyrelics." + key), (button, newValue) -> setter.accept(newValue));
         toggle.setTooltip(Tooltip.create(Component.translatable("screen.tinyrelics." + key + ".tip")));
         addRenderableWidget(toggle);
+    }
+
+    private void addSlider(int row, String key, int min, int max, IntSupplier getter, IntConsumer setter) {
+        IntSlider slider = new IntSlider(rightX(), rowY(row), RIGHT_WIDTH, 20, "screen.tinyrelics." + key, min, max, getter, setter);
+        slider.setTooltip(Tooltip.create(Component.translatable("screen.tinyrelics." + key + ".tip")));
+        addRenderableWidget(slider);
     }
 
     @Override
@@ -130,23 +144,32 @@ public class RelicsScreen extends Screen {
         return false;
     }
 
-    private class RadiusSlider extends AbstractSliderButton {
-        private static final int SPAN = RelicConfig.MAX_RADIUS - RelicConfig.MIN_RADIUS;
+    /** A slider over whole numbers that shows its value in its own label. */
+    private static class IntSlider extends AbstractSliderButton {
+        private final String key;
+        private final int min;
+        private final int max;
+        private final IntSupplier getter;
+        private final IntConsumer setter;
 
-        RadiusSlider(int x, int y, int width, int height) {
-            super(x, y, width, height, Component.empty(),
-                    (RelicsScreen.this.edit.hammerRadius - RelicConfig.MIN_RADIUS) / (double) SPAN);
+        IntSlider(int x, int y, int width, int height, String key, int min, int max, IntSupplier getter, IntConsumer setter) {
+            super(x, y, width, height, Component.empty(), (getter.getAsInt() - min) / (double) (max - min));
+            this.key = key;
+            this.min = min;
+            this.max = max;
+            this.getter = getter;
+            this.setter = setter;
             updateMessage();
         }
 
         @Override
         protected void updateMessage() {
-            setMessage(Component.translatable("screen.tinyrelics.hammer_radius", RelicsScreen.this.edit.hammerRadius));
+            setMessage(Component.translatable(this.key, this.getter.getAsInt()));
         }
 
         @Override
         protected void applyValue() {
-            RelicsScreen.this.edit.hammerRadius = RelicConfig.MIN_RADIUS + (int) Math.round(this.value * SPAN);
+            this.setter.accept(this.min + (int) Math.round(this.value * (this.max - this.min)));
         }
     }
 }

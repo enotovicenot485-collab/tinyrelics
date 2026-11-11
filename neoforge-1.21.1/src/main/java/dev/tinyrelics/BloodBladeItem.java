@@ -9,7 +9,6 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -38,7 +37,7 @@ public class BloodBladeItem extends RelicWeaponItem {
             }
             List<LivingEntity> enemies = server.getEntitiesOfClass(LivingEntity.class,
                     player.getBoundingBox().inflate(DRAIN_RADIUS),
-                    e -> e.isAlive() && e instanceof Enemy);
+                    e -> e.isAlive() && Minions.isEnemyOf(e, player));
             if (enemies.isEmpty()) {
                 player.displayClientMessage(Component.translatable("msg.tinyrelics.blade_no_enemies"), true);
                 return InteractionResultHolder.fail(stack);

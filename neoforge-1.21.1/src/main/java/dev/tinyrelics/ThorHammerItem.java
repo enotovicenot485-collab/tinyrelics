@@ -114,6 +114,9 @@ public class ThorHammerItem extends RelicWeaponItem {
         if (entity instanceof ArmorStand) {
             return false;
         }
+        if (Minions.isOwnedBy(entity, wielder)) {
+            return false;
+        }
         if (monstersOnly) {
             return entity instanceof Enemy;
         }

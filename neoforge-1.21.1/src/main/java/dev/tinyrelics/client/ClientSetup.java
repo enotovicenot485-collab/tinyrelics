@@ -12,6 +12,9 @@ public final class ClientSetup {
     public static final KeyMapping MENU_KEY =
             new KeyMapping("key.tinyrelics.menu", GLFW.GLFW_KEY_K, "key.categories.tinyrelics");
 
+    public static final KeyMapping SUPER_KEY =
+            new KeyMapping("key.tinyrelics.super", GLFW.GLFW_KEY_R, "key.categories.tinyrelics");
+
     private ClientSetup() {
     }
 
@@ -22,6 +25,7 @@ public final class ClientSetup {
 
     private static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(MENU_KEY);
+        event.register(SUPER_KEY);
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

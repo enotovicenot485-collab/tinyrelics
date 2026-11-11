@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -18,11 +19,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
@@ -35,10 +39,18 @@ public final class Abilities {
     private static final ResourceLocation CHARM_RECIPE = new ResourceLocation(TinyRelics.MODID, "keeping_charm");
     private static final ResourceLocation BOOMERANG_RECIPE = new ResourceLocation(TinyRelics.MODID, "chaos_boomerang");
     private static final ResourceLocation BLADE_RECIPE = new ResourceLocation(TinyRelics.MODID, "blood_blade");
+    private static final ResourceLocation STAFF_RECIPE = new ResourceLocation(TinyRelics.MODID, "undead_staff");
+
+    /** Soul fire burns for 5 seconds over a 30 x 30 block square. */
+    private static final int SOUL_FIRE_TICKS = 100;
+    private static final double SOUL_FIRE_HALF = 15.0D;
+    private static final int SOUL_FIRE_FLAMES_PER_TICK = 60;
+    private static final float SOUL_FIRE_DAMAGE = 5.0F;
 
     /** Bleeding entities and how many ticks they still bleed. */
     private static final Map<LivingEntity, Integer> BLEEDING = new HashMap<>();
     private static final List<Drain> DRAINS = new ArrayList<>();
+    private static final List<SoulFire> SOUL_FIRES = new ArrayList<>();
     /** Recipes taken out of the game, kept here so they can be switched back on. */
     private static final Map<ResourceLocation, Recipe<?>> STASHED = new HashMap<>();
     private static int tickCounter;
@@ -64,9 +76,19 @@ public final class Abilities {
         DRAINS.add(new Drain(player, new ArrayList<>(targets)));
     }
 
+    /** The Undead Staff's super ability: a field of blue fire around where the player stands. */
+    public static void startSoulFire(ServerPlayer player) {
+        ServerLevel server = player.serverLevel();
+        SOUL_FIRES.add(new SoulFire(player, server, player.getX(), player.getY(), player.getZ()));
+        server.playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 2.0F, 0.5F);
+    }
+
     public static void tick(MinecraftServer server) {
         tickBleeding();
         tickDrains();
+        tickSoulFires();
+        Minions.tick(server);
         if (++tickCounter % 20 == 0) {
             syncRecipes(server);
         }
@@ -133,6 +155,49 @@ public final class Abilities {
         }
     }
 
+    private static void tickSoulFires() {
+        Iterator<SoulFire> it = SOUL_FIRES.iterator();
+        while (it.hasNext()) {
+            SoulFire fire = it.next();
+            ServerLevel server = fire.level;
+            if (++fire.age > SOUL_FIRE_TICKS) {
+                it.remove();
+                continue;
+            }
+            RandomSource random = server.getRandom();
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+            for (int i = 0; i < SOUL_FIRE_FLAMES_PER_TICK; i++) {
+                double x = fire.x + (random.nextDouble() - 0.5D) * 2.0D * SOUL_FIRE_HALF;
+                double z = fire.z + (random.nextDouble() - 0.5D) * 2.0D * SOUL_FIRE_HALF;
+                // Look for the ground near the player's height so flames sit on the floor, in caves too.
+                int top = Mth.floor(fire.y) + 4;
+                for (int y = top; y >= top - 10; y--) {
+                    pos.set(Mth.floor(x), y, Mth.floor(z));
+                    boolean solidBelow = !server.getBlockState(pos.below()).getCollisionShape(server, pos.below()).isEmpty();
+                    boolean freeHere = server.getBlockState(pos).getCollisionShape(server, pos).isEmpty();
+                    if (solidBelow && freeHere) {
+                        server.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, x, y + 0.2D, z, 2, 0.15D, 0.25D, 0.15D, 0.01D);
+                        break;
+                    }
+                }
+            }
+            if (fire.age % 20 == 1) {
+                server.playSound(null, fire.x, fire.y, fire.z, SoundEvents.FIRE_AMBIENT, SoundSource.PLAYERS, 2.0F, 0.6F);
+            }
+            if (fire.age % 10 == 0) {
+                AABB area = new AABB(fire.x - SOUL_FIRE_HALF, fire.y - 6.0D, fire.z - SOUL_FIRE_HALF,
+                        fire.x + SOUL_FIRE_HALF, fire.y + 8.0D, fire.z + SOUL_FIRE_HALF);
+                List<LivingEntity> burning = server.getEntitiesOfClass(LivingEntity.class, area,
+                        e -> ThorHammerItem.isTarget(e, fire.owner, false));
+                for (LivingEntity victim : burning) {
+                    victim.setLastHurtByPlayer(fire.owner);
+                    victim.hurt(server.damageSources().magic(), SOUL_FIRE_DAMAGE);
+                    victim.setSecondsOnFire(3);
+                }
+            }
+        }
+    }
+
     private static void bloodBurst(ServerLevel server, LivingEntity entity, int count) {
         server.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.defaultBlockState()),
                 entity.getX(), entity.getY() + entity.getBbHeight() * 0.6D, entity.getZ(),
@@ -150,6 +215,7 @@ public final class Abilities {
         wanted.put(CHARM_RECIPE, config.charmCraft);
         wanted.put(BOOMERANG_RECIPE, config.boomerangCraft);
         wanted.put(BLADE_RECIPE, config.bladeCraft);
+        wanted.put(STAFF_RECIPE, config.staffCraft);
 
         RecipeManager manager = server.getRecipeManager();
         boolean changed = false;
@@ -182,6 +248,23 @@ public final class Abilities {
         }
         manager.replaceRecipes(recipes);
         server.getPlayerList().broadcastAll(new ClientboundUpdateRecipesPacket(manager.getRecipes()));
+    }
+
+    private static final class SoulFire {
+        final ServerPlayer owner;
+        final ServerLevel level;
+        final double x;
+        final double y;
+        final double z;
+        int age;
+
+        SoulFire(ServerPlayer owner, ServerLevel level, double x, double y, double z) {
+            this.owner = owner;
+            this.level = level;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
     }
 
     private static final class Drain {

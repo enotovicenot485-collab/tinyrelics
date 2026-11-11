@@ -17,6 +17,8 @@ import net.minecraft.network.FriendlyByteBuf;
 public final class RelicConfig {
     public static final int MIN_RADIUS = 8;
     public static final int MAX_RADIUS = 128;
+    public static final int MIN_KILLS = 5;
+    public static final int MAX_KILLS = 100;
 
     /** The copy the game logic reads. */
     public static RelicConfig SERVER = new RelicConfig();
@@ -33,6 +35,11 @@ public final class RelicConfig {
     public boolean charmCraft = true;
     public boolean boomerangCraft = true;
     public boolean bladeCraft = true;
+    public boolean staffCraft = true;
+    /** Mob kills needed to charge the Undead Staff's soul fire. */
+    public int staffKills = 20;
+    /** Whether the staff's wither skulls break blocks. */
+    public boolean staffSkullGrief = false;
 
     public RelicConfig copy() {
         RelicConfig c = new RelicConfig();
@@ -42,11 +49,15 @@ public final class RelicConfig {
         c.charmCraft = this.charmCraft;
         c.boomerangCraft = this.boomerangCraft;
         c.bladeCraft = this.bladeCraft;
+        c.staffCraft = this.staffCraft;
+        c.staffKills = this.staffKills;
+        c.staffSkullGrief = this.staffSkullGrief;
         return c;
     }
 
     public void clamp() {
         this.hammerRadius = Math.max(MIN_RADIUS, Math.min(MAX_RADIUS, this.hammerRadius));
+        this.staffKills = Math.max(MIN_KILLS, Math.min(MAX_KILLS, this.staffKills));
     }
 
     public void write(FriendlyByteBuf buffer) {
@@ -56,6 +67,9 @@ public final class RelicConfig {
         buffer.writeBoolean(this.charmCraft);
         buffer.writeBoolean(this.boomerangCraft);
         buffer.writeBoolean(this.bladeCraft);
+        buffer.writeBoolean(this.staffCraft);
+        buffer.writeVarInt(this.staffKills);
+        buffer.writeBoolean(this.staffSkullGrief);
     }
 
     public static RelicConfig read(FriendlyByteBuf buffer) {
@@ -66,6 +80,9 @@ public final class RelicConfig {
         c.charmCraft = buffer.readBoolean();
         c.boomerangCraft = buffer.readBoolean();
         c.bladeCraft = buffer.readBoolean();
+        c.staffCraft = buffer.readBoolean();
+        c.staffKills = buffer.readVarInt();
+        c.staffSkullGrief = buffer.readBoolean();
         c.clamp();
         return c;
     }

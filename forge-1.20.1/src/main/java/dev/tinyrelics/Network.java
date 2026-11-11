@@ -17,7 +17,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class Network {
-    private static final String VERSION = "2";
+    private static final String VERSION = "3";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(TinyRelics.MODID, "main"),
@@ -33,6 +33,13 @@ public final class Network {
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         CHANNEL.registerMessage(2, ConfigUpdate.class, ConfigUpdate::encode, ConfigUpdate::decode, ConfigUpdate::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        CHANNEL.registerMessage(3, StaffSuper.class, StaffSuper::encode, StaffSuper::decode, StaffSuper::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+    }
+
+    /** Called on the client when the super ability key is pressed. */
+    public static void requestStaffSuper() {
+        CHANNEL.sendToServer(new StaffSuper());
     }
 
     public static void sendCharmBroken(ServerPlayer player) {
@@ -102,6 +109,26 @@ public final class Network {
         public static void handle(ConfigSync message, Supplier<NetworkEvent.Context> context) {
             context.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> ClientEffects.receiveConfig(message.config)));
+            context.get().setPacketHandled(true);
+        }
+    }
+
+    /** Client -> server: the super ability key was pressed. */
+    public static final class StaffSuper {
+        public static void encode(StaffSuper message, FriendlyByteBuf buffer) {
+        }
+
+        public static StaffSuper decode(FriendlyByteBuf buffer) {
+            return new StaffSuper();
+        }
+
+        public static void handle(StaffSuper message, Supplier<NetworkEvent.Context> context) {
+            ServerPlayer sender = context.get().getSender();
+            context.get().enqueueWork(() -> {
+                if (sender != null) {
+                    UndeadStaffItem.trySuper(sender);
+                }
+            });
             context.get().setPacketHandled(true);
         }
     }

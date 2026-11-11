@@ -1,5 +1,6 @@
 package dev.tinyrelics.client;
 
+import dev.tinyrelics.Network;
 import dev.tinyrelics.RelicConfig;
 import dev.tinyrelics.TinyRelics;
 import net.minecraft.client.Minecraft;
@@ -52,6 +53,11 @@ public final class ClientEffects {
         while (ClientSetup.MENU_KEY.consumeClick()) {
             if (mc.screen == null && mc.player != null) {
                 mc.setScreen(new RelicsScreen());
+            }
+        }
+        while (ClientSetup.SUPER_KEY.consumeClick()) {
+            if (mc.screen == null && mc.player != null) {
+                Network.requestStaffSuper();
             }
         }
         if (shatterTimer >= 0 && --shatterTimer < 0) {
