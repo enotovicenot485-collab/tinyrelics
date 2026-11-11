@@ -1,6 +1,8 @@
 package dev.tinyrelics;
 
 import dev.tinyrelics.client.ClientSetup;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -23,6 +25,11 @@ public class TinyRelics {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MODID);
+    public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, MODID);
+
+    /** The purple swirl and spark of the Chaos Boomerang. */
+    public static final RegistryObject<SimpleParticleType> CHAOS_VORTEX = PARTICLES.register("chaos_vortex", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> CHAOS_SPARK = PARTICLES.register("chaos_spark", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<Item> KEEPING_CHARM = ITEMS.register("keeping_charm",
             () -> new KeepingCharmItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
@@ -53,6 +60,7 @@ public class TinyRelics {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ITEMS.register(modBus);
         ENTITIES.register(modBus);
+        PARTICLES.register(modBus);
         modBus.addListener(this::addCreative);
         Network.register();
         RelicConfig.load(FMLPaths.CONFIGDIR.get().resolve("tinyrelics.json"));

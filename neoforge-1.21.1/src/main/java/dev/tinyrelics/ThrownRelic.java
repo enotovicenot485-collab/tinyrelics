@@ -109,8 +109,15 @@ public class ThrownRelic extends Entity {
             finish(false);
             return;
         }
-        server.sendParticles(isHammer() ? ParticleTypes.ELECTRIC_SPARK : ParticleTypes.WITCH,
-                getX(), getY() + 0.3D, getZ(), 2, 0.1D, 0.1D, 0.1D, 0.0D);
+        if (isHammer()) {
+            server.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 0.3D, getZ(), 2, 0.1D, 0.1D, 0.1D, 0.0D);
+        } else {
+            // A trail of purple sparks, and a swirl left hanging in the air every few blocks.
+            server.sendParticles(TinyRelics.CHAOS_SPARK.get(), getX(), getY() + 0.3D, getZ(), 3, 0.15D, 0.15D, 0.15D, 0.0D);
+            if (this.life % 3 == 0) {
+                server.sendParticles(TinyRelics.CHAOS_VORTEX.get(), getX(), getY() + 0.3D, getZ(), 1, 0.0D, 0.0D, 0.0D, 0.0D);
+            }
+        }
         switch (this.mode) {
             case STRAIGHT -> tickStraight(server, this.owner);
             case CHAIN -> tickChain(server, this.owner);
@@ -192,7 +199,11 @@ public class ThrownRelic extends Entity {
         setPos(owner.getX() + Math.cos(this.angle) * ORBIT_RADIUS,
                 owner.getY() + owner.getBbHeight() * 0.5D,
                 owner.getZ() + Math.sin(this.angle) * ORBIT_RADIUS);
-        server.sendParticles(ParticleTypes.WITCH, getX(), getY() + 0.3D, getZ(), 1, 0.05D, 0.05D, 0.05D, 0.0D);
+        // The shield: sparks follow the boomerang and swirls mark the ring it draws.
+        server.sendParticles(TinyRelics.CHAOS_SPARK.get(), getX(), getY() + 0.3D, getZ(), 2, 0.1D, 0.1D, 0.1D, 0.0D);
+        if (this.life % 2 == 0) {
+            server.sendParticles(TinyRelics.CHAOS_VORTEX.get(), getX(), getY() + 0.3D, getZ(), 1, 0.0D, 0.0D, 0.0D, 0.0D);
+        }
 
         if (this.life % 5 == 0) {
             List<LivingEntity> near = server.getEntitiesOfClass(LivingEntity.class,
@@ -210,9 +221,13 @@ public class ThrownRelic extends Entity {
             ThorHammerItem.shock(server, victim, owner);
         } else {
             victim.hurt(server.damageSources().thrown(this, owner), ChaosBoomerangItem.THROW_DAMAGE);
-            server.sendParticles(ParticleTypes.WITCH,
+            // A burst of swirls on the victim and sparks flying out of it.
+            server.sendParticles(TinyRelics.CHAOS_VORTEX.get(),
                     victim.getX(), victim.getY() + victim.getBbHeight() * 0.5D, victim.getZ(),
-                    20, 0.3D, 0.4D, 0.3D, 0.1D);
+                    5, victim.getBbWidth() * 0.4D, victim.getBbHeight() * 0.3D, victim.getBbWidth() * 0.4D, 0.0D);
+            server.sendParticles(TinyRelics.CHAOS_SPARK.get(),
+                    victim.getX(), victim.getY() + victim.getBbHeight() * 0.5D, victim.getZ(),
+                    16, 0.2D, 0.3D, 0.2D, 0.12D);
             server.playSound(null, victim.getX(), victim.getY(), victim.getZ(),
                     SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 0.8F, 1.6F);
         }
