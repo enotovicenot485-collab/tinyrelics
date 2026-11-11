@@ -1,0 +1,8 @@
+{
+  "item.tinyrelics.keeping_charm": "Амулет сохранения",
+  "item.tinyrelics.keeping_charm.tooltip": "После смерти вернёт весь инвентарь",
+  "item.tinyrelics.keeping_charm.tooltip2": "Один амулет при этом ломается",
+  "item.tinyrelics.thor_hammer": "Молот Тора",
+  "item.tinyrelics.thor_hammer.tooltip": "ПКМ: молнии по всем в области 35×35 блоков",
+  "item.tinyrelics.thor_hammer.tooltip2": "Только из творческого режима"
+}

@@ -1,0 +1,8 @@
+{
+  "item.tinyrelics.keeping_charm": "Charm of Keeping",
+  "item.tinyrelics.keeping_charm.tooltip": "Returns your whole inventory after death",
+  "item.tinyrelics.keeping_charm.tooltip2": "One charm breaks each time",
+  "item.tinyrelics.thor_hammer": "Thor's Hammer",
+  "item.tinyrelics.thor_hammer.tooltip": "Right-click: lightning strikes everything in a 35×35 block area",
+  "item.tinyrelics.thor_hammer.tooltip2": "Creative mode only"
+}

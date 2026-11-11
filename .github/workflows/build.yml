@@ -1,0 +1,71 @@
+name: Build mod
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [forge-1.20.1, neoforge-1.21.1]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build
+        working-directory: ${{ matrix.project }}
+        run: |
+          chmod +x gradlew
+          if [ "${{ matrix.project }}" = "forge-1.20.1" ]; then
+            ./gradlew build renameJar --no-daemon --stacktrace
+          else
+            ./gradlew build --no-daemon --stacktrace
+          fi
+          rm -f build/libs/*-unobfuscated.jar build/libs/*-sources.jar
+          ls -la build/libs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.project }}
+          path: ${{ matrix.project }}/build/libs/*.jar
+          if-no-files-found: error
+
+  release:
+    name: Publish jars
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: jars
+          merge-multiple: true
+
+      - run: ls -la jars
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Tiny Relics, build ${{ github.run_number }}
+          body: |
+            Ready-to-use mod files.
+            - `tinyrelics-forge-1.20.1-*.jar` is for Minecraft 1.20.1 with Forge.
+            - `tinyrelics-neoforge-1.21.1-*.jar` is for Minecraft 1.21.1 with NeoForge.
+          files: jars/*.jar
+          fail_on_unmatched_files: true
