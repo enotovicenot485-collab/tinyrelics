@@ -58,8 +58,8 @@ def skull(part, side):
         cranium, jaw, face = (-5, -6, -3), (-5, -1, -2), "W"
     else:
         cranium, jaw, face = (-1, -6, -3), (4, -1, -2), "E"
-    a = box(part, None, cranium, (6, 5, 6), None); a["skull"] = "cranium"; a["face"] = face
-    b = box(part, None, jaw, (1, 2, 4), None); b["skull"] = "jaw"; b["face"] = face
+    a = box(part, None, cranium, (6, 5, 6), None, 0.3); a["skull"] = "cranium"; a["face"] = face
+    b = box(part, None, jaw, (1, 2, 4), None, 0.1); b["skull"] = "jaw"; b["face"] = face
     return [a, b]
 
 def relief(part, src, ref_xyz, ref_size, xyz, size, face="N"):
@@ -95,22 +95,22 @@ SLOTS = {
         *horn(RHORN, -7, -1),
         *horn(LHORN, 4, 1),
         # the skull mask stands out from the helmet: face plate, chin, and a bone crest over the top
-        relief("head", HEAD, (-4, -8, -4), (8, 8, 8), (-3, -6.5, -6), (6, 5, 1)),
-        relief("head", HEAD, (-4, -8, -4), (8, 8, 8), (-2, -1.5, -6), (4, 2, 1)),
+        relief("head", HEAD, (-4, -8, -4), (8, 8, 8), (-3, -6.5, -5.3), (6, 5, 1)),
+        relief("head", HEAD, (-4, -8, -4), (8, 8, 8), (-2, -1.5, -5.3), (4, 2, 1)),
         bone_box("head", (-1, -10, -5), (2, 1, 10), 0.95),
     ],
     "chest": [
         box("body", BODY, (-4, 0, -2), (8, 12, 4), (0, 0), 1.0),
-        box("right_arm", RARM, (-3, -2, -2), (4, 12, 4), (24, 0), 1.0),
-        box("left_arm", LARM, (-1, -2, -2), (4, 12, 4), (40, 0), 1.0),
+        box("right_arm", RARM, (-3, -2, -2), (4, 12, 4), (24, 0), 0.6),
+        box("left_arm", LARM, (-1, -2, -2), (4, 12, 4), (40, 0), 0.6),
         *skull("right_arm", -1),
         *skull("left_arm", 1),
         # ribcage, soul gem and spine as raised plates; thick cuffs on the forearms
         relief("body", BODY, (-4, 0, -2), (8, 12, 4), (-3, 1, -4), (6, 6, 1)),
         relief("body", BODY, (-4, 0, -2), (8, 12, 4), (-1, 2, -5), (2, 3, 1)),
         relief("body", BODY, (-4, 0, -2), (8, 12, 4), (-2, 1, 3), (4, 7, 1), face="S"),
-        box("right_arm", part_of(RARM, (-3, -2, -2), (4, 12, 4), (-3, 5, -2), (4, 3, 4)), (-3, 5, -2), (4, 3, 4), None, 1.6),
-        box("left_arm", part_of(LARM, (-1, -2, -2), (4, 12, 4), (-1, 5, -2), (4, 3, 4)), (-1, 5, -2), (4, 3, 4), None, 1.6),
+        box("right_arm", part_of(RARM, (-3, -2, -2), (4, 12, 4), (-3, 5, -2), (4, 3, 4)), (-3, 5, -2), (4, 3, 4), None, 1.0),
+        box("left_arm", part_of(LARM, (-1, -2, -2), (4, 12, 4), (-1, 5, -2), (4, 3, 4)), (-1, 5, -2), (4, 3, 4), None, 1.0),
     ],
     "legs": [
         box("body", BODY, (-4, 0, -2), (8, 12, 4), (0, 0), 0.5, rows=(0.72, 1.0), top=False, bottom=False),
