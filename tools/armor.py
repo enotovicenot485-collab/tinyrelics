@@ -55,11 +55,13 @@ def part_of(src, ref_xyz, ref_size, xyz, size):
 def skull(part, side):
     """A 3D skull over the whole shoulder, looking sideways: a cranium and, on its outer side, a jaw."""
     if side < 0:      # right arm: the arm box runs from x = -3 to 1, the outer side is -x
-        cranium, jaw, face = (-5, -6, -3), (-5, -1, -2), "W"
+        cranium, jaw, face = (-4, -4.5, -2.5), (-4.3, -0.5, -1.5), "W"
     else:
-        cranium, jaw, face = (-1, -6, -3), (4, -1, -2), "E"
-    a = box(part, None, cranium, (6, 5, 6), None, 0.3); a["skull"] = "cranium"; a["face"] = face
-    b = box(part, None, jaw, (1, 2, 4), None, 0.1); b["skull"] = "jaw"; b["face"] = face
+        cranium, jaw, face = (-1, -4.5, -2.5), (3.3, -0.5, -1.5), "E"
+    # No bigger than the shoulder itself (the arm is 4 wide): 5 x 4 x 5, a hair larger so its
+    # surfaces never lie in the same plane as the arm's and flicker.
+    a = box(part, None, cranium, (5, 4, 5), None, 0.2); a["skull"] = "cranium"; a["face"] = face
+    b = box(part, None, jaw, (1, 1, 3), None); b["skull"] = "jaw"; b["face"] = face
     return [a, b]
 
 def relief(part, src, ref_xyz, ref_size, xyz, size, face="N"):
