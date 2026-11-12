@@ -56,10 +56,12 @@ public final class NecroArmorModels {
                         .texOffs(0, 0).addBox(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(1.0F)), PartPose.ZERO);
                 root.addOrReplaceChild("right_arm", CubeListBuilder.create()
                         .texOffs(24, 0).addBox(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(1.0F))
-                        .texOffs(0, 16).addBox(-5.0F, -4.0F, -3.0F, 5.0F, 6.0F, 6.0F, new CubeDeformation(0.25F)), PartPose.offset(-5.0F, 2.0F, 0.0F));
+                        .texOffs(0, 16).addBox(-6.0F, -6.0F, -3.5F, 5.0F, 4.0F, 5.0F, new CubeDeformation(0.0F))
+                        .texOffs(20, 16).addBox(-5.0F, -2.0F, -3.5F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(-5.0F, 2.0F, 0.0F));
                 root.addOrReplaceChild("left_arm", CubeListBuilder.create()
                         .texOffs(40, 0).addBox(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(1.0F))
-                        .texOffs(22, 16).addBox(0.0F, -4.0F, -3.0F, 5.0F, 6.0F, 6.0F, new CubeDeformation(0.25F)), PartPose.offset(5.0F, 2.0F, 0.0F));
+                        .texOffs(0, 26).addBox(1.0F, -6.0F, -3.5F, 5.0F, 4.0F, 5.0F, new CubeDeformation(0.0F))
+                        .texOffs(20, 26).addBox(2.0F, -2.0F, -3.5F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(5.0F, 2.0F, 0.0F));
                 root.addOrReplaceChild("right_leg", CubeListBuilder.create(), PartPose.offset(-1.9F, 12.0F, 0.0F));
                 root.addOrReplaceChild("left_leg", CubeListBuilder.create(), PartPose.offset(1.9F, 12.0F, 0.0F));
             }

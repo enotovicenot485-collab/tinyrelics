@@ -43,8 +43,9 @@ public class NecroGlowLayer<T extends LivingEntity, M extends EntityModel<T>> ex
         if (!(getParentModel() instanceof HumanoidModel<?> parent)) {
             return;
         }
-        // Breathes between dim and full brightness about once every two seconds.
-        float pulse = 0.65F + 0.35F * Mth.sin(ageInTicks * 0.15F);
+        // Swings from almost dark to a white-hot flare about once every second and a half,
+        // strong enough to see in daylight.
+        float pulse = 0.55F + 0.45F * Mth.sin(ageInTicks * 0.2F);
         for (EquipmentSlot slot : SLOTS) {
             if (!(entity.getItemBySlot(slot).getItem() instanceof NecroArmorItem)) {
                 continue;
