@@ -76,8 +76,6 @@ public class ThorHammerItem extends RelicWeaponItem {
             shock(server, target, player);
         }
 
-        // A ring of lightning runs along the ground from the wielder's feet.
-        Network.sendShockwave(player, player.getX(), player.getY(), player.getZ(), 6, false);
     }
 
     /** A lightning bolt that is only for looks: it never hurts the wielder. */
@@ -99,13 +97,27 @@ public class ThorHammerItem extends RelicWeaponItem {
     /** Lightning on one target, credited to the wielder. */
     public static void shock(ServerLevel server, LivingEntity target, ServerPlayer wielder) {
         lightning(server, target.getX(), target.getY(), target.getZ());
-        server.sendParticles(TinyRelics.THOR_FLASH.get(),
-                target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(), 1, 0.0D, 0.0D, 0.0D, 0.0D);
+        strikeEffects(server, target);
         DamageSource source = new DamageSource(
                 server.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT),
                 wielder);
         target.hurt(source, STRIKE_DAMAGE);
         target.setSecondsOnFire(4);
+    }
+
+    /** Electricity where the lightning lands: about two by two blocks around the victim. */
+    private static void strikeEffects(ServerLevel server, LivingEntity target) {
+        double x = target.getX();
+        double y = target.getY();
+        double z = target.getZ();
+        server.sendParticles(TinyRelics.THOR_FLASH.get(), x, y + target.getBbHeight() * 0.5D, z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+        server.sendParticles(TinyRelics.THOR_BOLT.get(), x, y + 0.3D, z, 5, 0.6D, 0.15D, 0.6D, 0.0D);
+        server.sendParticles(TinyRelics.THOR_SPARK.get(), x, y + 0.5D, z, 8, 0.6D, 0.4D, 0.6D, 0.05D);
+        if (target.onGround()) {
+            // Count 0 passes the numbers through as they are: the first one is the crack's
+            // half-width, so 1.0 gives a crack two blocks across under the victim.
+            server.sendParticles(TinyRelics.THOR_CRACK.get(), x, y + 0.03D, z, 0, 1.0D, 0.0D, 0.0D, 1.0D);
+        }
     }
 
     public static void ignite(LivingEntity entity, int seconds) {
