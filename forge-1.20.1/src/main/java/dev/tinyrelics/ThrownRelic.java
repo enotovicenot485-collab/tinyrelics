@@ -113,7 +113,11 @@ public class ThrownRelic extends Entity {
             return;
         }
         if (isHammer()) {
-            server.sendParticles(ParticleTypes.ELECTRIC_SPARK, getX(), getY() + 0.3D, getZ(), 2, 0.1D, 0.1D, 0.1D, 0.0D);
+            // The thrown hammer leaves a crackling trail.
+            server.sendParticles(TinyRelics.THOR_SPARK.get(), getX(), getY() + 0.3D, getZ(), 3, 0.15D, 0.15D, 0.15D, 0.03D);
+            if (this.life % 2 == 0) {
+                server.sendParticles(TinyRelics.THOR_BOLT.get(), getX(), getY() + 0.3D, getZ(), 1, 0.1D, 0.1D, 0.1D, 0.0D);
+            }
         } else {
             // A trail of purple sparks, and a swirl left hanging in the air every few blocks.
             server.sendParticles(TinyRelics.CHAOS_SPARK.get(), getX(), getY() + 0.3D, getZ(), 3, 0.15D, 0.15D, 0.15D, 0.0D);

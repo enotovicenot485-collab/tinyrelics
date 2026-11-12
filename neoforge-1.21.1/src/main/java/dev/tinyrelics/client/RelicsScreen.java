@@ -70,8 +70,11 @@ public class RelicsScreen extends Screen {
             case 1 -> {
                 addSlider(0, "hammer_radius", RelicConfig.MIN_RADIUS, RelicConfig.MAX_RADIUS,
                         () -> this.edit.hammerRadius, value -> this.edit.hammerRadius = value);
-                addToggle(1, "hammer_fire", this.edit.hammerFire, value -> this.edit.hammerFire = value);
-                addToggle(2, "hammer_monsters", this.edit.hammerMonstersOnly, value -> this.edit.hammerMonstersOnly = value);
+                addToggle(1, 0, 2, "hammer_fire", this.edit.hammerFire, value -> this.edit.hammerFire = value);
+                addToggle(1, 1, 2, "hammer_monsters", this.edit.hammerMonstersOnly, value -> this.edit.hammerMonstersOnly = value);
+                addSlider(2, 0, 2, "hammer_slam_radius", RelicConfig.MIN_SLAM, RelicConfig.MAX_SLAM,
+                        () -> this.edit.hammerSlamRadius, value -> this.edit.hammerSlamRadius = value);
+                addToggle(2, 1, 2, "hammer_slam_fire", this.edit.hammerSlamFire, value -> this.edit.hammerSlamFire = value);
             }
             case 2 -> addToggle(0, "craft", this.edit.boomerangCraft, value -> this.edit.boomerangCraft = value);
             case 3 -> addToggle(0, "craft", this.edit.bladeCraft, value -> this.edit.bladeCraft = value);
@@ -91,15 +94,32 @@ public class RelicsScreen extends Screen {
                 .bounds(this.left + PANEL_WIDTH - 10 - 100, buttonY, 100, 20).build());
     }
 
+    /** Left edge of a widget when a row is split into several columns. */
+    private int columnX(int column, int columns) {
+        return rightX() + column * (columnWidth(columns) + 6);
+    }
+
+    private int columnWidth(int columns) {
+        return (RIGHT_WIDTH - 6 * (columns - 1)) / columns;
+    }
+
     private void addToggle(int row, String key, boolean value, Consumer<Boolean> setter) {
-        CycleButton<Boolean> toggle = CycleButton.onOffBuilder(value).create(rightX(), rowY(row), RIGHT_WIDTH, 20,
+        addToggle(row, 0, 1, key, value, setter);
+    }
+
+    private void addToggle(int row, int column, int columns, String key, boolean value, Consumer<Boolean> setter) {
+        CycleButton<Boolean> toggle = CycleButton.onOffBuilder(value).create(columnX(column, columns), rowY(row), columnWidth(columns), 20,
                 Component.translatable("screen.tinyrelics." + key), (button, newValue) -> setter.accept(newValue));
         toggle.setTooltip(Tooltip.create(Component.translatable("screen.tinyrelics." + key + ".tip")));
         addRenderableWidget(toggle);
     }
 
     private void addSlider(int row, String key, int min, int max, IntSupplier getter, IntConsumer setter) {
-        IntSlider slider = new IntSlider(rightX(), rowY(row), RIGHT_WIDTH, 20, "screen.tinyrelics." + key, min, max, getter, setter);
+        addSlider(row, 0, 1, key, min, max, getter, setter);
+    }
+
+    private void addSlider(int row, int column, int columns, String key, int min, int max, IntSupplier getter, IntConsumer setter) {
+        IntSlider slider = new IntSlider(columnX(column, columns), rowY(row), columnWidth(columns), 20, "screen.tinyrelics." + key, min, max, getter, setter);
         slider.setTooltip(Tooltip.create(Component.translatable("screen.tinyrelics." + key + ".tip")));
         addRenderableWidget(slider);
     }

@@ -5,7 +5,7 @@
   "item.tinyrelics.thor_hammer": "Молот Тора",
   "item.tinyrelics.thor_hammer.tooltip": "ПКМ: молнии по всем вокруг",
   "item.tinyrelics.thor_hammer.tooltip2": "Shift + ПКМ: бросок молота",
-  "item.tinyrelics.thor_hammer.tooltip3": "Только из творческого режима",
+  "item.tinyrelics.thor_hammer.tooltip3": "Клавиша %s: удар с небес",
   "item.tinyrelics.chaos_boomerang": "Бумеранг Хаоса",
   "item.tinyrelics.chaos_boomerang.tooltip": "ПКМ: бросок по цепочке врагов",
   "item.tinyrelics.chaos_boomerang.tooltip2": "Shift + ПКМ: щит на 20 секунд",
@@ -36,7 +36,7 @@
   "screen.tinyrelics.stats.chaos_boomerang": "8 урона · неразрушаемый",
   "screen.tinyrelics.stats.blood_blade": "6 урона · неразрушаемый",
   "screen.tinyrelics.desc.keeping_charm": "Лежит в инвентаре. Когда ты умираешь, один амулет ломается, а все вещи возвращаются после возрождения. Опыт не сохраняет.",
-  "screen.tinyrelics.desc.thor_hammer": "ПКМ: молнии бьют по всем в радиусе, перезарядки нет. Shift + ПКМ: молот летит вперёд, бьёт молнией первую цель и возвращается в руку.",
+  "screen.tinyrelics.desc.thor_hammer": "ПКМ: молнии по всем в радиусе. Shift + ПКМ: бросок, молот бьёт первую цель и возвращается. Клавиша суперспособности: прыжок на 20 блоков и удар о землю, от которого расходится кольцо разрядов.",
   "screen.tinyrelics.desc.chaos_boomerang": "ПКМ: летит в ближайшего врага и перескакивает по остальным, как цепная молния, потом возвращается. Shift + ПКМ: 20 секунд кружит вокруг тебя, отбрасывает монстров и гасит их удары. Перезарядка 10 секунд.",
   "screen.tinyrelics.desc.blood_blade": "Удар: шанс 20% на кровотечение. ПКМ при одном сердце и врагах рядом: высасывает их жизнь и лечит тебя. Shift + ПКМ: кровавый вихрь 5 секунд лечит игроков и питомцев в 8 блоках, а у тебя остаётся 2 сердца. Откат каждой способности 2 минуты.",
   "item.tinyrelics.undead_staff": "Посох Нежити",
@@ -47,7 +47,7 @@
   "msg.tinyrelics.staff_summon_wait": "Призыв будет готов через %s с",
   "msg.tinyrelics.staff_souls": "Души: %s из %s",
   "msg.tinyrelics.staff_ready": "Синее пламя готово! Нажми %s",
-  "key.tinyrelics.super": "Синее пламя посоха",
+  "key.tinyrelics.super": "Суперспособность оружия",
   "screen.tinyrelics.staff_kills": "Душ для синего пламени: %s",
   "screen.tinyrelics.staff_kills.tip": "Сколько мобов нужно убить, чтобы зарядить синее пламя. По умолчанию 20.",
   "screen.tinyrelics.stats.undead_staff": "5 урона · неразрушаемый",
@@ -56,5 +56,10 @@
   "screen.tinyrelics.staff_grief.tip": "Выключено: череп визера взрывается, но блоки не трогает. Включено: ломает их, как череп настоящего визера.",
   "item.tinyrelics.blood_blade.tooltip3": "Shift + ПКМ: кровавый вихрь лечит союзников ценой твоего здоровья",
   "msg.tinyrelics.blade_wait": "Способность будет готова через %s с",
-  "msg.tinyrelics.blade_vortex_health": "Для кровавого вихря нужно больше двух сердец"
+  "msg.tinyrelics.blade_vortex_health": "Для кровавого вихря нужно больше двух сердец",
+  "item.tinyrelics.thor_hammer.tooltip4": "Только из творческого режима",
+  "screen.tinyrelics.hammer_slam_radius": "Удар с небес: %s блоков",
+  "screen.tinyrelics.hammer_slam_radius.tip": "Радиус поражения при приземлении после прыжка. По умолчанию 10.",
+  "screen.tinyrelics.hammer_slam_fire": "Удар поджигает",
+  "screen.tinyrelics.hammer_slam_fire.tip": "Включено: удар с небес поджигает всех в радиусе. Выключено: только урон."
 }

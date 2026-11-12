@@ -71,6 +71,7 @@ public final class ClientEffects {
             }
         }
         tickVortexes(mc);
+        tickShockwaves(mc);
         while (ClientSetup.SUPER_KEY.consumeClick()) {
             if (mc.screen == null && mc.player != null) {
                 Network.requestStaffSuper();
@@ -99,6 +100,74 @@ public final class ClientEffects {
     }
 
     /** The server says: a blood tornado has started around this entity. */
+    /** Rings of lightning still spreading: x, y, z, final radius, age. */
+    private static final List<double[]> SHOCKWAVES = new ArrayList<>();
+    private static final int SHOCKWAVE_TICKS = 10;
+
+    /** A ring of lightning runs out along the ground; a full strike also leaves a flash and a crack. */
+    public static void startShockwave(double x, double y, double z, int radius, boolean full) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) {
+            return;
+        }
+        SHOCKWAVES.add(new double[] {x, y, z, radius, 0});
+        if (!full) {
+            return;
+        }
+        RandomSource random = mc.level.random;
+        // The big crack under the hammer and a few smaller ones around it.
+        mc.level.addParticle(TinyRelics.THOR_CRACK.get(), true, x, y + 0.03D, z, Math.max(2.5D, radius * 0.4D), 0.0D, 0.0D);
+        for (int i = 0; i < 4; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0D;
+            double distance = radius * (0.35D + random.nextDouble() * 0.35D);
+            mc.level.addParticle(TinyRelics.THOR_CRACK.get(), true,
+                    x + Math.cos(angle) * distance, y + 0.03D, z + Math.sin(angle) * distance, 1.4D, 0.0D, 0.0D);
+        }
+        for (int i = 0; i < 6; i++) {
+            mc.level.addParticle(TinyRelics.THOR_FLASH.get(), true,
+                    x + (random.nextDouble() - 0.5D) * 2.5D, y + 0.6D + random.nextDouble() * 1.5D,
+                    z + (random.nextDouble() - 0.5D) * 2.5D, 0.0D, 0.0D, 0.0D);
+        }
+        for (int i = 0; i < 50; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0D;
+            double speed = 0.15D + random.nextDouble() * 0.35D;
+            mc.level.addParticle(TinyRelics.THOR_SPARK.get(), x, y + 0.3D, z,
+                    Math.cos(angle) * speed, 0.1D + random.nextDouble() * 0.4D, Math.sin(angle) * speed);
+        }
+    }
+
+    private static void tickShockwaves(Minecraft mc) {
+        if (mc.level == null) {
+            SHOCKWAVES.clear();
+            return;
+        }
+        if (SHOCKWAVES.isEmpty() || mc.isPaused()) {
+            return;
+        }
+        RandomSource random = mc.level.random;
+        Iterator<double[]> it = SHOCKWAVES.iterator();
+        while (it.hasNext()) {
+            double[] wave = it.next();
+            if (++wave[4] > SHOCKWAVE_TICKS) {
+                it.remove();
+                continue;
+            }
+            double radius = wave[3] * wave[4] / SHOCKWAVE_TICKS;
+            int arcs = Math.max(10, Math.min(120, (int) (radius * 4.0D)));
+            double turn = random.nextDouble() * Math.PI * 2.0D;
+            for (int i = 0; i < arcs; i++) {
+                double angle = turn + i * Math.PI * 2.0D / arcs;
+                double px = wave[0] + Math.cos(angle) * radius;
+                double pz = wave[2] + Math.sin(angle) * radius;
+                mc.level.addParticle(TinyRelics.THOR_BOLT.get(), px, wave[1] + 0.3D, pz, 0.0D, 0.0D, 0.0D);
+                if (i % 2 == 0) {
+                    mc.level.addParticle(TinyRelics.THOR_SPARK.get(), px, wave[1] + 0.2D, pz,
+                            0.0D, 0.05D + random.nextDouble() * 0.15D, 0.0D);
+                }
+            }
+        }
+    }
+
     public static void startVortex(int entityId) {
         VORTEXES.add(new int[] {entityId, 0});
     }

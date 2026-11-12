@@ -17,7 +17,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class Network {
-    private static final String VERSION = "4";
+    private static final String VERSION = "5";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(TinyRelics.MODID, "main"),
@@ -37,6 +37,8 @@ public final class Network {
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
         CHANNEL.registerMessage(4, VortexStart.class, VortexStart::encode, VortexStart::decode, VortexStart::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(5, Shockwave.class, Shockwave::encode, Shockwave::decode, Shockwave::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 
     /** Called on the client when the super ability key is pressed. */
@@ -45,6 +47,11 @@ public final class Network {
     }
 
     /** Tells the player and everyone who can see them to draw a blood tornado around them. */
+    /** Everyone who can see the player gets the ring of lightning (and, for a full strike, the crack). */
+    public static void sendShockwave(ServerPlayer player, double x, double y, double z, int radius, boolean full) {
+        CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new Shockwave(x, y, z, radius, full));
+    }
+
     public static void sendVortex(ServerPlayer player) {
         CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new VortexStart(player.getId()));
     }
@@ -98,6 +105,41 @@ public final class Network {
     }
 
     /** Server -> client: a blood tornado starts around this entity. */
+    public static final class Shockwave {
+        private final double x;
+        private final double y;
+        private final double z;
+        private final int radius;
+        private final boolean full;
+
+        public Shockwave(double x, double y, double z, int radius, boolean full) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.radius = radius;
+            this.full = full;
+        }
+
+        public static void encode(Shockwave message, FriendlyByteBuf buffer) {
+            buffer.writeDouble(message.x);
+            buffer.writeDouble(message.y);
+            buffer.writeDouble(message.z);
+            buffer.writeVarInt(message.radius);
+            buffer.writeBoolean(message.full);
+        }
+
+        public static Shockwave decode(FriendlyByteBuf buffer) {
+            return new Shockwave(buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readVarInt(), buffer.readBoolean());
+        }
+
+        public static void handle(Shockwave message, Supplier<NetworkEvent.Context> context) {
+            context.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                    () -> () -> ClientEffects.startShockwave(message.x, message.y, message.z, message.radius, message.full)));
+            context.get().setPacketHandled(true);
+        }
+    }
+
+    /** Server -> client: a blood vortex starts around this entity. */
     public static final class VortexStart {
         private final int entityId;
 
@@ -156,7 +198,7 @@ public final class Network {
             ServerPlayer sender = context.get().getSender();
             context.get().enqueueWork(() -> {
                 if (sender != null) {
-                    UndeadStaffItem.trySuper(sender);
+                    Slam.superKey(sender);
                 }
             });
             context.get().setPacketHandled(true);

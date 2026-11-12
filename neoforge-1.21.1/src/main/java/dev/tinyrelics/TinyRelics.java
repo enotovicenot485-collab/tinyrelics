@@ -44,6 +44,11 @@ public class TinyRelics {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> GHOST_FLAME = PARTICLES.register("ghost_flame", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> GHOST_WISP = PARTICLES.register("ghost_wisp", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> GHOST_FIRE = PARTICLES.register("ghost_fire", () -> new SimpleParticleType(false));
+    /** Thor's Hammer: spark, lightning arc, impact flash and the crack on the ground. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> THOR_SPARK = PARTICLES.register("thor_spark", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> THOR_BOLT = PARTICLES.register("thor_bolt", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> THOR_FLASH = PARTICLES.register("thor_flash", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> THOR_CRACK = PARTICLES.register("thor_crack", () -> new SimpleParticleType(false));
 
     public static final DeferredItem<KeepingCharmItem> KEEPING_CHARM = ITEMS.register("keeping_charm",
             () -> new KeepingCharmItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));

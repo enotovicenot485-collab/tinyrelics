@@ -16,6 +16,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -167,6 +168,18 @@ public final class GameEvents {
         if (source != null && source.getPersistentData().getBoolean(UndeadStaffItem.STAFF_SKULL)
                 && !RelicConfig.SERVER.staffSkullGrief) {
             event.getAffectedBlocks().clear();
+        }
+    }
+
+    // ---- Thor's Hammer: no fall damage during and right after the strike from the sky.
+
+    @SubscribeEvent
+    public static void onFall(LivingFallEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            long left = player.getPersistentData().getLong(Slam.NO_FALL_UNTIL) - player.level().getGameTime();
+            if (left > 0 && left < 400) {
+                event.setCanceled(true);
+            }
         }
     }
 }

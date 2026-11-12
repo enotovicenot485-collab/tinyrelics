@@ -19,6 +19,8 @@ public final class RelicConfig {
     public static final int MAX_RADIUS = 128;
     public static final int MIN_KILLS = 5;
     public static final int MAX_KILLS = 100;
+    public static final int MIN_SLAM = 3;
+    public static final int MAX_SLAM = 32;
 
     /** The copy the game logic reads. */
     public static RelicConfig SERVER = new RelicConfig();
@@ -32,6 +34,10 @@ public final class RelicConfig {
     public boolean hammerFire = false;
     /** true = the hammer only hits hostile mobs, false = it hits everyone. */
     public boolean hammerMonstersOnly = false;
+    /** How far the hammer's strike from the sky reaches. */
+    public int hammerSlamRadius = 10;
+    /** Whether the strike from the sky also sets its victims on fire. */
+    public boolean hammerSlamFire = true;
     public boolean charmCraft = true;
     public boolean boomerangCraft = true;
     public boolean bladeCraft = true;
@@ -52,12 +58,15 @@ public final class RelicConfig {
         c.staffCraft = this.staffCraft;
         c.staffKills = this.staffKills;
         c.staffSkullGrief = this.staffSkullGrief;
+        c.hammerSlamRadius = this.hammerSlamRadius;
+        c.hammerSlamFire = this.hammerSlamFire;
         return c;
     }
 
     public void clamp() {
         this.hammerRadius = Math.max(MIN_RADIUS, Math.min(MAX_RADIUS, this.hammerRadius));
         this.staffKills = Math.max(MIN_KILLS, Math.min(MAX_KILLS, this.staffKills));
+        this.hammerSlamRadius = Math.max(MIN_SLAM, Math.min(MAX_SLAM, this.hammerSlamRadius));
     }
 
     public void write(FriendlyByteBuf buffer) {
@@ -70,6 +79,8 @@ public final class RelicConfig {
         buffer.writeBoolean(this.staffCraft);
         buffer.writeVarInt(this.staffKills);
         buffer.writeBoolean(this.staffSkullGrief);
+        buffer.writeVarInt(this.hammerSlamRadius);
+        buffer.writeBoolean(this.hammerSlamFire);
     }
 
     public static RelicConfig read(FriendlyByteBuf buffer) {
@@ -83,6 +94,8 @@ public final class RelicConfig {
         c.staffCraft = buffer.readBoolean();
         c.staffKills = buffer.readVarInt();
         c.staffSkullGrief = buffer.readBoolean();
+        c.hammerSlamRadius = buffer.readVarInt();
+        c.hammerSlamFire = buffer.readBoolean();
         c.clamp();
         return c;
     }

@@ -93,6 +93,7 @@ public final class Abilities {
         tickBleeding();
         tickDrains();
         tickVortexes();
+        Slam.tick();
         tickSoulFires();
         Minions.tick(server);
         if (++tickCounter % 20 == 0) {

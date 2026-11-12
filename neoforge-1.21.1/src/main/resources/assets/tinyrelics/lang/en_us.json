@@ -5,7 +5,7 @@
   "item.tinyrelics.thor_hammer": "Thor's Hammer",
   "item.tinyrelics.thor_hammer.tooltip": "Right-click: lightning strikes everything around",
   "item.tinyrelics.thor_hammer.tooltip2": "Shift + right-click: throw the hammer",
-  "item.tinyrelics.thor_hammer.tooltip3": "Creative mode only",
+  "item.tinyrelics.thor_hammer.tooltip3": "Key %s: strike from the sky",
   "item.tinyrelics.chaos_boomerang": "Chaos Boomerang",
   "item.tinyrelics.chaos_boomerang.tooltip": "Right-click: throw through a chain of enemies",
   "item.tinyrelics.chaos_boomerang.tooltip2": "Shift + right-click: shield for 20 seconds",
@@ -36,7 +36,7 @@
   "screen.tinyrelics.stats.chaos_boomerang": "8 damage · unbreakable",
   "screen.tinyrelics.stats.blood_blade": "6 damage · unbreakable",
   "screen.tinyrelics.desc.keeping_charm": "Keep it in your inventory. When you die one charm breaks and all your items come back after you respawn. It does not keep experience.",
-  "screen.tinyrelics.desc.thor_hammer": "Right-click: lightning strikes everything in range, no cooldown. Shift + right-click: the hammer flies forward, strikes the first target with lightning and returns to your hand.",
+  "screen.tinyrelics.desc.thor_hammer": "Right-click: lightning strikes everything in range. Shift + right-click: throw, the hammer hits the first target and returns. Super ability key: jump 20 blocks up and slam the ground, sending out a ring of lightning.",
   "screen.tinyrelics.desc.chaos_boomerang": "Right-click: flies to the nearest enemy and jumps to the others like chain lightning, then returns. Shift + right-click: circles you for 20 seconds, knocks monsters back and blocks their hits. 10 second cooldown.",
   "screen.tinyrelics.desc.blood_blade": "Hit: 20% chance to cause bleeding. Right-click at one heart with enemies near: drains their life and heals you. Shift + right-click: a blood vortex heals players and pets within 8 blocks for 5 seconds and leaves you at 2 hearts. Each ability has a 2 minute cooldown.",
   "item.tinyrelics.undead_staff": "Staff of the Undead",
@@ -47,7 +47,7 @@
   "msg.tinyrelics.staff_summon_wait": "Summon ready in %s s",
   "msg.tinyrelics.staff_souls": "Souls: %s of %s",
   "msg.tinyrelics.staff_ready": "Blue fire is ready! Press %s",
-  "key.tinyrelics.super": "Staff blue fire",
+  "key.tinyrelics.super": "Weapon super ability",
   "screen.tinyrelics.staff_kills": "Souls for blue fire: %s",
   "screen.tinyrelics.staff_kills.tip": "How many mobs you must kill to charge the blue fire. Default is 20.",
   "screen.tinyrelics.stats.undead_staff": "5 damage · unbreakable",
@@ -56,5 +56,10 @@
   "screen.tinyrelics.staff_grief.tip": "Off: the wither skull explodes but leaves blocks alone. On: it breaks them like a real wither's skull.",
   "item.tinyrelics.blood_blade.tooltip3": "Shift + right-click: a blood vortex heals allies at the cost of your health",
   "msg.tinyrelics.blade_wait": "Ability ready in %s s",
-  "msg.tinyrelics.blade_vortex_health": "The blood vortex needs more than two hearts"
+  "msg.tinyrelics.blade_vortex_health": "The blood vortex needs more than two hearts",
+  "item.tinyrelics.thor_hammer.tooltip4": "Creative mode only",
+  "screen.tinyrelics.hammer_slam_radius": "Sky strike: %s blocks",
+  "screen.tinyrelics.hammer_slam_radius.tip": "How far the landing after the jump reaches. Default is 10.",
+  "screen.tinyrelics.hammer_slam_fire": "Strike ignites",
+  "screen.tinyrelics.hammer_slam_fire.tip": "On: the sky strike sets everyone in range on fire. Off: damage only."
 }

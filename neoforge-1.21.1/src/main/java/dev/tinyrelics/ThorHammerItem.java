@@ -76,9 +76,8 @@ public class ThorHammerItem extends RelicWeaponItem {
             shock(server, target, player);
         }
 
-        server.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                player.getX(), player.getY() + player.getBbHeight() * 0.6D, player.getZ(),
-                40, 0.6D, 0.6D, 0.6D, 0.25D);
+        // A ring of lightning runs along the ground from the wielder's feet.
+        Network.sendShockwave(player, player.getX(), player.getY(), player.getZ(), 6, false);
     }
 
     /** A lightning bolt that is only for looks: it never hurts the wielder. */
@@ -100,11 +99,17 @@ public class ThorHammerItem extends RelicWeaponItem {
     /** Lightning on one target, credited to the wielder. */
     public static void shock(ServerLevel server, LivingEntity target, ServerPlayer wielder) {
         lightning(server, target.getX(), target.getY(), target.getZ());
+        server.sendParticles(TinyRelics.THOR_FLASH.get(),
+                target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(), 1, 0.0D, 0.0D, 0.0D, 0.0D);
         DamageSource source = new DamageSource(
                 server.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT),
                 wielder);
         target.hurt(source, STRIKE_DAMAGE);
         target.igniteForSeconds(4.0F);
+    }
+
+    public static void ignite(LivingEntity entity, int seconds) {
+        entity.igniteForSeconds(seconds);
     }
 
     public static boolean isTarget(LivingEntity entity, Player wielder, boolean monstersOnly) {
@@ -131,7 +136,7 @@ public class ThorHammerItem extends RelicWeaponItem {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         if (level instanceof ServerLevel server && entity instanceof LivingEntity living
                 && (selected || living.getOffhandItem() == stack) && entity.tickCount % 3 == 0) {
-            server.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+            server.sendParticles(TinyRelics.THOR_SPARK.get(),
                     entity.getX(), entity.getY() + entity.getBbHeight() * 0.55D, entity.getZ(),
                     2, 0.35D, 0.4D, 0.35D, 0.02D);
         }
@@ -141,6 +146,7 @@ public class ThorHammerItem extends RelicWeaponItem {
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.tinyrelics.thor_hammer.tooltip").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.tinyrelics.thor_hammer.tooltip2").withStyle(ChatFormatting.AQUA));
-        tooltip.add(Component.translatable("item.tinyrelics.thor_hammer.tooltip3").withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.add(Component.translatable("item.tinyrelics.thor_hammer.tooltip3", Component.keybind("key.tinyrelics.super")).withStyle(ChatFormatting.AQUA));
+        tooltip.add(Component.translatable("item.tinyrelics.thor_hammer.tooltip4").withStyle(ChatFormatting.DARK_GRAY));
     }
 }

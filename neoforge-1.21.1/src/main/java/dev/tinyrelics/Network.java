@@ -19,7 +19,7 @@ public final class Network {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("4");
+        PayloadRegistrar registrar = event.registrar("5");
         registrar.playToClient(CharmBroken.TYPE, CharmBroken.STREAM_CODEC,
                 (payload, context) -> ClientEffects.charmBroken());
         registrar.playToClient(ConfigSync.TYPE, ConfigSync.STREAM_CODEC,
@@ -32,10 +32,12 @@ public final class Network {
                 });
         registrar.playToClient(VortexStart.TYPE, VortexStart.STREAM_CODEC,
                 (payload, context) -> ClientEffects.startVortex(payload.entityId()));
+        registrar.playToClient(Shockwave.TYPE, Shockwave.STREAM_CODEC,
+                (payload, context) -> ClientEffects.startShockwave(payload.x(), payload.y(), payload.z(), payload.radius(), payload.full()));
         registrar.playToServer(StaffSuper.TYPE, StaffSuper.STREAM_CODEC,
                 (payload, context) -> {
                     if (context.player() instanceof ServerPlayer sender) {
-                        UndeadStaffItem.trySuper(sender);
+                        Slam.superKey(sender);
                     }
                 });
     }
@@ -46,6 +48,11 @@ public final class Network {
     }
 
     /** Tells the player and everyone who can see them to draw a blood tornado around them. */
+    /** Everyone who can see the player gets the ring of lightning (and, for a full strike, the crack). */
+    public static void sendShockwave(ServerPlayer player, double x, double y, double z, int radius, boolean full) {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new Shockwave(x, y, z, radius, full));
+    }
+
     public static void sendVortex(ServerPlayer player) {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new VortexStart(player.getId()));
     }
@@ -112,6 +119,23 @@ public final class Network {
     }
 
     /** Server -> client: a blood tornado starts around this entity. */
+    public record Shockwave(double x, double y, double z, int radius, boolean full) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<Shockwave> TYPE = new CustomPacketPayload.Type<>(id("shockwave"));
+        public static final StreamCodec<ByteBuf, Shockwave> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.DOUBLE, Shockwave::x,
+                ByteBufCodecs.DOUBLE, Shockwave::y,
+                ByteBufCodecs.DOUBLE, Shockwave::z,
+                ByteBufCodecs.VAR_INT, Shockwave::radius,
+                ByteBufCodecs.BOOL, Shockwave::full,
+                Shockwave::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Server -> client: a blood vortex starts around this entity. */
     public record VortexStart(int entityId) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<VortexStart> TYPE = new CustomPacketPayload.Type<>(id("vortex_start"));
         public static final StreamCodec<ByteBuf, VortexStart> STREAM_CODEC =
