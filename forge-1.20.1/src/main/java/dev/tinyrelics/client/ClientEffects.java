@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
@@ -16,6 +19,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -116,13 +120,17 @@ public final class ClientEffects {
         }
         RandomSource random = mc.level.random;
         // The big crack under the hammer and a few smaller ones around it.
-        mc.level.addParticle(TinyRelics.THOR_CRACK.get(), true, x, y + 0.03D, z, Math.max(2.5D, radius * 0.4D), 0.0D, 0.0D);
+        // Each one is laid on the surface it is actually over, so hills and steps are followed.
+        mc.level.addParticle(TinyRelics.THOR_CRACK.get(), true, x, groundY(mc.level, x, y, z) + 0.03D, z,
+                Math.max(1.8D, radius * 0.28D), 0.0D, 0.0D);
         for (int i = 0; i < 4; i++) {
             double angle = random.nextDouble() * Math.PI * 2.0D;
             double distance = radius * (0.35D + random.nextDouble() * 0.35D);
-            mc.level.addParticle(TinyRelics.THOR_CRACK.get(), true,
-                    x + Math.cos(angle) * distance, y + 0.03D, z + Math.sin(angle) * distance, 1.4D, 0.0D, 0.0D);
+            double cx = x + Math.cos(angle) * distance;
+            double cz = z + Math.sin(angle) * distance;
+            mc.level.addParticle(TinyRelics.THOR_CRACK.get(), true, cx, groundY(mc.level, cx, y, cz) + 0.03D, cz, 1.0D, 0.0D, 0.0D);
         }
+        y = groundY(mc.level, x, y, z);
         for (int i = 0; i < 6; i++) {
             mc.level.addParticle(TinyRelics.THOR_FLASH.get(), true,
                     x + (random.nextDouble() - 0.5D) * 2.5D, y + 0.6D + random.nextDouble() * 1.5D,
@@ -134,6 +142,31 @@ public final class ClientEffects {
             mc.level.addParticle(TinyRelics.THOR_SPARK.get(), x, y + 0.3D, z,
                     Math.cos(angle) * speed, 0.1D + random.nextDouble() * 0.4D, Math.sin(angle) * speed);
         }
+    }
+
+    /**
+     * The height of the ground at this spot: the top of the first solid block found
+     * looking down from a little above the given height. Falls back to the given height.
+     */
+    private static double groundY(ClientLevel level, double x, double y, double z) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        // Start two blocks up to catch a step or a slope; under a low roof start at the feet instead.
+        for (double above : new double[] {2.0D, 0.5D}) {
+            int top = (int) Math.floor(y + above);
+            pos.set((int) Math.floor(x), top, (int) Math.floor(z));
+            if (!level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()) {
+                continue;
+            }
+            for (int blockY = top - 1; blockY >= top - 10; blockY--) {
+                pos.setY(blockY);
+                VoxelShape shape = level.getBlockState(pos).getCollisionShape(level, pos);
+                if (!shape.isEmpty()) {
+                    return blockY + shape.max(Direction.Axis.Y);
+                }
+            }
+            return y;
+        }
+        return y;
     }
 
     private static void tickShockwaves(Minecraft mc) {
@@ -159,9 +192,10 @@ public final class ClientEffects {
                 double angle = turn + i * Math.PI * 2.0D / arcs;
                 double px = wave[0] + Math.cos(angle) * radius;
                 double pz = wave[2] + Math.sin(angle) * radius;
-                mc.level.addParticle(TinyRelics.THOR_BOLT.get(), px, wave[1] + 0.3D, pz, 0.0D, 0.0D, 0.0D);
+                double py = groundY(mc.level, px, wave[1], pz);
+                mc.level.addParticle(TinyRelics.THOR_BOLT.get(), px, py + 0.3D, pz, 0.0D, 0.0D, 0.0D);
                 if (i % 2 == 0) {
-                    mc.level.addParticle(TinyRelics.THOR_SPARK.get(), px, wave[1] + 0.2D, pz,
+                    mc.level.addParticle(TinyRelics.THOR_SPARK.get(), px, py + 0.2D, pz,
                             0.0D, 0.05D + random.nextDouble() * 0.15D, 0.0D);
                 }
             }

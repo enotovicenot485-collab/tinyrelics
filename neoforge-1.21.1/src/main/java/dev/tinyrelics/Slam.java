@@ -117,7 +117,11 @@ public final class Slam {
                 // Keep the dive fast against air drag.
                 push(player, DIVE_SPEED);
             }
-            if ((player.onGround() && jump.age > RISE_TICKS + 2) || player.isInWater() || jump.age > MAX_TICKS) {
+            // "On ground" is what the player's own game reports, and it can arrive early:
+            // only believe it when there really is something solid right under the feet.
+            boolean landed = player.onGround() && jump.age > RISE_TICKS + 2
+                    && !server.noCollision(player, player.getBoundingBox().move(0.0D, -0.6D, 0.0D));
+            if (landed || player.isInWater() || jump.age > MAX_TICKS) {
                 land(server, player);
                 it.remove();
             }

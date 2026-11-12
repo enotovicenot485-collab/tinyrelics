@@ -52,8 +52,8 @@ public final class ClientSetup {
         event.registerSpriteSet(TinyRelics.GHOST_FIRE.get(), sprites -> new ChaosParticle.Provider(sprites, 12, 0.5F, -0.03F));
         // Thor's Hammer electricity; the crack lies flat on the ground.
         event.registerSpriteSet(TinyRelics.THOR_SPARK.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 0.25F, 0.0F));
-        event.registerSpriteSet(TinyRelics.THOR_BOLT.get(), sprites -> new ChaosParticle.Provider(sprites, 8, 0.55F, 0.0F));
-        event.registerSpriteSet(TinyRelics.THOR_FLASH.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 1.2F, 0.0F));
+        event.registerSpriteSet(TinyRelics.THOR_BOLT.get(), sprites -> new ChaosParticle.Provider(sprites, 8, 0.45F, 0.0F));
+        event.registerSpriteSet(TinyRelics.THOR_FLASH.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 0.95F, 0.0F));
         event.registerSpriteSet(TinyRelics.THOR_CRACK.get(), GroundParticle.Provider::new);
     }
 
