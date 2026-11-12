@@ -20,6 +20,10 @@ public class OrbitParticle extends TextureSheetParticle {
 
     private final SpriteSet sprites;
     private final boolean animated;
+    /** How many times the frames play during the particle's life. */
+    private final int loops;
+    /** Opacity before the fade-out at the end. */
+    private final float maxAlpha;
     private final Entity centre;
     /** 0 = hugs the core, 1 = flies in the loose outer layer. */
     private final double spread;
@@ -28,8 +32,11 @@ public class OrbitParticle extends TextureSheetParticle {
     private double height;
 
     protected OrbitParticle(ClientLevel level, Entity centre, double angle, double startFraction, double spread,
-                            SpriteSet sprites, boolean animated, float size) {
+                            SpriteSet sprites, boolean animated, float size, int loops, float maxAlpha) {
         super(level, centre.getX(), centre.getY(), centre.getZ());
+        this.loops = loops;
+        this.maxAlpha = maxAlpha;
+        this.alpha = maxAlpha;
         this.sprites = sprites;
         this.animated = animated;
         this.centre = centre;
@@ -79,10 +86,10 @@ public class OrbitParticle extends TextureSheetParticle {
         this.height += this.riseSpeed;
         place();
         if (this.animated) {
-            setSpriteFromAge(this.sprites);
+            setSprite(this.sprites.get((this.age * this.loops) % this.lifetime, this.lifetime));
         }
         float left = 1.0F - (float) this.age / this.lifetime;
-        this.alpha = Math.min(1.0F, left * 4.0F);
+        this.alpha = this.maxAlpha * Math.min(1.0F, left * 4.0F);
     }
 
     @Override
@@ -103,11 +110,19 @@ public class OrbitParticle extends TextureSheetParticle {
         private final SpriteSet sprites;
         private final boolean animated;
         private final float size;
+        private final int loops;
+        private final float maxAlpha;
 
         public Provider(SpriteSet sprites, boolean animated, float size) {
+            this(sprites, animated, size, 1, 1.0F);
+        }
+
+        public Provider(SpriteSet sprites, boolean animated, float size, int loops, float maxAlpha) {
             this.sprites = sprites;
             this.animated = animated;
             this.size = size;
+            this.loops = loops;
+            this.maxAlpha = maxAlpha;
         }
 
         @Override
@@ -117,7 +132,7 @@ public class OrbitParticle extends TextureSheetParticle {
             if (centre == null) {
                 return null;
             }
-            return new OrbitParticle(level, centre, angle, startFraction, spread, this.sprites, this.animated, this.size);
+            return new OrbitParticle(level, centre, angle, startFraction, spread, this.sprites, this.animated, this.size, this.loops, this.maxAlpha);
         }
     }
 }

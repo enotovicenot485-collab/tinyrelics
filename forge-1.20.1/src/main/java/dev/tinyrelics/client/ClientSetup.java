@@ -40,6 +40,12 @@ public final class ClientSetup {
         // The blood tornado: drops keep one random picture, crescents play their frames.
         event.registerSpriteSet(TinyRelics.VORTEX_DROP.get(), sprites -> new OrbitParticle.Provider(sprites, false, 0.2F));
         event.registerSpriteSet(TinyRelics.VORTEX_SLASH.get(), sprites -> new OrbitParticle.Provider(sprites, true, 0.6F));
+        // Hearts beat three times on their way up, mist is half see-through, streaks give the feel of speed.
+        event.registerSpriteSet(TinyRelics.VORTEX_HEART.get(), sprites -> new OrbitParticle.Provider(sprites, true, 0.38F, 3, 1.0F));
+        event.registerSpriteSet(TinyRelics.VORTEX_MIST.get(), sprites -> new OrbitParticle.Provider(sprites, true, 0.95F, 1, 0.55F));
+        event.registerSpriteSet(TinyRelics.VORTEX_STREAK.get(), sprites -> new OrbitParticle.Provider(sprites, true, 0.7F, 2, 1.0F));
+        // The heart that floats up from everyone the vortex heals.
+        event.registerSpriteSet(TinyRelics.BLOOD_HEART.get(), sprites -> new ChaosParticle.Provider(sprites, 18, 0.3F, -0.15F));
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

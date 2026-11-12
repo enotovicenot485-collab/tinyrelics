@@ -129,6 +129,9 @@ public final class ClientEffects {
             double strength = Math.min(1.0D, Math.min(age / 20.0D, (VORTEX_TICKS - age) / 20.0D + 0.2D));
             int drops = (int) Math.round(14 * strength);
             int streaks = (int) Math.round(4 * strength);
+            int jets = (int) Math.round(4 * strength);
+            int mist = (int) Math.round(3 * strength);
+            int hearts = (int) Math.round(2 * strength);
 
             orbitCentre = centre;
             for (int i = 0; i < drops; i++) {
@@ -143,6 +146,27 @@ public final class ClientEffects {
                         random.nextDouble() * Math.PI * 2.0D,
                         random.nextDouble() * 0.4D,
                         random.nextDouble() * 0.6D);
+            }
+            for (int i = 0; i < jets; i++) {
+                // Fast streaks anywhere in the funnel.
+                mc.level.addParticle(TinyRelics.VORTEX_STREAK.get(), centre.getX(), centre.getY(), centre.getZ(),
+                        random.nextDouble() * Math.PI * 2.0D,
+                        random.nextDouble() * 0.6D,
+                        random.nextDouble());
+            }
+            for (int i = 0; i < mist; i++) {
+                // Mist fills the body of the funnel and makes it look solid.
+                mc.level.addParticle(TinyRelics.VORTEX_MIST.get(), centre.getX(), centre.getY(), centre.getZ(),
+                        random.nextDouble() * Math.PI * 2.0D,
+                        random.nextDouble() * 0.5D,
+                        random.nextDouble() * 0.8D);
+            }
+            for (int i = 0; i < hearts; i++) {
+                // Beating hearts ride the loose outer layer, where they are easy to see.
+                mc.level.addParticle(TinyRelics.VORTEX_HEART.get(), centre.getX(), centre.getY(), centre.getZ(),
+                        random.nextDouble() * Math.PI * 2.0D,
+                        random.nextDouble() * 0.5D,
+                        0.6D + random.nextDouble() * 0.4D);
             }
             orbitCentre = null;
 

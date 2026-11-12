@@ -266,7 +266,7 @@ public final class Abilities {
                 for (LivingEntity ally : allies) {
                     // Ten pulses of a tenth each: a full heal over the five seconds.
                     ally.heal(ally.getMaxHealth() / 10.0F);
-                    server.sendParticles(ParticleTypes.HEART,
+                    server.sendParticles(TinyRelics.BLOOD_HEART.get(),
                             ally.getX(), ally.getY() + ally.getBbHeight() + 0.2D, ally.getZ(), 2, 0.3D, 0.1D, 0.3D, 0.0D);
                 }
                 if (age % 20 == 0) {
