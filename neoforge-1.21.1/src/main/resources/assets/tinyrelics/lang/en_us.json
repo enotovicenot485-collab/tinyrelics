@@ -61,5 +61,14 @@
   "screen.tinyrelics.hammer_slam_radius": "Sky strike: %s blocks",
   "screen.tinyrelics.hammer_slam_radius.tip": "How far the landing after the jump reaches. Default is 10.",
   "screen.tinyrelics.hammer_slam_fire": "Strike ignites",
-  "screen.tinyrelics.hammer_slam_fire.tip": "On: the sky strike sets everyone in range on fire. Off: damage only."
+  "screen.tinyrelics.hammer_slam_fire.tip": "On: the sky strike sets everyone in range on fire. Off: damage only.",
+  "item.tinyrelics.necro_helmet": "Necromancer Helmet",
+  "item.tinyrelics.necro_chestplate": "Necromancer Chestplate",
+  "item.tinyrelics.necro_leggings": "Necromancer Leggings",
+  "item.tinyrelics.necro_boots": "Necromancer Boots",
+  "item.tinyrelics.necro_armor.tooltip": "Full set: what you kill rises as your servant",
+  "item.tinyrelics.necro_armor.tooltip2": "Up to 5 servants, 30 seconds each",
+  "screen.tinyrelics.name.necro_armor": "Necromancer Armor",
+  "screen.tinyrelics.stats.necro_armor": "11 armor with the full set",
+  "screen.tinyrelics.desc.necro_armor": "Helmet 2, chestplate 5, leggings 3, boots 1. With all four pieces on, every mob or player you kill rises where it died as a zombie or a skeleton and fights for you for 30 seconds. No more than 5 such servants at once."
 }

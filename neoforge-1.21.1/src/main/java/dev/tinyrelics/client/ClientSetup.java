@@ -2,10 +2,16 @@ package dev.tinyrelics.client;
 
 import dev.tinyrelics.TinyRelics;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.lwjgl.glfw.GLFW;
 
 /** Client-only registration: the menu key and the renderer of flying weapons. */
@@ -23,6 +29,7 @@ public final class ClientSetup {
         modBus.addListener(ClientSetup::registerKeys);
         modBus.addListener(ClientSetup::registerRenderers);
         modBus.addListener(ClientSetup::registerParticles);
+        modBus.addListener(ClientSetup::registerExtensions);
     }
 
     private static void registerKeys(RegisterKeyMappingsEvent event) {
@@ -55,6 +62,16 @@ public final class ClientSetup {
         event.registerSpriteSet(TinyRelics.THOR_BOLT.get(), sprites -> new ChaosParticle.Provider(sprites, 8, 0.45F, 0.0F));
         event.registerSpriteSet(TinyRelics.THOR_FLASH.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 0.95F, 0.0F));
         event.registerSpriteSet(TinyRelics.THOR_CRACK.get(), GroundParticle.Provider::new);
+    }
+
+    /** The necromancer armor is drawn with its own 3D model instead of the plain armor shape. */
+    private static void registerExtensions(RegisterClientExtensionsEvent event) {
+        event.registerItem(new IClientItemExtensions() {
+            @Override
+            public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original) {
+                return NecroArmorModels.get(slot);
+            }
+        }, TinyRelics.NECRO_HELMET.get(), TinyRelics.NECRO_CHESTPLATE.get(), TinyRelics.NECRO_LEGGINGS.get(), TinyRelics.NECRO_BOOTS.get());
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

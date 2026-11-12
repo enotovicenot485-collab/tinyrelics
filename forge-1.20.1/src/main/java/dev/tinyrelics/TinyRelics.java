@@ -5,6 +5,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -62,6 +63,15 @@ public class TinyRelics {
     public static final RegistryObject<Item> BLOOD_BLADE = ITEMS.register("blood_blade",
             () -> new BloodBladeItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
+    public static final RegistryObject<Item> NECRO_HELMET = ITEMS.register("necro_helmet",
+            () -> new NecroArmorItem(ArmorItem.Type.HELMET, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final RegistryObject<Item> NECRO_CHESTPLATE = ITEMS.register("necro_chestplate",
+            () -> new NecroArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final RegistryObject<Item> NECRO_LEGGINGS = ITEMS.register("necro_leggings",
+            () -> new NecroArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final RegistryObject<Item> NECRO_BOOTS = ITEMS.register("necro_boots",
+            () -> new NecroArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+
     public static final RegistryObject<Item> UNDEAD_STAFF = ITEMS.register("undead_staff",
             () -> new UndeadStaffItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
@@ -92,6 +102,10 @@ public class TinyRelics {
             event.accept(CHAOS_BOOMERANG);
             event.accept(BLOOD_BLADE);
             event.accept(UNDEAD_STAFF);
+            event.accept(NECRO_HELMET);
+            event.accept(NECRO_CHESTPLATE);
+            event.accept(NECRO_LEGGINGS);
+            event.accept(NECRO_BOOTS);
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(KEEPING_CHARM);

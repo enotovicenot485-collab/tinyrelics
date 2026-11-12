@@ -61,5 +61,14 @@
   "screen.tinyrelics.hammer_slam_radius": "Удар с небес: %s блоков",
   "screen.tinyrelics.hammer_slam_radius.tip": "Радиус поражения при приземлении после прыжка. По умолчанию 10.",
   "screen.tinyrelics.hammer_slam_fire": "Удар поджигает",
-  "screen.tinyrelics.hammer_slam_fire.tip": "Включено: удар с небес поджигает всех в радиусе. Выключено: только урон."
+  "screen.tinyrelics.hammer_slam_fire.tip": "Включено: удар с небес поджигает всех в радиусе. Выключено: только урон.",
+  "item.tinyrelics.necro_helmet": "Шлем Некроманта",
+  "item.tinyrelics.necro_chestplate": "Нагрудник Некроманта",
+  "item.tinyrelics.necro_leggings": "Поножи Некроманта",
+  "item.tinyrelics.necro_boots": "Ботинки Некроманта",
+  "item.tinyrelics.necro_armor.tooltip": "Полный комплект: убитые тобой встают слугами",
+  "item.tinyrelics.necro_armor.tooltip2": "До 5 слуг, каждый на 30 секунд",
+  "screen.tinyrelics.name.necro_armor": "Броня Некроманта",
+  "screen.tinyrelics.stats.necro_armor": "11 брони в полном комплекте",
+  "screen.tinyrelics.desc.necro_armor": "Шлем 2, нагрудник 5, поножи 3, ботинки 1. Когда надеты все четыре части, каждый убитый тобой моб или игрок встаёт на месте смерти зомби или скелетом и 30 секунд сражается за тебя. Одновременно не больше 5 таких слуг."
 }

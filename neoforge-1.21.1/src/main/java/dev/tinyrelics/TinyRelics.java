@@ -6,7 +6,16 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import java.util.EnumMap;
+import java.util.List;
+import net.minecraft.Util;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.neoforged.api.distmarker.Dist;
@@ -62,6 +71,34 @@ public class TinyRelics {
     public static final DeferredItem<BloodBladeItem> BLOOD_BLADE = ITEMS.register("blood_blade",
             () -> new BloodBladeItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
+    public static final DeferredRegister<ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, MODID);
+
+    /** 2 + 5 + 3 + 1 = 11 armor points for the full set. */
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> NECRO_MATERIAL = ARMOR_MATERIALS.register("necromancer",
+            () -> new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), defense -> {
+                        defense.put(ArmorItem.Type.HELMET, 2);
+                        defense.put(ArmorItem.Type.CHESTPLATE, 5);
+                        defense.put(ArmorItem.Type.LEGGINGS, 3);
+                        defense.put(ArmorItem.Type.BOOTS, 1);
+                        defense.put(ArmorItem.Type.BODY, 5);
+                    }),
+                    15,
+                    SoundEvents.ARMOR_EQUIP_NETHERITE,
+                    () -> Ingredient.of(Items.BONE_BLOCK),
+                    List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(MODID, "necromancer"))),
+                    1.0F,
+                    0.0F));
+
+    public static final DeferredItem<NecroArmorItem> NECRO_HELMET = ITEMS.register("necro_helmet",
+            () -> new NecroArmorItem(ArmorItem.Type.HELMET, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<NecroArmorItem> NECRO_CHESTPLATE = ITEMS.register("necro_chestplate",
+            () -> new NecroArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<NecroArmorItem> NECRO_LEGGINGS = ITEMS.register("necro_leggings",
+            () -> new NecroArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<NecroArmorItem> NECRO_BOOTS = ITEMS.register("necro_boots",
+            () -> new NecroArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+
     public static final DeferredItem<UndeadStaffItem> UNDEAD_STAFF = ITEMS.register("undead_staff",
             () -> new UndeadStaffItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
@@ -76,6 +113,7 @@ public class TinyRelics {
     public TinyRelics(IEventBus modBus) {
         ITEMS.register(modBus);
         ENTITIES.register(modBus);
+        ARMOR_MATERIALS.register(modBus);
         PARTICLES.register(modBus);
         modBus.addListener(this::addCreative);
         modBus.addListener(Network::register);
@@ -91,6 +129,10 @@ public class TinyRelics {
             event.accept(CHAOS_BOOMERANG.get());
             event.accept(BLOOD_BLADE.get());
             event.accept(UNDEAD_STAFF.get());
+            event.accept(NECRO_HELMET.get());
+            event.accept(NECRO_CHESTPLATE.get());
+            event.accept(NECRO_LEGGINGS.get());
+            event.accept(NECRO_BOOTS.get());
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(KEEPING_CHARM.get());

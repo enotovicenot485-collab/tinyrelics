@@ -22,7 +22,7 @@ public class RelicsScreen extends Screen {
     private static final int TAB_WIDTH = 140;
     private static final int TAB_HEIGHT = 22;
     private static final int RIGHT_WIDTH = 234;
-    private static final String[] IDS = {"keeping_charm", "thor_hammer", "chaos_boomerang", "blood_blade", "undead_staff"};
+    private static final String[] IDS = {"keeping_charm", "thor_hammer", "chaos_boomerang", "blood_blade", "undead_staff", "necro_armor"};
 
     private final RelicConfig edit;
     private final ItemStack[] icons;
@@ -39,7 +39,13 @@ public class RelicsScreen extends Screen {
                 new ItemStack(TinyRelics.CHAOS_BOOMERANG.get()),
                 new ItemStack(TinyRelics.BLOOD_BLADE.get()),
                 new ItemStack(TinyRelics.UNDEAD_STAFF.get()),
+                new ItemStack(TinyRelics.NECRO_CHESTPLATE.get()),
         };
+    }
+
+    /** A tab is named after its item, except the armor tab, which stands for all four pieces. */
+    private Component tabName(int index) {
+        return index == 5 ? Component.translatable("screen.tinyrelics.name.necro_armor") : this.icons[index].getHoverName();
     }
 
     private int rightX() {
@@ -57,7 +63,7 @@ public class RelicsScreen extends Screen {
 
         for (int i = 0; i < IDS.length; i++) {
             final int index = i;
-            Button tab = Button.builder(this.icons[i].getHoverName(), button -> {
+            Button tab = Button.builder(tabName(i), button -> {
                 this.selected = index;
                 rebuildWidgets();
             }).bounds(this.left + 8, this.top + 26 + i * (TAB_HEIGHT + 2), TAB_WIDTH, TAB_HEIGHT).build();
@@ -78,6 +84,7 @@ public class RelicsScreen extends Screen {
             }
             case 2 -> addToggle(0, "craft", this.edit.boomerangCraft, value -> this.edit.boomerangCraft = value);
             case 3 -> addToggle(0, "craft", this.edit.bladeCraft, value -> this.edit.bladeCraft = value);
+            case 5 -> addToggle(0, "craft", this.edit.armorCraft, value -> this.edit.armorCraft = value);
             default -> {
                 addSlider(0, "staff_kills", RelicConfig.MIN_KILLS, RelicConfig.MAX_KILLS,
                         () -> this.edit.staffKills, value -> this.edit.staffKills = value);
@@ -153,7 +160,7 @@ public class RelicsScreen extends Screen {
         graphics.renderItem(this.icons[this.selected], 0, 0);
         graphics.pose().popPose();
 
-        graphics.drawString(this.font, this.icons[this.selected].getHoverName(), x + 40, this.top + 29, 0xFFFFFF);
+        graphics.drawString(this.font, tabName(this.selected), x + 40, this.top + 29, 0xFFFFFF);
         graphics.drawString(this.font, Component.translatable("screen.tinyrelics.stats." + id), x + 40, this.top + 42, 0xA0A0A0);
         graphics.drawWordWrap(this.font, Component.translatable("screen.tinyrelics.desc." + id), x, this.top + 62, RIGHT_WIDTH, 0xD8D8D8);
         graphics.drawString(this.font, Component.translatable("screen.tinyrelics.settings"), x, this.top + 118, 0xFFD070);

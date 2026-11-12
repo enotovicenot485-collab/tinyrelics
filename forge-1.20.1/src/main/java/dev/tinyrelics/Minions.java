@@ -71,6 +71,47 @@ public final class Minions {
         return entity instanceof Enemy && !isOwnedBy(entity, player);
     }
 
+    /** How many servants raised by the armor (not summoned by the staff) this owner has right now. */
+    public static int countRaised(UUID owner) {
+        int count = 0;
+        for (Map.Entry<Mob, Servant> entry : ACTIVE.entrySet()) {
+            if (entry.getValue().raised && entry.getValue().owner.equals(owner) && entry.getKey().isAlive()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /** One zombie or skeleton climbs out of the ground at this spot and serves the owner for a while. */
+    public static void raiseAt(ServerLevel level, ServerPlayer owner, double x, double y, double z, int lifetime) {
+        boolean skeleton = level.getRandom().nextBoolean();
+        Mob mob = skeleton ? EntityType.SKELETON.create(level) : EntityType.ZOMBIE.create(level);
+        if (mob == null) {
+            return;
+        }
+        mob.moveTo(x, y, z, owner.getYRot(), 0.0F);
+        mob.getPersistentData().putUUID(OWNER, owner.getUUID());
+        mob.targetSelector.removeAllGoals(goal -> true);
+        mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+        mob.setDropChance(EquipmentSlot.HEAD, 0.0F);
+        if (skeleton) {
+            mob.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+            mob.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
+        }
+        mob.setCustomName(Component.translatable("entity.tinyrelics.minion", owner.getDisplayName()));
+
+        double groundY = mob.getY();
+        mob.setNoAi(true);
+        mob.setInvulnerable(true);
+        mob.noPhysics = true;
+        mob.setPos(mob.getX(), groundY - mob.getBbHeight(), mob.getZ());
+
+        Servant servant = new Servant(owner.getUUID(), lifetime, groundY);
+        servant.raised = true;
+        ACTIVE.put(mob, servant);
+        level.addFreshEntity(mob);
+    }
+
     public static void summon(ServerLevel level, ServerPlayer owner) {
         int total = SKELETONS + ZOMBIES;
         for (int i = 0; i < total; i++) {
@@ -224,6 +265,8 @@ public final class Minions {
         int ticksLeft;
         /** Ticks of climbing still to go. */
         int rise = RISE_TICKS;
+        /** true = raised by the necromancer armor, false = summoned by the staff. */
+        boolean raised;
 
         Servant(UUID owner, int ticksLeft, double groundY) {
             this.owner = owner;

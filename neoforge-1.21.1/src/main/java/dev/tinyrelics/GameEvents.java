@@ -140,6 +140,15 @@ public final class GameEvents {
         }
     }
 
+    // ---- Necromancer armor: with the full set on, whatever the wearer kills rises to serve.
+
+    @SubscribeEvent
+    public static void onNecroKill(LivingDeathEvent event) {
+        if (event.getSource().getEntity() instanceof ServerPlayer killer) {
+            NecroSet.onKill(killer, event.getEntity());
+        }
+    }
+
     @SubscribeEvent
     public static void onDrops(LivingDropsEvent event) {
         if (Minions.isMinion(event.getEntity())) {

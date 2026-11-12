@@ -46,6 +46,7 @@ public final class RelicConfig {
     public int staffKills = 20;
     /** Whether the staff's wither skulls break blocks. */
     public boolean staffSkullGrief = false;
+    public boolean armorCraft = true;
 
     public RelicConfig copy() {
         RelicConfig c = new RelicConfig();
@@ -58,6 +59,7 @@ public final class RelicConfig {
         c.staffCraft = this.staffCraft;
         c.staffKills = this.staffKills;
         c.staffSkullGrief = this.staffSkullGrief;
+        c.armorCraft = this.armorCraft;
         c.hammerSlamRadius = this.hammerSlamRadius;
         c.hammerSlamFire = this.hammerSlamFire;
         return c;
@@ -79,6 +81,7 @@ public final class RelicConfig {
         buffer.writeBoolean(this.staffCraft);
         buffer.writeVarInt(this.staffKills);
         buffer.writeBoolean(this.staffSkullGrief);
+        buffer.writeBoolean(this.armorCraft);
         buffer.writeVarInt(this.hammerSlamRadius);
         buffer.writeBoolean(this.hammerSlamFire);
     }
@@ -94,6 +97,7 @@ public final class RelicConfig {
         c.staffCraft = buffer.readBoolean();
         c.staffKills = buffer.readVarInt();
         c.staffSkullGrief = buffer.readBoolean();
+        c.armorCraft = buffer.readBoolean();
         c.hammerSlamRadius = buffer.readVarInt();
         c.hammerSlamFire = buffer.readBoolean();
         c.clamp();

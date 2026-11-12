@@ -44,6 +44,7 @@ public final class Abilities {
     private static final ResourceLocation BOOMERANG_RECIPE = ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, "chaos_boomerang");
     private static final ResourceLocation BLADE_RECIPE = ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, "blood_blade");
     private static final ResourceLocation STAFF_RECIPE = ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, "undead_staff");
+    private static final String[] ARMOR_RECIPES = {"necro_helmet", "necro_chestplate", "necro_leggings", "necro_boots"};
 
     /** Soul fire burns for 5 seconds over a 30 x 30 block square. */
     private static final int SOUL_FIRE_TICKS = 100;
@@ -291,6 +292,9 @@ public final class Abilities {
         wanted.put(BOOMERANG_RECIPE, config.boomerangCraft);
         wanted.put(BLADE_RECIPE, config.bladeCraft);
         wanted.put(STAFF_RECIPE, config.staffCraft);
+        for (String piece : ARMOR_RECIPES) {
+            wanted.put(ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, piece), config.armorCraft);
+        }
 
         RecipeManager manager = server.getRecipeManager();
         boolean changed = false;
