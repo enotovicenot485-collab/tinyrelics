@@ -4,6 +4,7 @@ import dev.tinyrelics.client.ClientEffects;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -18,7 +19,7 @@ public final class Network {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("3");
+        PayloadRegistrar registrar = event.registrar("4");
         registrar.playToClient(CharmBroken.TYPE, CharmBroken.STREAM_CODEC,
                 (payload, context) -> ClientEffects.charmBroken());
         registrar.playToClient(ConfigSync.TYPE, ConfigSync.STREAM_CODEC,
@@ -29,6 +30,8 @@ public final class Network {
                         applyConfig(sender, payload.config());
                     }
                 });
+        registrar.playToClient(VortexStart.TYPE, VortexStart.STREAM_CODEC,
+                (payload, context) -> ClientEffects.startVortex(payload.entityId()));
         registrar.playToServer(StaffSuper.TYPE, StaffSuper.STREAM_CODEC,
                 (payload, context) -> {
                     if (context.player() instanceof ServerPlayer sender) {
@@ -40,6 +43,11 @@ public final class Network {
     /** Called on the client when the super ability key is pressed. */
     public static void requestStaffSuper() {
         PacketDistributor.sendToServer(StaffSuper.INSTANCE);
+    }
+
+    /** Tells the player and everyone who can see them to draw a blood tornado around them. */
+    public static void sendVortex(ServerPlayer player) {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new VortexStart(player.getId()));
     }
 
     public static void sendCharmBroken(ServerPlayer player) {
@@ -96,6 +104,18 @@ public final class Network {
         public static final StaffSuper INSTANCE = new StaffSuper();
         public static final CustomPacketPayload.Type<StaffSuper> TYPE = new CustomPacketPayload.Type<>(id("staff_super"));
         public static final StreamCodec<ByteBuf, StaffSuper> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Server -> client: a blood tornado starts around this entity. */
+    public record VortexStart(int entityId) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<VortexStart> TYPE = new CustomPacketPayload.Type<>(id("vortex_start"));
+        public static final StreamCodec<ByteBuf, VortexStart> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.VAR_INT, VortexStart::entityId, VortexStart::new);
 
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

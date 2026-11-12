@@ -37,6 +37,9 @@ public final class ClientSetup {
         // Blood: five drop frames that fall, six crescent frames that hang in the air.
         event.registerSpriteSet(TinyRelics.BLOOD_DROP.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 0.2F, 0.8F));
         event.registerSpriteSet(TinyRelics.BLOOD_SLASH.get(), sprites -> new ChaosParticle.Provider(sprites, 12, 0.55F, 0.0F));
+        // The blood tornado: drops keep one random picture, crescents play their frames.
+        event.registerSpriteSet(TinyRelics.VORTEX_DROP.get(), sprites -> new OrbitParticle.Provider(sprites, false, 0.2F));
+        event.registerSpriteSet(TinyRelics.VORTEX_SLASH.get(), sprites -> new OrbitParticle.Provider(sprites, true, 0.6F));
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

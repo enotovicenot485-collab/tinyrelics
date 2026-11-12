@@ -33,6 +33,9 @@ public class TinyRelics {
     /** The falling drop and the crescent streak of the Blood Blade. */
     public static final RegistryObject<SimpleParticleType> BLOOD_DROP = PARTICLES.register("blood_drop", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> BLOOD_SLASH = PARTICLES.register("blood_slash", () -> new SimpleParticleType(false));
+    /** The same pictures, but circling the player in the blood tornado. */
+    public static final RegistryObject<SimpleParticleType> VORTEX_DROP = PARTICLES.register("vortex_drop", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> VORTEX_SLASH = PARTICLES.register("vortex_slash", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<Item> KEEPING_CHARM = ITEMS.register("keeping_charm",
             () -> new KeepingCharmItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));

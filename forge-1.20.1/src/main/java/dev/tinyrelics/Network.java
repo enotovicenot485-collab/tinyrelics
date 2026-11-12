@@ -17,7 +17,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class Network {
-    private static final String VERSION = "3";
+    private static final String VERSION = "4";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(TinyRelics.MODID, "main"),
@@ -35,11 +35,18 @@ public final class Network {
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
         CHANNEL.registerMessage(3, StaffSuper.class, StaffSuper::encode, StaffSuper::decode, StaffSuper::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        CHANNEL.registerMessage(4, VortexStart.class, VortexStart::encode, VortexStart::decode, VortexStart::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 
     /** Called on the client when the super ability key is pressed. */
     public static void requestStaffSuper() {
         CHANNEL.sendToServer(new StaffSuper());
+    }
+
+    /** Tells the player and everyone who can see them to draw a blood tornado around them. */
+    public static void sendVortex(ServerPlayer player) {
+        CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new VortexStart(player.getId()));
     }
 
     public static void sendCharmBroken(ServerPlayer player) {
@@ -86,6 +93,29 @@ public final class Network {
 
         public static void handle(CharmBroken message, Supplier<NetworkEvent.Context> context) {
             context.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientEffects::charmBroken));
+            context.get().setPacketHandled(true);
+        }
+    }
+
+    /** Server -> client: a blood tornado starts around this entity. */
+    public static final class VortexStart {
+        private final int entityId;
+
+        public VortexStart(int entityId) {
+            this.entityId = entityId;
+        }
+
+        public static void encode(VortexStart message, FriendlyByteBuf buffer) {
+            buffer.writeVarInt(message.entityId);
+        }
+
+        public static VortexStart decode(FriendlyByteBuf buffer) {
+            return new VortexStart(buffer.readVarInt());
+        }
+
+        public static void handle(VortexStart message, Supplier<NetworkEvent.Context> context) {
+            context.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                    () -> () -> ClientEffects.startVortex(message.entityId)));
             context.get().setPacketHandled(true);
         }
     }

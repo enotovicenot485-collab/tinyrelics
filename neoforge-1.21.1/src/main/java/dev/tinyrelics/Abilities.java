@@ -230,6 +230,7 @@ public final class Abilities {
                 40, 0.3D, 0.5D, 0.3D, 0.2D);
         server.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.PLAYER_HURT_SWEET_BERRY_BUSH, SoundSource.PLAYERS, 1.0F, 0.5F);
+        Network.sendVortex(player);
         VORTEXES.add(new Vortex(player));
     }
 
@@ -258,25 +259,7 @@ public final class Abilities {
             ServerLevel server = player.serverLevel();
             int age = vortex.age;
 
-            // Three arms of blood wind upwards around the player.
-            for (int arm = 0; arm < 3; arm++) {
-                double angle = age * 0.45D + arm * (Math.PI * 2.0D / 3.0D);
-                double rise = (age * 0.04D + arm / 3.0D) % 1.0D;
-                double x = player.getX() + Math.cos(angle) * 1.5D;
-                double y = player.getY() + 0.2D + rise * 2.0D;
-                double z = player.getZ() + Math.sin(angle) * 1.5D;
-                server.sendParticles(TinyRelics.BLOOD_SLASH.get(), x, y, z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-                server.sendParticles(TinyRelics.BLOOD_DROP.get(), x, y, z, 1, 0.1D, 0.1D, 0.1D, 0.02D);
-            }
-            // A slowly turning ring of drops shows how far the healing reaches.
-            if (age % 4 == 0) {
-                for (int i = 0; i < 16; i++) {
-                    double angle = age * 0.05D + i * (Math.PI * 2.0D / 16.0D);
-                    server.sendParticles(TinyRelics.BLOOD_DROP.get(),
-                            player.getX() + Math.cos(angle) * VORTEX_RADIUS, player.getY() + 0.6D,
-                            player.getZ() + Math.sin(angle) * VORTEX_RADIUS, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-                }
-            }
+            // The tornado itself is drawn by every client on its own (see ClientEffects).
             if (age % 10 == 0) {
                 List<LivingEntity> allies = server.getEntitiesOfClass(LivingEntity.class,
                         player.getBoundingBox().inflate(VORTEX_RADIUS), e -> isVortexAlly(e, player));
