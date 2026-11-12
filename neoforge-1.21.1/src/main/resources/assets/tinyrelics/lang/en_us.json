@@ -38,7 +38,7 @@
   "screen.tinyrelics.desc.keeping_charm": "Keep it in your inventory. When you die one charm breaks and all your items come back after you respawn. It does not keep experience.",
   "screen.tinyrelics.desc.thor_hammer": "Right-click: lightning strikes everything in range, no cooldown. Shift + right-click: the hammer flies forward, strikes the first target with lightning and returns to your hand.",
   "screen.tinyrelics.desc.chaos_boomerang": "Right-click: flies to the nearest enemy and jumps to the others like chain lightning, then returns. Shift + right-click: circles you for 20 seconds, knocks monsters back and blocks their hits. 10 second cooldown.",
-  "screen.tinyrelics.desc.blood_blade": "Hits have a 20% chance to cause bleeding for 5 seconds. Right-click at one heart with enemies nearby: the blade drains their life and heals you fully. 2 minute cooldown.",
+  "screen.tinyrelics.desc.blood_blade": "Hit: 20% chance to cause bleeding. Right-click at one heart with enemies near: drains their life and heals you. Shift + right-click: a blood vortex heals players and pets within 8 blocks for 5 seconds and leaves you at 2 hearts. Each ability has a 2 minute cooldown.",
   "item.tinyrelics.undead_staff": "Staff of the Undead",
   "item.tinyrelics.undead_staff.tooltip": "Right-click: shoot a wither skull",
   "item.tinyrelics.undead_staff.tooltip2": "Shift + right-click: summon 2 skeletons and 3 zombies",
@@ -53,5 +53,8 @@
   "screen.tinyrelics.stats.undead_staff": "5 damage · unbreakable",
   "screen.tinyrelics.desc.undead_staff": "Right-click: wither skull, 1.5 second cooldown. Shift + right-click: 2 skeletons and 3 zombies for a minute, they attack whoever hits you; 2 minute cooldown. Kill mobs with the staff in your inventory, then press the fire key: blue fire erupts in a 30×30 area around you.",
   "screen.tinyrelics.staff_grief": "Skulls break blocks",
-  "screen.tinyrelics.staff_grief.tip": "Off: the wither skull explodes but leaves blocks alone. On: it breaks them like a real wither's skull."
+  "screen.tinyrelics.staff_grief.tip": "Off: the wither skull explodes but leaves blocks alone. On: it breaks them like a real wither's skull.",
+  "item.tinyrelics.blood_blade.tooltip3": "Shift + right-click: a blood vortex heals allies at the cost of your health",
+  "msg.tinyrelics.blade_wait": "Ability ready in %s s",
+  "msg.tinyrelics.blade_vortex_health": "The blood vortex needs more than two hearts"
 }

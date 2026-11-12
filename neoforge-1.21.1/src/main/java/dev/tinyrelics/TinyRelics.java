@@ -30,6 +30,9 @@ public class TinyRelics {
     /** The purple swirl and spark of the Chaos Boomerang. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CHAOS_VORTEX = PARTICLES.register("chaos_vortex", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CHAOS_SPARK = PARTICLES.register("chaos_spark", () -> new SimpleParticleType(false));
+    /** The falling drop and the crescent streak of the Blood Blade. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BLOOD_DROP = PARTICLES.register("blood_drop", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BLOOD_SLASH = PARTICLES.register("blood_slash", () -> new SimpleParticleType(false));
 
     public static final DeferredItem<KeepingCharmItem> KEEPING_CHARM = ITEMS.register("keeping_charm",
             () -> new KeepingCharmItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));

@@ -32,8 +32,11 @@ public final class ClientSetup {
 
     private static void registerParticles(RegisterParticleProvidersEvent event) {
         // Six swirl frames over 12 ticks, four spark frames over 8 ticks.
-        event.registerSpriteSet(TinyRelics.CHAOS_VORTEX.get(), sprites -> new ChaosParticle.Provider(sprites, 12, 0.5F));
-        event.registerSpriteSet(TinyRelics.CHAOS_SPARK.get(), sprites -> new ChaosParticle.Provider(sprites, 8, 0.22F));
+        event.registerSpriteSet(TinyRelics.CHAOS_VORTEX.get(), sprites -> new ChaosParticle.Provider(sprites, 12, 0.5F, 0.0F));
+        event.registerSpriteSet(TinyRelics.CHAOS_SPARK.get(), sprites -> new ChaosParticle.Provider(sprites, 8, 0.22F, 0.0F));
+        // Blood: five drop frames that fall, six crescent frames that hang in the air.
+        event.registerSpriteSet(TinyRelics.BLOOD_DROP.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 0.2F, 0.8F));
+        event.registerSpriteSet(TinyRelics.BLOOD_SLASH.get(), sprites -> new ChaosParticle.Provider(sprites, 12, 0.55F, 0.0F));
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

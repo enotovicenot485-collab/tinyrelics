@@ -22,6 +22,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -34,7 +35,10 @@ import org.joml.Vector3f;
 public final class Abilities {
     private static final int BLEED_TICKS = 100;
     private static final int DRAIN_TICKS = 60;
-    private static final DustParticleOptions BLOOD_DROP = new DustParticleOptions(new Vector3f(0.75F, 0.0F, 0.0F), 1.3F);
+    private static final int VORTEX_TICKS = 100;
+    private static final double VORTEX_RADIUS = 8.0D;
+    /** What the blade's owner is left with: two hearts. */
+    public static final float VORTEX_HEALTH_LEFT = 4.0F;
 
     private static final ResourceLocation CHARM_RECIPE = ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, "keeping_charm");
     private static final ResourceLocation BOOMERANG_RECIPE = ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, "chaos_boomerang");
@@ -50,6 +54,7 @@ public final class Abilities {
     /** Bleeding entities and how many ticks they still bleed. */
     private static final Map<LivingEntity, Integer> BLEEDING = new HashMap<>();
     private static final List<Drain> DRAINS = new ArrayList<>();
+    private static final List<Vortex> VORTEXES = new ArrayList<>();
     private static final List<SoulFire> SOUL_FIRES = new ArrayList<>();
     /** Recipes taken out of the game, kept here so they can be switched back on. */
     private static final Map<ResourceLocation, RecipeHolder<?>> STASHED = new HashMap<>();
@@ -87,6 +92,7 @@ public final class Abilities {
     public static void tick(MinecraftServer server) {
         tickBleeding();
         tickDrains();
+        tickVortexes();
         tickSoulFires();
         Minions.tick(server);
         if (++tickCounter % 20 == 0) {
@@ -106,7 +112,7 @@ public final class Abilities {
             }
             entry.setValue(left);
             if (left % 4 == 0) {
-                server.sendParticles(BLOOD_DROP, entity.getX(), entity.getY() + entity.getBbHeight() * 0.5D, entity.getZ(),
+                server.sendParticles(TinyRelics.BLOOD_DROP.get(), entity.getX(), entity.getY() + entity.getBbHeight() * 0.5D, entity.getZ(),
                         2, entity.getBbWidth() * 0.3D, entity.getBbHeight() * 0.25D, entity.getBbWidth() * 0.3D, 0.0D);
             }
             if (left % 20 == 0) {
@@ -199,9 +205,93 @@ public final class Abilities {
     }
 
     private static void bloodBurst(ServerLevel server, LivingEntity entity, int count) {
-        server.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.defaultBlockState()),
+        server.sendParticles(TinyRelics.BLOOD_DROP.get(),
                 entity.getX(), entity.getY() + entity.getBbHeight() * 0.6D, entity.getZ(),
-                count, entity.getBbWidth() * 0.3D, entity.getBbHeight() * 0.2D, entity.getBbWidth() * 0.3D, 0.15D);
+                count, entity.getBbWidth() * 0.3D, entity.getBbHeight() * 0.2D, entity.getBbWidth() * 0.3D, 0.12D);
+    }
+
+    /** A few drops and one crescent streak for every hit of the Blood Blade. */
+    public static void hitSplash(LivingEntity target) {
+        if (target.level() instanceof ServerLevel server) {
+            bloodBurst(server, target, 6);
+            server.sendParticles(TinyRelics.BLOOD_SLASH.get(),
+                    target.getX(), target.getY() + target.getBbHeight() * 0.6D, target.getZ(),
+                    1, 0.1D, 0.1D, 0.1D, 0.0D);
+        }
+    }
+
+    // ---- Blood Blade: the blood vortex
+
+    /** The owner pays with health down to two hearts, the vortex heals allies for five seconds. */
+    public static void startVortex(ServerPlayer player) {
+        player.setHealth(VORTEX_HEALTH_LEFT);
+        ServerLevel server = player.serverLevel();
+        server.sendParticles(TinyRelics.BLOOD_DROP.get(), player.getX(), player.getY() + player.getBbHeight() * 0.6D, player.getZ(),
+                40, 0.3D, 0.5D, 0.3D, 0.2D);
+        server.playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.PLAYER_HURT_SWEET_BERRY_BUSH, SoundSource.PLAYERS, 1.0F, 0.5F);
+        VORTEXES.add(new Vortex(player));
+    }
+
+    private static boolean isVortexAlly(LivingEntity entity, ServerPlayer owner) {
+        if (entity == owner || !entity.isAlive() || entity.distanceToSqr(owner) > VORTEX_RADIUS * VORTEX_RADIUS) {
+            return false;
+        }
+        if (entity instanceof Player other) {
+            return !other.isSpectator();
+        }
+        if (entity instanceof TamableAnimal pet && pet.isOwnedBy(owner)) {
+            return true;
+        }
+        return Minions.isOwnedBy(entity, owner);
+    }
+
+    private static void tickVortexes() {
+        Iterator<Vortex> it = VORTEXES.iterator();
+        while (it.hasNext()) {
+            Vortex vortex = it.next();
+            ServerPlayer player = vortex.player;
+            if (!player.isAlive() || player.isRemoved() || ++vortex.age > VORTEX_TICKS) {
+                it.remove();
+                continue;
+            }
+            ServerLevel server = player.serverLevel();
+            int age = vortex.age;
+
+            // Three arms of blood wind upwards around the player.
+            for (int arm = 0; arm < 3; arm++) {
+                double angle = age * 0.45D + arm * (Math.PI * 2.0D / 3.0D);
+                double rise = (age * 0.04D + arm / 3.0D) % 1.0D;
+                double x = player.getX() + Math.cos(angle) * 1.5D;
+                double y = player.getY() + 0.2D + rise * 2.0D;
+                double z = player.getZ() + Math.sin(angle) * 1.5D;
+                server.sendParticles(TinyRelics.BLOOD_SLASH.get(), x, y, z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+                server.sendParticles(TinyRelics.BLOOD_DROP.get(), x, y, z, 1, 0.1D, 0.1D, 0.1D, 0.02D);
+            }
+            // A slowly turning ring of drops shows how far the healing reaches.
+            if (age % 4 == 0) {
+                for (int i = 0; i < 16; i++) {
+                    double angle = age * 0.05D + i * (Math.PI * 2.0D / 16.0D);
+                    server.sendParticles(TinyRelics.BLOOD_DROP.get(),
+                            player.getX() + Math.cos(angle) * VORTEX_RADIUS, player.getY() + 0.6D,
+                            player.getZ() + Math.sin(angle) * VORTEX_RADIUS, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+                }
+            }
+            if (age % 10 == 0) {
+                List<LivingEntity> allies = server.getEntitiesOfClass(LivingEntity.class,
+                        player.getBoundingBox().inflate(VORTEX_RADIUS), e -> isVortexAlly(e, player));
+                for (LivingEntity ally : allies) {
+                    // Ten pulses of a tenth each: a full heal over the five seconds.
+                    ally.heal(ally.getMaxHealth() / 10.0F);
+                    server.sendParticles(ParticleTypes.HEART,
+                            ally.getX(), ally.getY() + ally.getBbHeight() + 0.2D, ally.getZ(), 2, 0.3D, 0.1D, 0.3D, 0.0D);
+                }
+                if (age % 20 == 0) {
+                    server.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 1.5F, 1.2F);
+                }
+            }
+        }
     }
 
     /**
@@ -264,6 +354,15 @@ public final class Abilities {
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+    }
+
+    private static final class Vortex {
+        final ServerPlayer player;
+        int age;
+
+        Vortex(ServerPlayer player) {
+            this.player = player;
         }
     }
 
