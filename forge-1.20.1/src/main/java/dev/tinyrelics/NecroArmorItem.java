@@ -27,10 +27,18 @@ public class NecroArmorItem extends ArmorItem {
         super(Material.INSTANCE, type, properties);
     }
 
-    /** Every slot has its own picture; all four share the layout of the 3D model. */
+    /** Frames of the shimmer that runs over the cyan details. */
+    private static final int FRAMES = 8;
+
+    /**
+     * Every slot has its own picture, and each picture comes in eight frames. The game asks
+     * for the texture every time it draws the armor, so answering with the frame for the
+     * current moment animates it.
+     */
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-        return TinyRelics.MODID + ":textures/models/armor/necromancer_" + slot.getName() + ".png";
+        int frame = entity == null ? 0 : (entity.tickCount / 2) % FRAMES;
+        return TinyRelics.MODID + ":textures/models/armor/necromancer_" + slot.getName() + "_" + frame + ".png";
     }
 
     @Override

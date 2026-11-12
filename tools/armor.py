@@ -8,6 +8,7 @@ from scipy import ndimage as ndi
 SRC, OUT_TEX, OUT_JAVA = sys.argv[1], sys.argv[2], sys.argv[3]
 K = 4                      # texels per model unit
 SHEET = 64                 # logical texture size
+FRAMES = 8                 # frames of the cyan shimmer
 im = np.array(Image.open(SRC).convert("RGB")).astype(np.float64)
 H, W, _ = im.shape
 # magenta background, and the purple fringe where it blends into the black outline
@@ -29,7 +30,7 @@ SKIRT = dict(N=(112, 610, 360, 775), S=(556, 610, 791, 775), W=(950, 610, 1126, 
 
 def box(part, src, xyz, size, uv, inflate=0.0, rows=(0.0, 1.0), top=True, bottom=True, solid=True):
     """solid = holes left by the concept's background are filled in, so the body never shows through."""
-    return dict(part=part, src=src, xyz=xyz, size=size, uv=uv, inflate=inflate, rows=rows, top=top, bottom=bottom, solid=solid, bone=False, skull=None)
+    return dict(part=part, src=src, xyz=xyz, size=size, uv=uv, inflate=inflate, rows=rows, top=top, bottom=bottom, solid=solid, bone=False, skull=None, relief=None, shade=1.0)
 
 def part_of(src, ref_xyz, ref_size, xyz, size):
     """The pictures for a small box that is a piece of a bigger reference box (a step of a horn)."""
@@ -51,24 +52,34 @@ def part_of(src, ref_xyz, ref_size, xyz, size):
         out[face] = (x0 + a * (x1 - x0), y0 + v0 * (y1 - y0), x0 + b * (x1 - x0), y0 + max(v1, v0 + 0.05) * (y1 - y0))
     return out
 
-def skull(part, side, row):
-    """A 3D skull sitting on the shoulder and bulging outwards: a cranium and a jaw, facing forward."""
-    if side < 0:
-        cranium, jaw = (-6, -6, -3.5), (-5, -2, -3.5)
+def skull(part, side):
+    """A 3D skull over the whole shoulder, looking sideways: a cranium and, on its outer side, a jaw."""
+    if side < 0:      # right arm: the arm box runs from x = -3 to 1, the outer side is -x
+        cranium, jaw, face = (-5, -6, -3), (-5, -1, -2), "W"
     else:
-        cranium, jaw = (1, -6, -3.5), (2, -2, -3.5)
-    a = box(part, None, cranium, (5, 4, 5), (0, row)); a["skull"] = "cranium"
-    b = box(part, None, jaw, (3, 1, 3), (20, row)); b["skull"] = "jaw"
+        cranium, jaw, face = (-1, -6, -3), (4, -1, -2), "E"
+    a = box(part, None, cranium, (6, 5, 6), None); a["skull"] = "cranium"; a["face"] = face
+    b = box(part, None, jaw, (1, 2, 4), None); b["skull"] = "jaw"; b["face"] = face
     return [a, b]
+
+def relief(part, src, ref_xyz, ref_size, xyz, size, face="N"):
+    """A raised plate: one face shows its share of the concept picture, the thin sides continue its edges."""
+    b = box(part, part_of(src, ref_xyz, ref_size, xyz, size), xyz, size, None)
+    b["relief"] = face
+    return b
+
+def bone_box(part, xyz, size, shade=1.0):
+    b = box(part, None, xyz, size, None); b["bone"] = True; b["shade"] = shade
+    return b
 
 def horn(src, ref_x, side):
     """A horn in four steps: out of the temple, up the side, in over the top, and a tip."""
     ref_xyz, ref_size = (ref_x, -10, -1), (3, 7, 2)
     if side < 0:   # the character's right
-        steps = [((-8, -6, -1.5), (3, 3, 3)), ((-9, -9, -1), (2, 3, 2)), ((-8, -11, -1), (2, 2, 2)), ((-6.5, -13, -0.5), (1, 2, 1))]
+        steps = [((-8, -8, -1.5), (3, 3, 3)), ((-9, -11, -1), (2, 3, 2)), ((-8, -13, -1), (2, 2, 2)), ((-6.5, -15, -0.5), (1, 2, 1))]
         row = 16
     else:
-        steps = [((5, -6, -1.5), (3, 3, 3)), ((7, -9, -1), (2, 3, 2)), ((6, -11, -1), (2, 2, 2)), ((5.5, -13, -0.5), (1, 2, 1))]
+        steps = [((5, -8, -1.5), (3, 3, 3)), ((7, -11, -1), (2, 3, 2)), ((6, -13, -1), (2, 2, 2)), ((5.5, -15, -0.5), (1, 2, 1))]
         row = 22
     columns = [0, 12, 20, 28]
     boxes = [box("head", part_of(src, ref_xyz, ref_size, xyz, size), xyz, size, (columns[k], row)) for k, (xyz, size) in enumerate(steps)]
@@ -83,25 +94,70 @@ SLOTS = {
         box("head", HEAD, (-4, -8, -4), (8, 8, 8), (0, 0), 1.0),
         *horn(RHORN, -7, -1),
         *horn(LHORN, 4, 1),
+        # the skull mask stands out from the helmet: face plate, chin, and a bone crest over the top
+        relief("head", HEAD, (-4, -8, -4), (8, 8, 8), (-3, -6.5, -6), (6, 5, 1)),
+        relief("head", HEAD, (-4, -8, -4), (8, 8, 8), (-2, -1.5, -6), (4, 2, 1)),
+        bone_box("head", (-1, -10, -5), (2, 1, 10), 0.95),
     ],
     "chest": [
         box("body", BODY, (-4, 0, -2), (8, 12, 4), (0, 0), 1.0),
         box("right_arm", RARM, (-3, -2, -2), (4, 12, 4), (24, 0), 1.0),
         box("left_arm", LARM, (-1, -2, -2), (4, 12, 4), (40, 0), 1.0),
-        *skull("right_arm", -1, 16),
-        *skull("left_arm", 1, 26),
+        *skull("right_arm", -1),
+        *skull("left_arm", 1),
+        # ribcage, soul gem and spine as raised plates; thick cuffs on the forearms
+        relief("body", BODY, (-4, 0, -2), (8, 12, 4), (-3, 1, -4), (6, 6, 1)),
+        relief("body", BODY, (-4, 0, -2), (8, 12, 4), (-1, 2, -5), (2, 3, 1)),
+        relief("body", BODY, (-4, 0, -2), (8, 12, 4), (-2, 1, 3), (4, 7, 1), face="S"),
+        box("right_arm", part_of(RARM, (-3, -2, -2), (4, 12, 4), (-3, 5, -2), (4, 3, 4)), (-3, 5, -2), (4, 3, 4), None, 1.6),
+        box("left_arm", part_of(LARM, (-1, -2, -2), (4, 12, 4), (-1, 5, -2), (4, 3, 4)), (-1, 5, -2), (4, 3, 4), None, 1.6),
     ],
     "legs": [
         box("body", BODY, (-4, 0, -2), (8, 12, 4), (0, 0), 0.5, rows=(0.72, 1.0), top=False, bottom=False),
         box("right_leg", RLEG, (-2, 0, -2), (4, 12, 4), (24, 0), 0.5, rows=(0.0, 0.54), top=False, bottom=False),
         box("left_leg", LLEG, (-2, 0, -2), (4, 12, 4), (40, 0), 0.5, rows=(0.0, 0.54), top=False, bottom=False),
         box("body", SKIRT, (-5, 12, -3), (10, 6, 6), (0, 16), 0.0, top=False, bottom=False, solid=False),
+        # the skull buckle of the belt
+        relief("body", BODY, (-4, 0, -2), (8, 12, 4), (-1.5, 9, -4), (3, 3, 1)),
     ],
     "feet": [
         box("right_leg", RLEG, (-2, 0, -2), (4, 12, 4), (0, 0), 1.0, rows=(0.46, 1.0), top=False),
         box("left_leg", LLEG, (-2, 0, -2), (4, 12, 4), (16, 0), 1.0, rows=(0.46, 1.0), top=False),
+        # shin plates and toe caps
+        relief("right_leg", RLEG, (-2, 0, -2), (4, 12, 4), (-1.5, 6.5, -3.6), (3, 4, 1)),
+        relief("left_leg", LLEG, (-2, 0, -2), (4, 12, 4), (-1.5, 6.5, -3.6), (3, 4, 1)),
+        relief("right_leg", RLEG, (-2, 0, -2), (4, 12, 4), (-2, 10.5, -4), (4, 2, 1)),
+        relief("left_leg", LLEG, (-2, 0, -2), (4, 12, 4), (-2, 10.5, -4), (4, 2, 1)),
     ],
 }
+
+def place_boxes(boxes):
+    """Finds a free spot on the 64x64 sheet for every box that has no fixed place yet."""
+    used = np.zeros((SHEET, SHEET), bool)
+    def footprint(b):
+        w, h, d = b["size"]
+        return 2 * (w + d), d + h
+    for b in boxes:
+        if b["uv"] is not None:
+            fw, fh = footprint(b); u, v = b["uv"]
+            used[v:v + fh, u:u + fw] = True
+    for b in boxes:
+        if b["uv"] is not None:
+            continue
+        fw, fh = footprint(b)
+        spot = None
+        for v in range(SHEET - fh + 1):
+            for u in range(SHEET - fw + 1):
+                if not used[v:v + fh, u:u + fw].any():
+                    spot = (u, v); break
+            if spot:
+                break
+        assert spot, ("texture sheet is full", b["part"], b["size"])
+        b["uv"] = spot
+        used[spot[1]:spot[1] + fh, spot[0]:spot[0] + fw] = True
+
+for _boxes in SLOTS.values():
+    place_boxes(_boxes)
 
 def sample(rect, fu, fv):
     """Colour of the concept art at the fraction (fu, fv) of a rectangle, or None on background."""
@@ -158,7 +214,7 @@ SOCKET_RIM = (120, 110, 92)
 CYAN = (40, 225, 235)
 
 def paint_skull(sheet, b):
-    """Draws the shoulder skull by hand: eye sockets, nose and teeth on the front, plain bone elsewhere."""
+    """Draws the shoulder skull by hand: eye sockets, nose and teeth on its outer side, plain bone elsewhere."""
     w, h, d = b["size"]; u, v = b["uv"]
     bone = np.array(BONE, dtype=np.float64)
     def blank(fw, fh, shade=1.0):
@@ -168,34 +224,66 @@ def paint_skull(sheet, b):
         return block
     def put(block, fx, fy):
         sheet[fy * K:fy * K + block.shape[0], fx * K:fx * K + block.shape[1]] = block
-    front = blank(w, h); left = blank(d, h, 0.9); right = blank(d, h, 0.9); back = blank(w, h, 0.82)
+    faces = {"W": blank(d, h, 0.9), "N": blank(w, h, 0.9), "E": blank(d, h, 0.9), "S": blank(w, h, 0.9)}
     top = blank(w, d, 1.04); under = blank(w, d, 0.7)
-    if b["skull"] == "cranium":           # front is 20 x 16 texels
-        for x0 in (3, 12):                # eye sockets
-            front[5:11, x0 - 1:x0 + 6, :3] = SOCKET_RIM
-            front[6:11, x0:x0 + 5, :3] = DARK
-        front[11:14, 9:11, :3] = DARK     # nose
-        front[11, 9:11, :3] = SOCKET_RIM
-        front[2, 4:16, :3] *= 0.93        # brow line
-        for block in (left, right):       # temple hollow
-            block[6:11, 6:13, :3] *= 0.78
-        top[:, 9:11, :3] *= 0.9           # suture along the top
+    face = faces[b["face"]]; face[..., :3] = blank(face.shape[1] // K, face.shape[0] // K)[..., :3]
+    fh, fw = face.shape[:2]
+    if b["skull"] == "cranium":
+        ew, eh = max(4, round(fw * 0.26)), max(4, round(fh * 0.3))
+        ey = round(fh * 0.32)
+        for ex in (round(fw * 0.13), fw - round(fw * 0.13) - ew):          # eye sockets
+            face[ey - 1:ey + eh, ex - 1:ex + ew + 1, :3] = SOCKET_RIM
+            face[ey:ey + eh, ex:ex + ew, :3] = DARK
+        mid = fw // 2
+        face[ey + eh + 1:ey + eh + 4, mid - 1:mid + 1, :3] = DARK          # nose
+        face[ey + eh, mid - 1:mid + 1, :3] = SOCKET_RIM
+        face[2, 3:fw - 3, :3] *= 0.93                                       # brow line
+        for name, block in faces.items():                                   # temple hollows on the neighbouring sides
+            if name in ("N", "S") and b["face"] in ("W", "E") or name in ("W", "E") and b["face"] in ("N", "S"):
+                bh, bw = block.shape[:2]
+                block[bh // 3:bh * 2 // 3, bw // 4:bw * 3 // 4, :3] *= 0.8
+        top[:, top.shape[1] // 2 - 1:top.shape[1] // 2 + 1, :3] *= 0.9      # suture along the top
         # ghost fire licking out from under the skull
-        for block in (front, left, right, back):
-            width = block.shape[1]
-            for i in range(width):
+        for block in faces.values():
+            for i in range(block.shape[1]):
                 if i % 4 in (0, 1):
                     block[-1, i, :3] = CYAN
                 if i % 8 == 0:
                     block[-2, i, :3] = CYAN
-        front[-1, 6:14, :3] = bone * 0.8  # ...but not across the mouth, where the jaw hangs
-        front[-2, 6:14, :3] = bone
-    else:                                 # jaw: front is 12 x 4 texels, all teeth
-        for i in range(0, w * K, 2):
-            front[0:3, i, :3] = DARK
-        front[3, :, :3] = bone * 0.75
-    put(right, u, v + d); put(front, u + d, v + d); put(left, u + d + w, v + d); put(back, u + d + w + d, v + d)
+        face[-1, fw // 4:fw * 3 // 4, :3] = bone * 0.8                      # ...but not across the mouth, where the jaw hangs
+        face[-2, fw // 4:fw * 3 // 4, :3] = bone
+    else:                                                                   # jaw: a row of teeth
+        for i in range(1, fw, 2):
+            face[0:fh - 2, i, :3] = DARK
+        face[fh - 2:, :, :3] = bone * 0.75
+    put(faces["W"], u, v + d); put(faces["N"], u + d, v + d); put(faces["E"], u + d + w, v + d); put(faces["S"], u + d + w + d, v + d)
     put(top, u + d, v); put(under, u + d + w, v)
+
+def paint_relief(sheet, b):
+    """A raised plate: the concept picture on its main face, and its edge colours carried round the thin sides."""
+    w, h, d = b["size"]; u, v = b["uv"]; main_face = b["relief"]
+    main = np.zeros((h * K, w * K, 4))
+    for j in range(h * K):
+        for i in range(w * K):
+            c = sample(b["src"][main_face], (i + 0.5) / (w * K), (j + 0.5) / (h * K))
+            if c is not None:
+                main[j, i] = (*c, 255)
+    fill_holes(main, BONE)
+    def put(block, fx, fy):
+        sheet[fy * K:fy * K + block.shape[0], fx * K:fx * K + block.shape[1]] = block
+    def strip(column):            # a side: every row takes the colour of the picture's edge, a little darker
+        block = np.repeat(column[:, None, :], d * K, axis=1).copy(); block[..., :3] *= 0.78
+        return block
+    def cap(row, tone):           # top or bottom
+        block = np.repeat(row[None, :, :], d * K, axis=0).copy(); block[..., :3] *= tone
+        return block
+    mirrored = main[:, ::-1]
+    if main_face == "N":
+        north, south, west, east, top_row, bottom_row = main, mirrored, main[:, 0], main[:, -1], main[0], main[-1]
+    else:
+        north, south, west, east, top_row, bottom_row = mirrored, main, main[:, -1], main[:, 0], main[0, ::-1], main[-1, ::-1]
+    put(strip(west), u, v + d); put(north, u + d, v + d); put(strip(east), u + d + w, v + d); put(south, u + d + w + d, v + d)
+    put(cap(top_row, 0.9), u + d, v); put(cap(bottom_row, 0.7), u + d + w, v)
 
 def paint_top(sheet, b, fx, fy, front, crest):
     """A plain top instead of a smear: the box's own darkest tone, with the helmet's bone crest."""
@@ -215,6 +303,9 @@ def paint(sheet, b):
         return
     if b["skull"]:
         paint_skull(sheet, b)
+        return
+    if b["relief"]:
+        paint_relief(sheet, b)
         return
     w, h, d = b["size"]; u, v = b["uv"]; r0, r1 = b["rows"]
     faces = {"W": (u, v + d, d, h), "N": (u + d, v + d, w, h), "E": (u + d + w, v + d, d, h), "S": (u + d + w + d, v + d, w, h)}
@@ -308,6 +399,15 @@ for slot, boxes in SLOTS.items():
     glow[cyan, :3] = sheet[cyan, :3] * 0.35 + np.array([235.0, 255.0, 255.0]) * 0.65
     glow[cyan, 3] = 255
     Image.fromarray(glow.clip(0, 255).astype(np.uint8), "RGBA").save(f"{OUT_TEX}/necromancer_{slot}_glow.png")
+    yy, xx = np.indices(cyan.shape)
+    for f in range(FRAMES):
+        phase = 2 * np.pi * f / FRAMES - (xx * 0.09 + yy * 0.13)
+        wave = np.clip(np.cos(phase), 0, 1) ** 2
+        frame = sheet.copy()
+        lit = frame[..., :3] * (0.6 + 0.4 * wave[..., None])
+        lit = lit * (1 - 0.75 * wave[..., None]) + np.array([240.0, 255.0, 255.0]) * 0.75 * wave[..., None]
+        frame[cyan, :3] = lit[cyan]
+        Image.fromarray(frame.clip(0, 255).astype(np.uint8), "RGBA").save(f"{OUT_TEX}/necromancer_{slot}_{f}.png")
     print(slot, "glowing texels", int(cyan.sum()))
     java.append(f"            case {SLOT_ENUM[slot]} -> {{\n" if slot != "feet" else "            default -> {\n")
     for part, pose in POSES.items():

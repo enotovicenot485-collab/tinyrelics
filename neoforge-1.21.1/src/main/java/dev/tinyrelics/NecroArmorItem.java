@@ -1,6 +1,8 @@
 package dev.tinyrelics;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -18,10 +20,28 @@ public class NecroArmorItem extends ArmorItem {
         super(TinyRelics.NECRO_MATERIAL, type, properties.durability(type.getDurability(30)));
     }
 
-    /** Every slot has its own picture; all four share the layout of the 3D model. */
+    /** Frames of the shimmer that runs over the cyan details. */
+    private static final int FRAMES = 8;
+    private static final Map<EquipmentSlot, ResourceLocation[]> TEXTURES = new EnumMap<>(EquipmentSlot.class);
+
+    private static ResourceLocation[] frames(EquipmentSlot slot) {
+        ResourceLocation[] frames = new ResourceLocation[FRAMES];
+        for (int i = 0; i < FRAMES; i++) {
+            frames[i] = ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID,
+                    "textures/models/armor/necromancer_" + slot.getName() + "_" + i + ".png");
+        }
+        return frames;
+    }
+
+    /**
+     * Every slot has its own picture, and each picture comes in eight frames. The game asks
+     * for the texture every time it draws the armor, so answering with the frame for the
+     * current moment animates it.
+     */
     @Override
     public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, ArmorMaterial.Layer layer, boolean innerModel) {
-        return ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, "textures/models/armor/necromancer_" + slot.getName() + ".png");
+        int frame = entity == null ? 0 : (entity.tickCount / 2) % FRAMES;
+        return TEXTURES.computeIfAbsent(slot, NecroArmorItem::frames)[frame];
     }
 
     @Override
