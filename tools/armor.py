@@ -3,13 +3,15 @@ four concept views, and writes the matching Java model class."""
 import sys
 import numpy as np
 from PIL import Image
+from scipy import ndimage as ndi
 
 SRC, OUT_TEX, OUT_JAVA = sys.argv[1], sys.argv[2], sys.argv[3]
 K = 4                      # texels per model unit
 SHEET = 64                 # logical texture size
 im = np.array(Image.open(SRC).convert("RGB")).astype(np.float64)
 H, W, _ = im.shape
-BG = (im[..., 0] > 120) & (im[..., 2] > 120) & (im[..., 1] < 110) & (im[..., 0] - im[..., 1] > 70)
+# magenta background, and the purple fringe where it blends into the black outline
+BG = (im[..., 0] - im[..., 1] > 30) & (im[..., 2] - im[..., 1] > 30)
 
 # Source rectangles (x0, y0, x1, y1) in the concept image for each face of each box.
 # N = front, S = back, W = the character's right side, E = the character's left side.
@@ -25,15 +27,52 @@ RPAD = dict(N=(24, 290, 136, 445), S=(775, 290, 877, 445), W=(950, 290, 1080, 44
 LPAD = dict(N=(336, 290, 447, 445), S=(470, 290, 572, 445), W=(950, 290, 1080, 445), E=(1358, 290, 1488, 445))
 SKIRT = dict(N=(112, 610, 360, 775), S=(556, 610, 791, 775), W=(950, 610, 1126, 775), E=(1310, 610, 1482, 775))
 
-def box(part, src, xyz, size, uv, inflate=0.0, rows=(0.0, 1.0), top=True, bottom=True):
-    return dict(part=part, src=src, xyz=xyz, size=size, uv=uv, inflate=inflate, rows=rows, top=top, bottom=bottom)
+def box(part, src, xyz, size, uv, inflate=0.0, rows=(0.0, 1.0), top=True, bottom=True, solid=True):
+    """solid = holes left by the concept's background are filled in, so the body never shows through."""
+    return dict(part=part, src=src, xyz=xyz, size=size, uv=uv, inflate=inflate, rows=rows, top=top, bottom=bottom, solid=solid, bone=False)
+
+def part_of(src, ref_xyz, ref_size, xyz, size):
+    """The pictures for a small box that is a piece of a bigger reference box (a step of a horn)."""
+    (rx, ry, rz), (rw, rh, rd) = ref_xyz, ref_size
+    (x, y, z), (w, h, d) = xyz, size
+    clamp = lambda t: min(max(t, 0.0), 1.0)
+    v0, v1 = clamp((y - ry) / rh), clamp((y + h - ry) / rh)
+    spans = {
+        "N": (clamp((x - rx) / rw), clamp((x + w - rx) / rw)),
+        "S": (clamp((rx + rw - x - w) / rw), clamp((rx + rw - x) / rw)),
+        "W": (clamp((rz + rd - z - d) / rd), clamp((rz + rd - z) / rd)),
+        "E": (clamp((z - rz) / rd), clamp((z + d - rz) / rd)),
+    }
+    out = {}
+    for face, (a, b) in spans.items():
+        x0, y0, x1, y1 = src[face]
+        if b - a < 0.05:
+            a, b = max(a - 0.2, 0.0), min(b + 0.2, 1.0)
+        out[face] = (x0 + a * (x1 - x0), y0 + v0 * (y1 - y0), x0 + b * (x1 - x0), y0 + max(v1, v0 + 0.05) * (y1 - y0))
+    return out
+
+def horn(src, ref_x, side):
+    """A horn in four steps: out of the temple, up the side, in over the top, and a tip."""
+    ref_xyz, ref_size = (ref_x, -10, -1), (3, 7, 2)
+    if side < 0:   # the character's right
+        steps = [((-8, -6, -1.5), (3, 3, 3)), ((-9, -9, -1), (2, 3, 2)), ((-8, -11, -1), (2, 2, 2)), ((-6.5, -13, -0.5), (1, 2, 1))]
+        row = 16
+    else:
+        steps = [((5, -6, -1.5), (3, 3, 3)), ((7, -9, -1), (2, 3, 2)), ((6, -11, -1), (2, 2, 2)), ((5.5, -13, -0.5), (1, 2, 1))]
+        row = 22
+    columns = [0, 12, 20, 28]
+    boxes = [box("head", part_of(src, ref_xyz, ref_size, xyz, size), xyz, size, (columns[k], row)) for k, (xyz, size) in enumerate(steps)]
+    for k, b in enumerate(boxes):
+        b["bone"] = True
+        b["shade"] = 1.0 - 0.07 * (len(boxes) - 1 - k)     # a little darker towards the base
+    return boxes
 
 # rows = the part of the box height (0 = top, 1 = bottom) that is painted; the rest stays see-through.
 SLOTS = {
     "head": [
         box("head", HEAD, (-4, -8, -4), (8, 8, 8), (0, 0), 1.0),
-        box("head", RHORN, (-7, -10, -1), (3, 7, 2), (0, 16)),
-        box("head", LHORN, (4, -10, -1), (3, 7, 2), (10, 16)),
+        *horn(RHORN, -7, -1),
+        *horn(LHORN, 4, 1),
     ],
     "chest": [
         box("body", BODY, (-4, 0, -2), (8, 12, 4), (0, 0), 1.0),
@@ -46,7 +85,7 @@ SLOTS = {
         box("body", BODY, (-4, 0, -2), (8, 12, 4), (0, 0), 0.5, rows=(0.72, 1.0), top=False, bottom=False),
         box("right_leg", RLEG, (-2, 0, -2), (4, 12, 4), (24, 0), 0.5, rows=(0.0, 0.54), top=False, bottom=False),
         box("left_leg", LLEG, (-2, 0, -2), (4, 12, 4), (40, 0), 0.5, rows=(0.0, 0.54), top=False, bottom=False),
-        box("body", SKIRT, (-5, 12, -3), (10, 6, 6), (0, 16), 0.0, top=False, bottom=False),
+        box("body", SKIRT, (-5, 12, -3), (10, 6, 6), (0, 16), 0.0, top=False, bottom=False, solid=False),
     ],
     "feet": [
         box("right_leg", RLEG, (-2, 0, -2), (4, 12, 4), (0, 0), 1.0, rows=(0.46, 1.0), top=False),
@@ -65,27 +104,78 @@ def sample(rect, fu, fv):
     win = im[ys, xs].reshape(-1, 3)[~BG[ys, xs].reshape(-1)]
     return win.mean(axis=0)
 
+BONE = (214, 203, 172)
+
+def fill_holes(block, fallback):
+    """Every see-through texel of the block takes the colour of the nearest painted one."""
+    painted = block[..., 3] > 0
+    if painted.all():
+        return
+    if not painted.any():
+        block[...] = (*fallback, 255)
+        return
+    idx = ndi.distance_transform_edt(~painted, return_distances=False, return_indices=True)
+    block[...] = block[idx[0], idx[1]]
+
+def edge_colour(rect, fu, from_top):
+    """The first colour met going into the picture from its top (or bottom) edge."""
+    steps = [t / 40.0 for t in range(1, 30)]
+    for t in steps:
+        c = sample(rect, fu, t if from_top else 1.0 - t)
+        if c is not None and c.max() > 45:      # skip the black outline
+            return c
+    return None
+
+def paint_bone(sheet, b):
+    """Plain carved bone for the horns: light in the middle of each face, darker towards its edges."""
+    w, h, d = b["size"]; u, v = b["uv"]
+    blocks = [(u, v + d, d, h), (u + d, v + d, w, h), (u + d + w, v + d, d, h), (u + d + w + d, v + d, w, h),
+              (u + d, v, w, d), (u + d + w, v, w, d)]
+    light = np.array(BONE, dtype=np.float64) * b["shade"]
+    for fx, fy, fw, fh in blocks:
+        block = np.zeros((fh * K, fw * K, 4))
+        for j in range(fh * K):
+            for i in range(fw * K):
+                edge = min(i, j, fw * K - 1 - i, fh * K - 1 - j)
+                tone = 0.8 if edge == 0 else 0.92 if edge == 1 else 1.0
+                # faint grain along the horn
+                grain = 0.96 if (i + 2 * j) % 5 == 0 else 1.0
+                block[j, i] = (*(light * tone * grain), 255)
+        sheet[fy * K:(fy + fh) * K, fx * K:(fx + fw) * K] = block
+
 def paint(sheet, b):
+    if b["bone"]:
+        paint_bone(sheet, b)
+        return
     w, h, d = b["size"]; u, v = b["uv"]; r0, r1 = b["rows"]
     faces = {"W": (u, v + d, d, h), "N": (u + d, v + d, w, h), "E": (u + d + w, v + d, d, h), "S": (u + d + w + d, v + d, w, h)}
+    front = None
     for name, (fx, fy, fw, fh) in faces.items():
-        for j in range(fh * K):
+        block = np.zeros((fh * K, fw * K, 4))
+        j0, j1 = int(round(r0 * fh * K)), int(round(r1 * fh * K))
+        for j in range(j0, j1):
             fv = (j + 0.5) / (fh * K)
-            if fv < r0 or fv > r1:
-                continue
             for i in range(fw * K):
                 c = sample(b["src"][name], (i + 0.5) / (fw * K), fv)
                 if c is not None:
-                    sheet[fy * K + j, fx * K + i] = (*c, 255)
-    # top and bottom: the edge row of the front face, drawn across the whole depth
-    for flag, (fx, fy), fv in ((b["top"], (u + d, v), 0.04), (b["bottom"], (u + d + w, v), 0.97)):
+                    block[j, i] = (*c, 255)
+        if b["solid"]:
+            fill_holes(block[j0:j1], front if front is not None else BONE)
+        if name == "N" and (block[..., 3] > 0).any():
+            front = tuple(block[block[..., 3] > 0][:, :3].mean(axis=0))
+        sheet[fy * K:(fy + fh) * K, fx * K:(fx + fw) * K] = block
+    # top and bottom: the colour just inside the front picture's edge, drawn across the whole depth
+    for flag, (fx, fy), from_top in ((b["top"], (u + d, v), True), (b["bottom"], (u + d + w, v), False)):
         if not flag:
             continue
+        block = np.zeros((d * K, w * K, 4))
         for i in range(w * K):
-            c = sample(b["src"]["N"], (i + 0.5) / (w * K), fv)
-            if c is None:
-                continue
-            sheet[fy * K: (fy + d) * K, fx * K + i] = (*c, 255)
+            c = edge_colour(b["src"]["N"], (i + 0.5) / (w * K), from_top)
+            if c is not None:
+                block[:, i] = (*c, 255)
+        if b["solid"]:
+            fill_holes(block, front if front is not None else BONE)
+        sheet[fy * K:(fy + d) * K, fx * K:(fx + w) * K] = block
 
 POSES = {"head": None, "hat": None, "body": None, "right_arm": (-5, 2, 0), "left_arm": (5, 2, 0),
          "right_leg": (-1.9, 12, 0), "left_leg": (1.9, 12, 0)}
@@ -133,6 +223,12 @@ for slot, boxes in SLOTS.items():
     for b in boxes:
         paint(sheet, b)
     Image.fromarray(sheet.clip(0, 255).astype(np.uint8), "RGBA").save(f"{OUT_TEX}/necromancer_{slot}.png")
+    r_, g_, b_, a_ = [sheet[..., i] for i in range(4)]
+    cyan = (a_ > 0) & (g_ > 135) & (b_ > 135) & (b_ - r_ > 55) & (g_ - r_ > 40)
+    glow = np.zeros_like(sheet)
+    glow[cyan] = sheet[cyan]
+    Image.fromarray(glow.clip(0, 255).astype(np.uint8), "RGBA").save(f"{OUT_TEX}/necromancer_{slot}_glow.png")
+    print(slot, "glowing texels", int(cyan.sum()))
     java.append(f"            case {SLOT_ENUM[slot]} -> {{\n" if slot != "feet" else "            default -> {\n")
     for part, pose in POSES.items():
         cubes = "CubeListBuilder.create()"

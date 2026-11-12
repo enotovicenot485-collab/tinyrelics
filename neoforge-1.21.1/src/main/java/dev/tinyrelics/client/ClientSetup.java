@@ -2,6 +2,9 @@ package dev.tinyrelics.client;
 
 import dev.tinyrelics.TinyRelics;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -29,6 +32,7 @@ public final class ClientSetup {
         modBus.addListener(ClientSetup::registerKeys);
         modBus.addListener(ClientSetup::registerRenderers);
         modBus.addListener(ClientSetup::registerParticles);
+        modBus.addListener(ClientSetup::addLayers);
         modBus.addListener(ClientSetup::registerExtensions);
     }
 
@@ -72,6 +76,22 @@ public final class ClientSetup {
                 return NecroArmorModels.get(slot);
             }
         }, TinyRelics.NECRO_HELMET.get(), TinyRelics.NECRO_CHESTPLATE.get(), TinyRelics.NECRO_LEGGINGS.get(), TinyRelics.NECRO_BOOTS.get());
+    }
+
+    /** Players and armor stands get the pulsing glow of the necromancer armor. */
+    @SuppressWarnings("rawtypes")
+    private static void addLayers(EntityRenderersEvent.AddLayers event) {
+        for (var skin : event.getSkins()) {
+            addGlow((EntityRenderer) event.getSkin(skin));
+        }
+        addGlow((EntityRenderer) event.getRenderer(EntityType.ARMOR_STAND));
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void addGlow(EntityRenderer renderer) {
+        if (renderer instanceof LivingEntityRenderer living) {
+            living.addLayer(new NecroGlowLayer(living));
+        }
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
