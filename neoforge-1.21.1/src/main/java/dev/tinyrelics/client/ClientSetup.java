@@ -46,6 +46,10 @@ public final class ClientSetup {
         event.registerSpriteSet(TinyRelics.VORTEX_STREAK.get(), sprites -> new OrbitParticle.Provider(sprites, true, 0.7F, 2, 1.0F));
         // The heart that floats up from everyone the vortex heals.
         event.registerSpriteSet(TinyRelics.BLOOD_HEART.get(), sprites -> new ChaosParticle.Provider(sprites, 18, 0.3F, -0.15F));
+        // The staff's ghost fire. Negative gravity makes a particle float upwards.
+        event.registerSpriteSet(TinyRelics.GHOST_FLAME.get(), sprites -> new ChaosParticle.Provider(sprites, 12, 0.3F, -0.25F));
+        event.registerSpriteSet(TinyRelics.GHOST_WISP.get(), sprites -> new ChaosParticle.Provider(sprites, 24, 0.4F, -0.12F));
+        event.registerSpriteSet(TinyRelics.GHOST_FIRE.get(), sprites -> new ChaosParticle.Provider(sprites, 12, 0.5F, -0.03F));
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

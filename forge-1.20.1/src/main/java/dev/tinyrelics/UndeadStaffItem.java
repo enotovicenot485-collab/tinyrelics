@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.WitherSkull;
 import net.minecraft.world.item.ItemStack;
@@ -62,12 +63,32 @@ public class UndeadStaffItem extends RelicWeaponItem {
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
+    /** Ghost fire bursts from the skull at the top of the staff, in front of the right hand. */
+    private static void eyeFlames(ServerLevel server, LivingEntity holder, int count) {
+        Vec3 look = holder.getLookAngle();
+        Vec3 right = new Vec3(-look.z, 0.0D, look.x).normalize();
+        Vec3 tip = holder.getEyePosition().add(look.scale(0.9D)).add(right.scale(0.45D)).add(0.0D, 0.35D, 0.0D);
+        server.sendParticles(TinyRelics.GHOST_FLAME.get(), tip.x, tip.y, tip.z, count, 0.08D, 0.08D, 0.08D, 0.01D);
+    }
+
+    @Override
+    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+        if (attacker.level() instanceof ServerLevel server) {
+            eyeFlames(server, attacker, 6);
+            server.sendParticles(TinyRelics.GHOST_FLAME.get(),
+                    target.getX(), target.getY() + target.getBbHeight() * 0.6D, target.getZ(),
+                    6, target.getBbWidth() * 0.3D, target.getBbHeight() * 0.2D, target.getBbWidth() * 0.3D, 0.01D);
+        }
+        return true;
+    }
+
     private static void shootSkull(ServerLevel server, ServerPlayer player) {
         Vec3 look = player.getLookAngle();
         WitherSkull skull = new WitherSkull(server, player, look.x, look.y, look.z);
         skull.setPos(player.getX() + look.x, player.getEyeY() - 0.2D + look.y, player.getZ() + look.z);
         skull.getPersistentData().putBoolean(STAFF_SKULL, true);
         server.addFreshEntity(skull);
+        eyeFlames(server, player, 10);
         server.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 0.7F, 1.0F);
     }

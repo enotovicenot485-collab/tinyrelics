@@ -154,6 +154,11 @@ public final class Minions {
             level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, ground),
                     mob.getX(), servant.groundY + 0.1D, mob.getZ(), 6, 0.3D, 0.1D, 0.3D, 0.1D);
         }
+        if (servant.rise % 5 == 0) {
+            // A soul drifts up out of the grave while the servant climbs.
+            level.sendParticles(TinyRelics.GHOST_WISP.get(), mob.getX(), servant.groundY + 0.3D, mob.getZ(),
+                    1, 0.3D, 0.1D, 0.3D, 0.0D);
+        }
         if (servant.rise % 6 == 0) {
             level.playSound(null, mob.getX(), servant.groundY, mob.getZ(),
                     SoundEvents.GRAVEL_BREAK, SoundSource.HOSTILE, 0.8F, 0.6F);
@@ -207,7 +212,9 @@ public final class Minions {
 
     private static void puff(ServerLevel level, Mob mob) {
         level.sendParticles(ParticleTypes.SOUL, mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
-                20, 0.3D, 0.6D, 0.3D, 0.03D);
+                10, 0.3D, 0.6D, 0.3D, 0.03D);
+        level.sendParticles(TinyRelics.GHOST_WISP.get(), mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
+                6, 0.35D, 0.6D, 0.35D, 0.0D);
     }
 
     private static final class Servant {

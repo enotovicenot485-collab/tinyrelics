@@ -182,7 +182,8 @@ public final class Abilities {
                     boolean solidBelow = !server.getBlockState(pos.below()).getCollisionShape(server, pos.below()).isEmpty();
                     boolean freeHere = server.getBlockState(pos).getCollisionShape(server, pos).isEmpty();
                     if (solidBelow && freeHere) {
-                        server.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, x, y + 0.2D, z, 2, 0.15D, 0.25D, 0.15D, 0.01D);
+                        server.sendParticles(TinyRelics.GHOST_FIRE.get(), x, y + 0.5D, z, 1, 0.1D, 0.05D, 0.1D, 0.0D);
+                        server.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, x, y + 0.2D, z, 1, 0.15D, 0.25D, 0.15D, 0.01D);
                         break;
                     }
                 }
