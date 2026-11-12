@@ -30,7 +30,7 @@ SKIRT = dict(N=(112, 610, 360, 775), S=(556, 610, 791, 775), W=(950, 610, 1126, 
 
 def box(part, src, xyz, size, uv, inflate=0.0, rows=(0.0, 1.0), top=True, bottom=True, solid=True):
     """solid = holes left by the concept's background are filled in, so the body never shows through."""
-    return dict(part=part, src=src, xyz=xyz, size=size, uv=uv, inflate=inflate, rows=rows, top=top, bottom=bottom, solid=solid, bone=False, skull=None, relief=None, shade=1.0)
+    return dict(part=part, src=src, xyz=xyz, size=size, uv=uv, inflate=inflate, rows=rows, top=top, bottom=bottom, solid=solid, bone=False, skull=None, relief=None, shade=1.0, ragged=False)
 
 def part_of(src, ref_xyz, ref_size, xyz, size):
     """The pictures for a small box that is a piece of a bigger reference box (a step of a horn)."""
@@ -64,10 +64,12 @@ def skull(part, side):
     b = box(part, None, jaw, (1, 1, 3), None); b["skull"] = "jaw"; b["face"] = face
     return [a, b]
 
-def relief(part, src, ref_xyz, ref_size, xyz, size, face="N"):
-    """A raised plate: one face shows its share of the concept picture, the thin sides continue its edges."""
+def relief(part, src, ref_xyz, ref_size, xyz, size, face="N", ragged=False):
+    """A raised plate: one face shows its share of the concept picture, the thin sides continue its edges.
+    ragged = keep the concept's own outline (see-through where it had background) instead of a full rectangle."""
     b = box(part, part_of(src, ref_xyz, ref_size, xyz, size), xyz, size, None)
     b["relief"] = face
+    b["ragged"] = ragged
     return b
 
 def bone_box(part, xyz, size, shade=1.0):
@@ -118,7 +120,14 @@ SLOTS = {
         box("body", BODY, (-4, 0, -2), (8, 12, 4), (0, 0), 0.5, rows=(0.72, 1.0), top=False, bottom=False),
         box("right_leg", RLEG, (-2, 0, -2), (4, 12, 4), (24, 0), 0.5, rows=(0.0, 0.54), top=False, bottom=False),
         box("left_leg", LLEG, (-2, 0, -2), (4, 12, 4), (40, 0), 0.5, rows=(0.0, 0.54), top=False, bottom=False),
-        box("body", SKIRT, (-5, 12, -3), (10, 6, 6), (0, 16), 0.0, top=False, bottom=False, solid=False),
+        # The skirt is cut into flaps that hang from the legs (front, back and outer side of each),
+        # so it swings with every step and stays on the legs when the player crouches or sits.
+        relief("right_leg", SKIRT, (-3.1, 0, -3), (10, 6, 6), (-3.1, 0, -3.2), (5, 6, 1), "N", ragged=True),
+        relief("left_leg", SKIRT, (-6.9, 0, -3), (10, 6, 6), (-1.9, 0, -3.2), (5, 6, 1), "N", ragged=True),
+        relief("right_leg", SKIRT, (-3.1, 0, -3), (10, 6, 6), (-3.1, 0, 2.2), (5, 6, 1), "S", ragged=True),
+        relief("left_leg", SKIRT, (-6.9, 0, -3), (10, 6, 6), (-1.9, 0, 2.2), (5, 6, 1), "S", ragged=True),
+        relief("right_leg", SKIRT, (-3.1, 0, -3), (10, 6, 6), (-3.2, 0, -2), (1, 6, 4), "W", ragged=True),
+        relief("left_leg", SKIRT, (-6.9, 0, -3), (10, 6, 6), (2.2, 0, -2), (1, 6, 4), "E", ragged=True),
         # the skull buckle of the belt
         relief("body", BODY, (-4, 0, -2), (8, 12, 4), (-1.5, 9, -4), (3, 3, 1)),
     ],
@@ -262,30 +271,43 @@ def paint_skull(sheet, b):
     put(top, u + d, v); put(under, u + d + w, v)
 
 def paint_relief(sheet, b):
-    """A raised plate: the concept picture on its main face, and its edge colours carried round the thin sides."""
+    """A raised plate: the concept picture on its main face (and its mirror image on the opposite one),
+    and the colours of the picture's edges carried round the remaining thin sides."""
     w, h, d = b["size"]; u, v = b["uv"]; main_face = b["relief"]
-    main = np.zeros((h * K, w * K, 4))
+    across = w if main_face in ("N", "S") else d          # width of the main face in model units
+    main = np.zeros((h * K, across * K, 4))
     for j in range(h * K):
-        for i in range(w * K):
-            c = sample(b["src"][main_face], (i + 0.5) / (w * K), (j + 0.5) / (h * K))
+        for i in range(across * K):
+            c = sample(b["src"][main_face], (i + 0.5) / (across * K), (j + 0.5) / (h * K))
             if c is not None:
                 main[j, i] = (*c, 255)
-    fill_holes(main, BONE)
+    if not b["ragged"]:
+        fill_holes(main, BONE)
     def put(block, fx, fy):
         sheet[fy * K:fy * K + block.shape[0], fx * K:fx * K + block.shape[1]] = block
-    def strip(column):            # a side: every row takes the colour of the picture's edge, a little darker
-        block = np.repeat(column[:, None, :], d * K, axis=1).copy(); block[..., :3] *= 0.78
-        return block
-    def cap(row, tone):           # top or bottom
-        block = np.repeat(row[None, :, :], d * K, axis=0).copy(); block[..., :3] *= tone
+    def strip(column, width):     # a thin side: every row takes the colour of the picture's edge, a little darker
+        block = np.repeat(column[:, None, :], width * K, axis=1).copy(); block[..., :3] *= 0.78
         return block
     mirrored = main[:, ::-1]
-    if main_face == "N":
-        north, south, west, east, top_row, bottom_row = main, mirrored, main[:, 0], main[:, -1], main[0], main[-1]
+    top = np.zeros((d * K, w * K, 4)); bottom = np.zeros((d * K, w * K, 4))
+    if main_face in ("N", "S"):
+        if main_face == "N":
+            north, south, left_edge, right_edge, top_row, bottom_row = main, mirrored, main[:, 0], main[:, -1], main[0], main[-1]
+        else:
+            north, south, left_edge, right_edge, top_row, bottom_row = mirrored, main, main[:, -1], main[:, 0], main[0, ::-1], main[-1, ::-1]
+        west, east = strip(left_edge, d), strip(right_edge, d)
+        top[:] = top_row[None, :, :]; bottom[:] = bottom_row[None, :, :]
     else:
-        north, south, west, east, top_row, bottom_row = mirrored, main, main[:, -1], main[:, 0], main[0, ::-1], main[-1, ::-1]
-    put(strip(west), u, v + d); put(north, u + d, v + d); put(strip(east), u + d + w, v + d); put(south, u + d + w + d, v + d)
-    put(cap(top_row, 0.9), u + d, v); put(cap(bottom_row, 0.7), u + d + w, v)
+        # On the west face the picture runs back-to-front, on the east face front-to-back.
+        if main_face == "W":
+            west, east, back_edge, front_edge, top_row, bottom_row = main, mirrored, main[:, 0], main[:, -1], main[0], main[-1]
+        else:
+            west, east, back_edge, front_edge, top_row, bottom_row = mirrored, main, main[:, -1], main[:, 0], main[0, ::-1], main[-1, ::-1]
+        north, south = strip(front_edge, w), strip(back_edge, w)
+        top[:] = top_row[:, None, :]; bottom[:] = bottom_row[:, None, :]      # rows of the top run back to front
+    top[..., :3] *= 0.9; bottom[..., :3] *= 0.7
+    put(west, u, v + d); put(north, u + d, v + d); put(east, u + d + w, v + d); put(south, u + d + w + d, v + d)
+    put(top, u + d, v); put(bottom, u + d + w, v)
 
 def paint_top(sheet, b, fx, fy, front, crest):
     """A plain top instead of a smear: the box's own darkest tone, with the helmet's bone crest."""

@@ -78,14 +78,19 @@ public final class NecroArmorModels {
                 root.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
                 root.addOrReplaceChild("body", CubeListBuilder.create()
                         .texOffs(0, 0).addBox(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(0.5F))
-                        .texOffs(0, 16).addBox(-5.0F, 12.0F, -3.0F, 10.0F, 6.0F, 6.0F, new CubeDeformation(0.0F))
                         .texOffs(56, 0).addBox(-1.5F, 9.0F, -4.0F, 3.0F, 3.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.ZERO);
                 root.addOrReplaceChild("right_arm", CubeListBuilder.create(), PartPose.offset(-5.0F, 2.0F, 0.0F));
                 root.addOrReplaceChild("left_arm", CubeListBuilder.create(), PartPose.offset(5.0F, 2.0F, 0.0F));
                 root.addOrReplaceChild("right_leg", CubeListBuilder.create()
-                        .texOffs(24, 0).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.5F)), PartPose.offset(-1.9F, 12.0F, 0.0F));
+                        .texOffs(24, 0).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.5F))
+                        .texOffs(0, 16).addBox(-3.1F, 0.0F, -3.2F, 5.0F, 6.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(24, 16).addBox(-3.1F, 0.0F, 2.2F, 5.0F, 6.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(48, 16).addBox(-3.2F, 0.0F, -2.0F, 1.0F, 6.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-1.9F, 12.0F, 0.0F));
                 root.addOrReplaceChild("left_leg", CubeListBuilder.create()
-                        .texOffs(40, 0).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.5F)), PartPose.offset(1.9F, 12.0F, 0.0F));
+                        .texOffs(40, 0).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.5F))
+                        .texOffs(12, 16).addBox(-1.9F, 0.0F, -3.2F, 5.0F, 6.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(36, 16).addBox(-1.9F, 0.0F, 2.2F, 5.0F, 6.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(0, 23).addBox(2.2F, 0.0F, -2.0F, 1.0F, 6.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(1.9F, 12.0F, 0.0F));
             }
             default -> {
                 root.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
