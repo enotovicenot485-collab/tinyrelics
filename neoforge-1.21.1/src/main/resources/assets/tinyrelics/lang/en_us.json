@@ -85,5 +85,10 @@
   "screen.tinyrelics.stats.chaos_armor": "13 armor with the full set",
   "screen.tinyrelics.desc.chaos_armor": "Hood 3, chestplate 6, leggings 3, boots 1. The full set gives Speed III. Key I: the wearer vanishes in a cloud of steam, armor and weapon included, mobs lose track, and Speed V is granted. Cooldown 2 minutes.",
   "screen.tinyrelics.vanish_seconds": "Invisibility: %s s",
-  "screen.tinyrelics.vanish_seconds.tip": "How many seconds the vanishing and Speed V last. 10 by default."
+  "screen.tinyrelics.vanish_seconds.tip": "How many seconds the vanishing and Speed V last. 10 by default.",
+  "item.tinyrelics.blood_helmet": "Blood Master Crown",
+  "item.tinyrelics.blood_chestplate": "Blood Master Chestplate",
+  "item.tinyrelics.blood_leggings": "Blood Master Leggings",
+  "item.tinyrelics.blood_boots": "Blood Master Boots",
+  "item.tinyrelics.blood_armor.tooltip": "Blood Master armor"
 }

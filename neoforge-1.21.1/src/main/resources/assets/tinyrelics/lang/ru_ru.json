@@ -85,5 +85,10 @@
   "screen.tinyrelics.stats.chaos_armor": "13 брони в полном комплекте",
   "screen.tinyrelics.desc.chaos_armor": "Капюшон 3, нагрудник 6, поножи 3, ботинки 1. Полный комплект даёт Скорость III. Клавиша I: владелец исчезает в облаке пара вместе с бронёй и оружием, мобы его теряют, и он получает Скорость V. Перезарядка 2 минуты.",
   "screen.tinyrelics.vanish_seconds": "Невидимость: %s с",
-  "screen.tinyrelics.vanish_seconds.tip": "Сколько секунд длится исчезновение и Скорость V. По умолчанию 10."
+  "screen.tinyrelics.vanish_seconds.tip": "Сколько секунд длится исчезновение и Скорость V. По умолчанию 10.",
+  "item.tinyrelics.blood_helmet": "Корона Мастера Крови",
+  "item.tinyrelics.blood_chestplate": "Нагрудник Мастера Крови",
+  "item.tinyrelics.blood_leggings": "Поножи Мастера Крови",
+  "item.tinyrelics.blood_boots": "Ботинки Мастера Крови",
+  "item.tinyrelics.blood_armor.tooltip": "Броня Мастера Крови"
 }

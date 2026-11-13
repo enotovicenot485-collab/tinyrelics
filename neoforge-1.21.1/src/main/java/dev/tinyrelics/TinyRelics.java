@@ -112,6 +112,23 @@ public class TinyRelics {
                     1.0F,
                     0.0F));
 
+    /** 3 + 6 + 4 + 2 = 15 armor points for the full set. */
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> BLOOD_MATERIAL = ARMOR_MATERIALS.register("blood",
+            () -> new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), defense -> {
+                        defense.put(ArmorItem.Type.HELMET, 3);
+                        defense.put(ArmorItem.Type.CHESTPLATE, 6);
+                        defense.put(ArmorItem.Type.LEGGINGS, 4);
+                        defense.put(ArmorItem.Type.BOOTS, 2);
+                        defense.put(ArmorItem.Type.BODY, 6);
+                    }),
+                    15,
+                    SoundEvents.ARMOR_EQUIP_NETHERITE,
+                    () -> Ingredient.of(Items.REDSTONE_BLOCK),
+                    List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(MODID, "blood"))),
+                    1.0F,
+                    0.0F));
+
     public static final DeferredItem<NecroArmorItem> NECRO_HELMET = ITEMS.register("necro_helmet",
             () -> new NecroArmorItem(ArmorItem.Type.HELMET, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
     public static final DeferredItem<NecroArmorItem> NECRO_CHESTPLATE = ITEMS.register("necro_chestplate",
@@ -129,6 +146,15 @@ public class TinyRelics {
             () -> new ChaosArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
     public static final DeferredItem<ChaosArmorItem> CHAOS_BOOTS = ITEMS.register("chaos_boots",
             () -> new ChaosArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+
+    public static final DeferredItem<BloodArmorItem> BLOOD_HELMET = ITEMS.register("blood_helmet",
+            () -> new BloodArmorItem(ArmorItem.Type.HELMET, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<BloodArmorItem> BLOOD_CHESTPLATE = ITEMS.register("blood_chestplate",
+            () -> new BloodArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<BloodArmorItem> BLOOD_LEGGINGS = ITEMS.register("blood_leggings",
+            () -> new BloodArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<BloodArmorItem> BLOOD_BOOTS = ITEMS.register("blood_boots",
+            () -> new BloodArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
 
     /** Invisible: fills the cells of the creative tab that hold a banner picture or nothing at all. */
     public static final DeferredItem<Item> TAB_FILLER = ITEMS.register("tab_filler",

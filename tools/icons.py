@@ -10,7 +10,7 @@ bg = (im[..., 1] - im[..., 0] > 40) & (im[..., 1] - im[..., 2] > 40)
 cols = np.where((~bg).sum(0) > 2)[0]
 groups, start, prev = [], cols[0], cols[0]
 for c in cols[1:]:
-    if c - prev > 50:                      # the two boots stand closer than that, so they stay one icon
+    if c - prev > 36:                      # the two boots stand closer than that, so they stay one icon
         groups.append((start, prev)); start = c
     prev = c
 groups.append((start, prev))
