@@ -92,6 +92,13 @@
   "item.tinyrelics.blood_boots": "Ботинки Мастера Крови",
   "item.tinyrelics.blood_armor.tooltip": "Полный комплект: 4 кровавых сердца",
   "item.tinyrelics.blood_armor.tooltip2": "Сердца восполняет только кровь мирных животных",
-  "item.tinyrelics.blood_armor.tooltip3": "[%s] кровавый дождь 9x9",
-  "msg.tinyrelics.rain_wait": "Кровавый дождь будет готов через %s с"
+  "item.tinyrelics.blood_armor.tooltip3": "[%s] кровавый дождь",
+  "msg.tinyrelics.rain_wait": "Кровавый дождь будет готов через %s с",
+  "screen.tinyrelics.name.blood_armor": "Мастер Крови",
+  "screen.tinyrelics.stats.blood_armor": "18 брони в полном комплекте",
+  "screen.tinyrelics.desc.blood_armor": "Корона 4, нагрудник 7, поножи 5, ботинки 2. Полный комплект даёт 4 кровавых сердца: они не лечатся сами, одно возвращает каждое убитое мирное животное. Клавиша I: кровавый дождь, до 3 сердец урона каждому под тучами.",
+  "screen.tinyrelics.rain_cooldown": "Откат дождя: %s с",
+  "screen.tinyrelics.rain_cooldown.tip": "Сколько секунд между кровавыми дождями. По умолчанию 180.",
+  "screen.tinyrelics.rain_radius": "Радиус дождя: %s блоков",
+  "screen.tinyrelics.rain_radius.tip": "Как далеко дождь достаёт от центра. 4 это девять блоков в поперечнике. По умолчанию 4."
 }

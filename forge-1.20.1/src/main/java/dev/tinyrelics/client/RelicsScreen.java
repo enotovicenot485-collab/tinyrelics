@@ -22,7 +22,7 @@ public class RelicsScreen extends Screen {
     private static final int TAB_WIDTH = 140;
     private static final int TAB_HEIGHT = 22;
     private static final int RIGHT_WIDTH = 234;
-    private static final String[] IDS = {"keeping_charm", "thor_hammer", "chaos_boomerang", "blood_blade", "undead_staff", "necro_armor", "chaos_armor"};
+    private static final String[] IDS = {"keeping_charm", "thor_hammer", "chaos_boomerang", "blood_blade", "undead_staff", "necro_armor", "chaos_armor", "blood_armor"};
 
     private final RelicConfig edit;
     private final ItemStack[] icons;
@@ -41,6 +41,7 @@ public class RelicsScreen extends Screen {
                 new ItemStack(TinyRelics.UNDEAD_STAFF.get()),
                 new ItemStack(TinyRelics.NECRO_CHESTPLATE.get()),
                 new ItemStack(TinyRelics.CHAOS_CHESTPLATE.get()),
+                new ItemStack(TinyRelics.BLOOD_CHESTPLATE.get()),
         };
     }
 
@@ -90,6 +91,12 @@ public class RelicsScreen extends Screen {
                 addSlider(0, "vanish_seconds", RelicConfig.MIN_VANISH, RelicConfig.MAX_VANISH,
                         () -> this.edit.vanishSeconds, value -> this.edit.vanishSeconds = value);
                 addToggle(1, "craft", this.edit.chaosCraft, value -> this.edit.chaosCraft = value);
+            }
+            case 7 -> {
+                addSlider(0, "rain_cooldown", RelicConfig.MIN_RAIN_COOLDOWN, RelicConfig.MAX_RAIN_COOLDOWN,
+                        () -> this.edit.rainCooldown, value -> this.edit.rainCooldown = value);
+                addSlider(1, "rain_radius", RelicConfig.MIN_RAIN_RADIUS, RelicConfig.MAX_RAIN_RADIUS,
+                        () -> this.edit.rainRadius, value -> this.edit.rainRadius = value);
             }
             default -> {
                 addSlider(0, "staff_kills", RelicConfig.MIN_KILLS, RelicConfig.MAX_KILLS,

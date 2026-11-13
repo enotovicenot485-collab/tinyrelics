@@ -25,7 +25,7 @@ import net.minecraft.world.phys.AABB;
 /**
  * The full Blood Master armor. Passive: four extra "blood hearts" that take damage before
  * the wearer's own health, never heal by themselves and are refilled only by killing
- * peaceful animals. Ability key: a rain of blood over a 9x9 area.
+ * peaceful animals. Ability key: a rain of blood from drifting clouds, nine blocks across by default.
  */
 public final class BloodSet {
     /** Blood hearts in half-hearts: four hearts. */
@@ -36,13 +36,14 @@ public final class BloodSet {
     private static final String HEARTS_GIVEN = "tinyrelics_blood_hearts_given";
     private static final String RAIN_READY = "tinyrelics_blood_rain_ready";
 
-    /** Three minutes between rains; a rain falls for six seconds. */
-    private static final int COOLDOWN = 3600;
+    /** A rain falls for six seconds. How long until the next one, and how wide it is, are settings. */
+    private static final int LONGEST_COOLDOWN = RelicConfig.MAX_RAIN_COOLDOWN * 20;
     private static final int RAIN_TICKS = 120;
     private static final int HIT_EVERY = 10;
     /** The most one rain takes from one victim: three hearts. */
     private static final float MAX_DAMAGE = 6.0F;
-    private static final double HALF_SIDE = 4.5D;
+    /** Separate clouds drift round the centre, so from the side it is a sky of clouds and not a slab. */
+    private static final int CLOUDS = 6;
     private static final double CLOUD_HEIGHT = 6.0D;
     private static final EquipmentSlot[] ARMOR = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
 
@@ -123,12 +124,12 @@ public final class BloodSet {
         CompoundTag data = player.getPersistentData();
         long wait = data.getLong(RAIN_READY) - now;
         // A wait longer than the cooldown means the world clock was changed: ignore it.
-        if (wait > 0 && wait <= COOLDOWN) {
+        if (wait > 0 && wait <= LONGEST_COOLDOWN) {
             player.displayClientMessage(Component.translatable("msg.tinyrelics.rain_wait", (wait + 19) / 20), true);
             return;
         }
-        data.putLong(RAIN_READY, now + COOLDOWN);
-        RAINS.add(new Rain(level, player.getUUID(), player.getX(), player.getY(), player.getZ()));
+        data.putLong(RAIN_READY, now + RelicConfig.SERVER.rainCooldown * 20L);
+        RAINS.add(new Rain(level, player.getUUID(), player.getX(), player.getY(), player.getZ(), RelicConfig.SERVER.rainRadius + 0.5D));
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 0.7F, 0.5F);
     }
 
@@ -143,19 +144,29 @@ public final class BloodSet {
             ServerLevel level = rain.level;
             RandomSource random = level.random;
             double top = rain.y + CLOUD_HEIGHT;
-            // The cloud: thick puffs over the whole square, drifting a little.
-            for (int i = 0; i < 5; i++) {
-                level.sendParticles(TinyRelics.BLOOD_CLOUD.get(),
-                        rain.x + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE, top + random.nextDouble() * 1.2D,
-                        rain.z + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE, 0, random.nextDouble() - 0.5D, 0.0D, random.nextDouble() - 0.5D, 0.03D);
+            double radius = rain.radius;
+            // The clouds: each one circles the centre at its own distance, height and pace and
+            // puffs where it is, so there are gaps between them and the edge is ragged.
+            int puffs = Math.max(2, (int) Math.round(radius * 0.55D));
+            for (int i = 0; i < puffs; i++) {
+                int cloud = random.nextInt(CLOUDS);
+                double angle = rain.seed + cloud * 2.4D + rain.age * (0.010D + 0.004D * (cloud % 3)) * (cloud % 2 == 0 ? 1.0D : -1.0D);
+                double away = radius * (0.15D + 0.75D * ((cloud * 37 % 10) / 9.0D));
+                double cx = rain.x + Math.cos(angle) * away + random.nextGaussian() * 0.9D;
+                double cz = rain.z + Math.sin(angle) * away + random.nextGaussian() * 0.9D;
+                double cy = top + ((cloud * 53 % 7) / 6.0D) * 1.6D - 0.4D + random.nextDouble() * 0.5D;
+                level.sendParticles(TinyRelics.BLOOD_CLOUD.get(), cx, cy, cz, 0, Math.cos(angle + 1.6D), 0.0D, Math.sin(angle + 1.6D), 0.025D);
             }
-            // The rain: every drop falls straight from the cloud and splashes where it lands.
-            for (int i = 0; i < 12; i++) {
-                double dx = rain.x + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE;
-                double dz = rain.z + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE;
+            // The rain: every drop falls straight down and splashes where it lands. Spread evenly over the circle.
+            int drops = Math.max(3, (int) Math.round(radius * radius * 0.3D));
+            for (int i = 0; i < drops; i++) {
+                double turn = random.nextDouble() * Math.PI * 2.0D;
+                double far = Math.sqrt(random.nextDouble()) * radius;
+                double dx = rain.x + Math.cos(turn) * far;
+                double dz = rain.z + Math.sin(turn) * far;
                 // count 0: the three numbers are the direction and the last one the speed
-                level.sendParticles(TinyRelics.BLOOD_RAIN.get(), dx, top - random.nextDouble() * 1.5D, dz, 0, 0.0D, -1.0D, 0.0D, 0.8D);
-                if (i < 5) {
+                level.sendParticles(TinyRelics.BLOOD_RAIN.get(), dx, top - 0.5D - random.nextDouble() * 1.5D, dz, 0, 0.0D, -1.0D, 0.0D, 0.8D);
+                if (i % 2 == 0) {
                     int ground = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(dx), (int) Math.floor(dz));
                     double floor = Math.abs(ground - rain.y) <= 5.0D ? ground : rain.y;
                     level.sendParticles(TinyRelics.BLOOD_SPLASH.get(), dx, floor + 0.3D, dz, 1, 0.0D, 0.0D, 0.0D, 0.0D);
@@ -168,9 +179,14 @@ public final class BloodSet {
                 continue;
             }
             Player owner = level.getPlayerByUUID(rain.owner);
-            AABB area = new AABB(rain.x - HALF_SIDE, rain.y - 4.0D, rain.z - HALF_SIDE, rain.x + HALF_SIDE, top, rain.z + HALF_SIDE);
+            AABB area = new AABB(rain.x - radius, rain.y - 4.0D, rain.z - radius, rain.x + radius, top, rain.z + radius);
             for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, area)) {
                 if (!victim.isAlive() || victim.getUUID().equals(rain.owner) || isFriend(victim, owner)) {
+                    continue;
+                }
+                double offX = victim.getX() - rain.x;
+                double offZ = victim.getZ() - rain.z;
+                if (offX * offX + offZ * offZ > radius * radius) {
                     continue;
                 }
                 float dealt = rain.dealt.getOrDefault(victim.getUUID(), 0.0F);
@@ -224,15 +240,20 @@ public final class BloodSet {
         final double x;
         final double y;
         final double z;
+        final double radius;
+        /** Where the clouds start on their circles: different for every rain. */
+        final double seed;
         final Map<UUID, Float> dealt = new HashMap<>();
         int age;
 
-        Rain(ServerLevel level, UUID owner, double x, double y, double z) {
+        Rain(ServerLevel level, UUID owner, double x, double y, double z, double radius) {
             this.level = level;
             this.owner = owner;
             this.x = x;
             this.y = y;
             this.z = z;
+            this.radius = radius;
+            this.seed = level.random.nextDouble() * 6.28D;
         }
     }
 }
