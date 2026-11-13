@@ -102,7 +102,8 @@ def stepped(part, rects, xyz, depth, side, unit=26.67):
     for row in range(int(round((y1 - y0) / unit))):
         ya, yb = int(y0 + row * unit), int(y0 + (row + 1) * unit)
         # the drawing's black outline is not part of the shape: it would only make the blade fatter
-        metal = ~BG[ya:yb, x0:x1] & (im[ya:yb, x0:x1].mean(-1) > 60)
+        # nor are the dark shadows drawn beside the blade: only the steel itself counts
+        metal = ~BG[ya:yb, x0:x1] & (im[ya:yb, x0:x1].mean(-1) > 95)
         cols = np.where(metal.sum(0) > (yb - ya) * 0.25)[0]
         if len(cols) == 0:
             continue
