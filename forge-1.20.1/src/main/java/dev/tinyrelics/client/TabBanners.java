@@ -26,8 +26,8 @@ public final class TabBanners {
     private static final int FRAME_WIDTH = WIDTH * 4;
     private static final int FRAME_HEIGHT = HEIGHT * 4;
     /** Per banner, same order as the textures: how many frames its picture holds and how long each one stays. */
-    private static final int[] FRAMES = {0, 12, 24, 36};
-    private static final int[] FRAME_MILLIS = {0, 150, 100, 100};
+    private static final int[] FRAMES = {0, 12, 24, 36, 36};
+    private static final int[] FRAME_MILLIS = {0, 150, 100, 100, 100};
     /** The scrolling grid of the creative screen: five rows of nine slots. */
     private static final int GRID_LEFT = 8;
     private static final int GRID_TOP = 17;
@@ -39,6 +39,7 @@ public final class TabBanners {
             new ResourceLocation(TinyRelics.MODID, "textures/gui/banner_necromancer.png"),
             new ResourceLocation(TinyRelics.MODID, "textures/gui/banner_thor.png"),
             new ResourceLocation(TinyRelics.MODID, "textures/gui/banner_chaos.png"),
+            new ResourceLocation(TinyRelics.MODID, "textures/gui/banner_blood.png"),
     };
 
     private TabBanners() {

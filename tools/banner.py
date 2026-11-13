@@ -9,7 +9,7 @@ src, out, y0 = sys.argv[1], sys.argv[2], int(sys.argv[3])
 name = sys.argv[4] if len(sys.argv) > 4 else "necromancer"
 mode = sys.argv[5] if len(sys.argv) > 5 else "eyes"
 GW, GH, SCALE = 162, 36, 4
-FRAMES = {"strike": 24, "slash": 36}.get(mode, 12)
+FRAMES = {"strike": 24, "slash": 36, "throne": 36}.get(mode, 12)
 im = Image.open(src).convert("RGB")
 W, H = im.size
 ch = round(W * GH / GW)
@@ -263,8 +263,77 @@ def slash_frames():
         out_frames.append(fr)
     return out_frames
 
-frames = strike_frames() if mode == "strike" else slash_frames() if mode == "slash" else []
-for f in range(0 if mode in ("strike", "slash") else FRAMES):
+def throne_frames():
+    """The Blood Master: blood rains behind the throne, a flash runs over the helm's eyes, light climbs
+    the sword, the blood in the floor pulses away from the throne, the clouds glow from inside."""
+    rng = np.random.default_rng(9)
+    P = 2
+    hh, ww = base.shape[0] // P, base.shape[1] // P
+    k = base.shape[1] / W
+    yy, xs = np.indices(base.shape[:2])
+    sx, sy = xs / k, yy / k + y0                                # every texel's place in the source picture
+    def box(x0, y_0, x1, y1):
+        return (sx >= x0) & (sx < x1) & (sy >= y_0) & (sy < y1)
+    red = (r > 150) & (g < 80) & (b < 80)
+    eyes = box(1362, 248, 1448, 292) & (r > 190) & (g < 110)
+    gems = red & (box(1388, 222, 1422, 252) | box(1388, 358, 1418, 388) | box(1068, 195, 1100, 235) | box(990, 285, 1015, 315) | box(1155, 285, 1180, 315))
+    blade = box(1378, 400, 1428, 628) & (r > 160) & (g < 70)
+    runes = box(1040, 262, 1132, 482) & red
+    floor = (sy >= 588) & (r > 140) & (g < 60) & ~box(1010, 0, 1150, 2000) & ~box(1370, 0, 1435, 2000)
+    sky = (sy < 470) & (r - g > 25)
+    # what stands in front of the rain: the grey stone and the sword, not the red sky
+    front = ndi.binary_dilation(box(840, 140, 1480, 640) & (r - g < 28), iterations=1) | (sy >= 596)
+    lum = base.mean(-1) / 255
+    drops = [(rng.integers(0, ww + 20), rng.integers(0, hh), rng.choice([4, 6])) for _ in range(90)]
+    hot = np.array([255.0, 190.0, 170.0])
+    def bump(t, at, width):
+        gap = np.abs((t - at + 0.5) % 1.0 - 0.5)
+        return np.exp(-(gap / width) ** 2)
+    def glow(fr, mask, amount):
+        a = np.clip(amount, 0, 1)
+        a = a[..., None] if np.ndim(a) else a
+        fr[mask] = (fr * (1 - a) + hot * a)[mask]
+    out_frames = []
+    for f in range(FRAMES):
+        t = f / FRAMES
+        fr = base.copy()
+        # clouds: two soft red glows wander through them, the moon breathes
+        for centre, at in ((0.30, 0.2), (0.74, 0.65)):
+            power = bump(t, at, 0.12)
+            near = np.exp(-((xs / base.shape[1] - centre) / 0.16) ** 2)
+            fr[sky] *= (1 + 0.55 * power * near * (0.3 + lum))[sky][:, None]
+        moon = box(318, 40, 525, 262) & (r > 120)
+        fr[moon] *= 1.0 + 0.10 * np.sin(2 * np.pi * t)
+        # rain, behind everything that stands on the floor
+        for x0, phase, speed in drops:
+            fall = (f * speed + phase) % hh
+            long = 5 if speed == 6 else 3
+            for n in range(long):
+                y, x = int(fall + n), int(x0 - 0.3 * (fall + n))
+                if 0 <= y < hh and 0 <= x < ww and not front[y * P, x * P]:
+                    a = (0.35 + 0.5 * n / long) * (1.0 if speed == 6 else 0.6)
+                    cell = fr[y * P:(y + 1) * P, x * P:(x + 1) * P]
+                    cell[:] = cell * (1 - a) + np.array([235.0, 28.0, 36.0]) * a
+        # the floor: a pulse of light runs from the throne out to both edges, twice a loop
+        away = np.abs(sx - 1085) / 1100.0
+        glow(fr, floor, 0.55 * np.maximum(bump(t - away * 0.5, 0.05, 0.07), bump(t - away * 0.5, 0.55, 0.07)))
+        # the sword: light climbs the blade from the floor to the guard
+        height = (628 - sy) / 228.0
+        glow(fr, blade, 0.7 * bump(t - height * 0.25, 0.30, 0.06))
+        # the helm: a flash runs across the eyes, then again weaker; the gems light up after it
+        across = (sx - 1362) / 86.0
+        flash = np.maximum(bump(t - across * 0.10, 0.62, 0.035), 0.6 * bump(t - across * 0.10, 0.74, 0.035))
+        fr[eyes] *= 0.72
+        glow(fr, eyes, 0.9 * flash)
+        halo = ndi.binary_dilation(eyes, iterations=2) & ~eyes
+        fr[halo] += (np.array([150.0, 15.0, 15.0]) * flash[..., None])[halo]
+        glow(fr, gems, 0.6 * bump(t, 0.82, 0.07))
+        fr[runes] *= 0.75 + 0.45 * bump(t, 0.45, 0.2)
+        out_frames.append(fr)
+    return out_frames
+
+frames = strike_frames() if mode == "strike" else slash_frames() if mode == "slash" else throne_frames() if mode == "throne" else []
+for f in range(0 if mode in ("strike", "slash", "throne") else FRAMES):
     if mode == "storm":
         frames.append(storm(f))
         continue
@@ -284,6 +353,6 @@ for f in range(0 if mode in ("strike", "slash") else FRAMES):
     frames.append(fr)
 strip = np.concatenate(frames, 0).clip(0, 255).astype(np.uint8)
 Image.fromarray(strip, "RGB").save(out + "/banner_" + name + ".png")
-sheet = np.concatenate([frames[k] for k in ((2, 3, 4, 7, 10, 17) if mode == "strike" else (2, 5, 7, 10, 16, 22) if mode == "slash" else (0, 2, 7))], 0).clip(0, 255).astype(np.uint8)
+sheet = np.concatenate([frames[k] for k in ((2, 3, 4, 7, 10, 17) if mode == "strike" else (2, 5, 7, 10, 16, 22) if mode == "slash" else (2, 11, 20, 23, 27, 30) if mode == "throne" else (0, 2, 7))], 0).clip(0, 255).astype(np.uint8)
 Image.fromarray(sheet, "RGB").save(out + "/banner_preview.png")
 print("texture", strip.shape[1], strip.shape[0])

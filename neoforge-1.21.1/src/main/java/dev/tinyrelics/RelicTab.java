@@ -23,6 +23,7 @@ public final class RelicTab {
     public static final int NECROMANCER = 1;
     public static final int THOR = 2;
     public static final int CHAOS = 3;
+    public static final int BLOOD = 4;
 
     private RelicTab() {
     }
@@ -54,7 +55,7 @@ public final class RelicTab {
                 TinyRelics.CHAOS_HELMET.get(), TinyRelics.CHAOS_CHESTPLATE.get(),
                 TinyRelics.CHAOS_LEGGINGS.get(), TinyRelics.CHAOS_BOOTS.get(),
                 TinyRelics.CHAOS_BOOMERANG.get());
-        // No banner for these yet. Blood Master: the armor, its blade, and what they are made of.
+        banner(output, BLOOD);
         row(output, nextGap,
                 TinyRelics.BLOOD_HELMET.get(), TinyRelics.BLOOD_CHESTPLATE.get(),
                 TinyRelics.BLOOD_LEGGINGS.get(), TinyRelics.BLOOD_BOOTS.get(),
