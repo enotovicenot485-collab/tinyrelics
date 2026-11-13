@@ -13,7 +13,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.Item;
@@ -23,7 +27,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -99,6 +102,33 @@ public class TinyRelics {
     public static final DeferredItem<NecroArmorItem> NECRO_BOOTS = ITEMS.register("necro_boots",
             () -> new NecroArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
 
+    /** Invisible: fills the cells of the creative tab that hold a banner picture or nothing at all. */
+    public static final DeferredItem<Item> TAB_FILLER = ITEMS.register("tab_filler",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
+
+    /** The mod's own creative tab, with Thor's Hammer as its icon. */
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register("main",
+            () -> CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.tinyrelics"))
+                    .icon(() -> new ItemStack(TinyRelics.THOR_HAMMER.get()))
+                    .displayItems((parameters, output) -> RelicTab.fill(output))
+                    .build());
+
+    /** A filler carrying a number; every cell of the tab needs a different one. */
+    public static ItemStack filler(int code) {
+        ItemStack stack = new ItemStack(TAB_FILLER.get());
+        stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(code));
+        return stack;
+    }
+
+    /** The number a filler carries, or -1 for anything that is not a filler. */
+    public static int fillerCode(ItemStack stack) {
+        CustomModelData data = stack.get(DataComponents.CUSTOM_MODEL_DATA);
+        return stack.is(TAB_FILLER.get()) && data != null ? data.value() : -1;
+    }
+
     public static final DeferredItem<UndeadStaffItem> UNDEAD_STAFF = ITEMS.register("undead_staff",
             () -> new UndeadStaffItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
@@ -113,29 +143,13 @@ public class TinyRelics {
     public TinyRelics(IEventBus modBus) {
         ITEMS.register(modBus);
         ENTITIES.register(modBus);
+        TABS.register(modBus);
         ARMOR_MATERIALS.register(modBus);
         PARTICLES.register(modBus);
-        modBus.addListener(this::addCreative);
         modBus.addListener(Network::register);
         RelicConfig.load(FMLPaths.CONFIGDIR.get().resolve("tinyrelics.json"));
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientSetup.init(modBus);
-        }
-    }
-
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-            event.accept(THOR_HAMMER.get());
-            event.accept(CHAOS_BOOMERANG.get());
-            event.accept(BLOOD_BLADE.get());
-            event.accept(UNDEAD_STAFF.get());
-            event.accept(NECRO_HELMET.get());
-            event.accept(NECRO_CHESTPLATE.get());
-            event.accept(NECRO_LEGGINGS.get());
-            event.accept(NECRO_BOOTS.get());
-        }
-        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
-            event.accept(KEEPING_CHARM.get());
         }
     }
 }

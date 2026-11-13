@@ -9,6 +9,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.glfw.GLFW;
 
 /** Client-only registration: the menu key and the renderer of flying weapons. */
@@ -26,6 +27,12 @@ public final class ClientSetup {
         modBus.addListener(ClientSetup::registerKeys);
         modBus.addListener(ClientSetup::registerRenderers);
         modBus.addListener(ClientSetup::registerParticles);
+        // The banner pictures of the creative tab: drawing them, and keeping hands off the cells under them.
+        MinecraftForge.EVENT_BUS.addListener(TabBanners::onForeground);
+        MinecraftForge.EVENT_BUS.addListener(TabBanners::onMousePressed);
+        MinecraftForge.EVENT_BUS.addListener(TabBanners::onMouseReleased);
+        MinecraftForge.EVENT_BUS.addListener(TabBanners::onKeyPressed);
+        MinecraftForge.EVENT_BUS.addListener(TabBanners::onTooltip);
         modBus.addListener(ClientSetup::addLayers);
     }
 

@@ -15,6 +15,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import org.lwjgl.glfw.GLFW;
 
 /** Client-only registration: the menu key and the renderer of flying weapons. */
@@ -32,6 +33,12 @@ public final class ClientSetup {
         modBus.addListener(ClientSetup::registerKeys);
         modBus.addListener(ClientSetup::registerRenderers);
         modBus.addListener(ClientSetup::registerParticles);
+        // The banner pictures of the creative tab: drawing them, and keeping hands off the cells under them.
+        NeoForge.EVENT_BUS.addListener(TabBanners::onForeground);
+        NeoForge.EVENT_BUS.addListener(TabBanners::onMousePressed);
+        NeoForge.EVENT_BUS.addListener(TabBanners::onMouseReleased);
+        NeoForge.EVENT_BUS.addListener(TabBanners::onKeyPressed);
+        NeoForge.EVENT_BUS.addListener(TabBanners::onTooltip);
         modBus.addListener(ClientSetup::addLayers);
         modBus.addListener(ClientSetup::registerExtensions);
     }

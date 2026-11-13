@@ -6,11 +6,13 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -72,6 +74,32 @@ public class TinyRelics {
     public static final RegistryObject<Item> NECRO_BOOTS = ITEMS.register("necro_boots",
             () -> new NecroArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
 
+    /** Invisible: fills the cells of the creative tab that hold a banner picture or nothing at all. */
+    public static final RegistryObject<Item> TAB_FILLER = ITEMS.register("tab_filler",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
+
+    /** The mod's own creative tab, with Thor's Hammer as its icon. */
+    public static final RegistryObject<CreativeModeTab> TAB = TABS.register("main",
+            () -> CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.tinyrelics"))
+                    .icon(() -> new ItemStack(TinyRelics.THOR_HAMMER.get()))
+                    .displayItems((parameters, output) -> RelicTab.fill(output))
+                    .build());
+
+    /** A filler carrying a number; every cell of the tab needs a different one. */
+    public static ItemStack filler(int code) {
+        ItemStack stack = new ItemStack(TAB_FILLER.get());
+        stack.getOrCreateTag().putInt("cell", code);
+        return stack;
+    }
+
+    /** The number a filler carries, or -1 for anything that is not a filler. */
+    public static int fillerCode(ItemStack stack) {
+        return stack.is(TAB_FILLER.get()) && stack.hasTag() ? stack.getTag().getInt("cell") : -1;
+    }
+
     public static final RegistryObject<Item> UNDEAD_STAFF = ITEMS.register("undead_staff",
             () -> new UndeadStaffItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
@@ -89,26 +117,10 @@ public class TinyRelics {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ITEMS.register(modBus);
         ENTITIES.register(modBus);
+        TABS.register(modBus);
         PARTICLES.register(modBus);
-        modBus.addListener(this::addCreative);
         Network.register();
         RelicConfig.load(FMLPaths.CONFIGDIR.get().resolve("tinyrelics.json"));
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientSetup.init(modBus));
-    }
-
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-            event.accept(THOR_HAMMER);
-            event.accept(CHAOS_BOOMERANG);
-            event.accept(BLOOD_BLADE);
-            event.accept(UNDEAD_STAFF);
-            event.accept(NECRO_HELMET);
-            event.accept(NECRO_CHESTPLATE);
-            event.accept(NECRO_LEGGINGS);
-            event.accept(NECRO_BOOTS);
-        }
-        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
-            event.accept(KEEPING_CHARM);
-        }
     }
 }

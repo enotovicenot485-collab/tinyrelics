@@ -70,5 +70,7 @@
   "item.tinyrelics.necro_armor.tooltip2": "Up to 5 servants, 30 seconds each",
   "screen.tinyrelics.name.necro_armor": "Necromancer Armor",
   "screen.tinyrelics.stats.necro_armor": "11 armor with the full set",
-  "screen.tinyrelics.desc.necro_armor": "Helmet 2, chestplate 5, leggings 3, boots 1. With all four pieces on, every mob or player you kill rises where it died as a zombie or a skeleton and fights for you for 30 seconds. No more than 5 such servants at once."
+  "screen.tinyrelics.desc.necro_armor": "Helmet 2, chestplate 5, leggings 3, boots 1. With all four pieces on, every mob or player you kill rises where it died as a zombie or a skeleton and fights for you for 30 seconds. No more than 5 such servants at once.",
+  "itemGroup.tinyrelics": "Tiny Relics",
+  "item.tinyrelics.tab_filler": " "
 }
