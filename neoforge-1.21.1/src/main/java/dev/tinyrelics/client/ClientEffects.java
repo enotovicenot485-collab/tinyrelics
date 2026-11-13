@@ -179,11 +179,23 @@ public final class ClientEffects {
         return y;
     }
 
-    /** Rarely a small drop of blood falls off a Blood Blade that someone is holding. */
+    /**
+     * Where the notches of each held Blood Blade were when its holder was last drawn: entity id ->
+     * three points relative to the holder's feet, then the game time. Written by BladeDripLayer.
+     */
+    public static final java.util.Map<Integer, double[]> BLADE_POINTS = new java.util.HashMap<>();
+
+    /** Rarely a small drop of blood falls from a notch of a Blood Blade that someone is holding. */
     private static void tickBladeDrips(Minecraft mc) {
-        if (mc.level == null || mc.isPaused()) {
+        if (mc.level == null) {
+            BLADE_POINTS.clear();
             return;
         }
+        if (mc.isPaused()) {
+            return;
+        }
+        long now = mc.level.getGameTime();
+        BLADE_POINTS.values().removeIf(points -> now - (long) points[9] > 20L);
         for (net.minecraft.world.entity.player.Player player : mc.level.players()) {
             if (player.isInvisible() || player.getRandom().nextInt(110) != 0) {
                 continue;
@@ -192,16 +204,16 @@ public final class ClientEffects {
             if (!main && !(player.getOffhandItem().getItem() instanceof dev.tinyrelics.BloodBladeItem)) {
                 continue;
             }
-            boolean rightSide = (player.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT) == main;
-            double side = rightSide ? 1.0D : -1.0D;
-            // how far along the blade, from the guard (0) to the tip (1)
-            double along = player.getRandom().nextDouble();
             double x;
             double y;
             double z;
+            double[] points = BLADE_POINTS.get(player.getId());
             if (player == mc.player && mc.options.getCameraType().isFirstPerson()) {
                 // In first person the sword is drawn on the screen, not in the world: the drop
                 // goes where the blade is seen, low and to the side of where the eyes look.
+                boolean rightSide = (player.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT) == main;
+                double side = rightSide ? 1.0D : -1.0D;
+                double along = player.getRandom().nextDouble();
                 net.minecraft.world.phys.Vec3 look = player.getLookAngle();
                 net.minecraft.world.phys.Vec3 right = look.cross(new net.minecraft.world.phys.Vec3(0.0D, 1.0D, 0.0D));
                 if (right.lengthSqr() < 1.0E-4D) {
@@ -216,13 +228,14 @@ public final class ClientEffects {
                 x = at.x;
                 y = at.y;
                 z = at.z;
+            } else if (points != null && now - (long) points[9] <= 3L) {
+                // Seen from outside: one of the notches, exactly where the blade was just drawn.
+                int notch = player.getRandom().nextInt(3) * 3;
+                x = player.getX() + points[notch];
+                y = player.getY() + points[notch + 1];
+                z = player.getZ() + points[notch + 2];
             } else {
-                // Seen from outside: the hand is at the hip, the blade runs forward from it and rises a little.
-                double yaw = Math.toRadians(player.yBodyRot);
-                double ahead = 0.35D + along * 1.25D;
-                x = player.getX() - Math.cos(yaw) * side * 0.38D - Math.sin(yaw) * ahead;
-                z = player.getZ() - Math.sin(yaw) * side * 0.38D + Math.cos(yaw) * ahead;
-                y = player.getY() + 0.78D + along * 0.45D;
+                continue;
             }
             mc.level.addParticle(TinyRelics.BLADE_DRIP.get(), x, y, z, 0.0D, 0.0D, 0.0D);
         }

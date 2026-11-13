@@ -64,11 +64,13 @@ def rot(rx, ry, rz):
     Z = np.array([[np.cos(rz), -np.sin(rz), 0], [np.sin(rz), np.cos(rz), 0], [0, 0, 1]])
     return X @ Y @ Z
 
+# Thin: the sides of a fine-grained sprite let the sky through when seen at an angle, and a thin blade hides it.
+DEPTH = 0.35
 GRIP = np.array([-5.3, -5.3, 0.0])       # where the hand is on the 16x16 sprite, from its middle
 def view(rotation, translation, old_scale, new_scale):
     # the game does translate, rotate, scale: keep translate + rotate(scale * grip) where it was
     moved = np.array(translation) + rot(*rotation) @ ((old_scale - new_scale) * GRIP)
-    right = {"rotation": rotation, "translation": [round(float(v), 2) for v in moved], "scale": [new_scale, new_scale, old_scale]}
+    right = {"rotation": rotation, "translation": [round(float(v), 2) for v in moved], "scale": [new_scale, new_scale, DEPTH]}
     left = dict(right, rotation=[rotation[0], -rotation[1], -rotation[2]])
     return right, left
 

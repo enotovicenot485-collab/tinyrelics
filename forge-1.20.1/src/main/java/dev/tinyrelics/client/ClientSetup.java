@@ -115,6 +115,7 @@ public final class ClientSetup {
     private static void addGlow(EntityRenderer renderer) {
         if (renderer instanceof LivingEntityRenderer living) {
             living.addLayer(new NecroGlowLayer(living));
+            living.addLayer(new BladeDripLayer(living));
         }
     }
 
