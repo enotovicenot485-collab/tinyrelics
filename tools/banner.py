@@ -9,7 +9,7 @@ src, out, y0 = sys.argv[1], sys.argv[2], int(sys.argv[3])
 name = sys.argv[4] if len(sys.argv) > 4 else "necromancer"
 mode = sys.argv[5] if len(sys.argv) > 5 else "eyes"
 GW, GH, SCALE = 162, 36, 4
-FRAMES = 24 if mode == "strike" else 12
+FRAMES = {"strike": 24, "slash": 36}.get(mode, 12)
 im = Image.open(src).convert("RGB")
 W, H = im.size
 ch = round(W * GH / GW)
@@ -158,8 +158,97 @@ def strike_frames():
         out_frames.append(fr)
     return out_frames
 
-frames = strike_frames() if mode == "strike" else []
-for f in range(0 if mode == "strike" else FRAMES):
+def slash_frames():
+    """The assassin: eyes flare, a blade's flash crosses the whole banner behind the head,
+    the cut it leaves bleeds, lanterns flicker in the temples."""
+    rng = np.random.default_rng(5)
+    P = 2
+    hh, ww = base.shape[0] // P, base.shape[1] // P
+    k = base.shape[1] / W                       # source pixels to texels
+    # the outline of the hood in the source picture: the flash passes behind it
+    hood = [(1085, 165), (1005, 198), (940, 255), (920, 330), (890, 450), (900, 475), (982, 555), (1075, 548),
+            (1178, 558), (1200, 550), (1270, 472), (1275, 440), (1245, 320), (1230, 250), (1165, 198)]
+    from PIL import ImageDraw
+    m = Image.new("L", (base.shape[1], base.shape[0]), 0)
+    ImageDraw.Draw(m).polygon([(x * k, (y - y0) * k) for x, y in hood], fill=255)
+    head = ndi.binary_dilation(np.array(m) > 0, iterations=2)
+    eye = head & (b > 200) & (g > 110) & (r > 150)
+    eye_halo = ndi.gaussian_filter(eye.astype(float), 4); eye_halo /= max(eye_halo.max(), 1e-6)
+    rune = head & (b > 150) & (b - g > 70) & (r > 90) & ~eye
+    lamp = (r > 150) & (g > 80) & (b < 110) & (r - b > 70) & ~head
+    lamps, count = ndi.label(ndi.binary_dilation(lamp, iterations=6))
+    # the cut: a slightly rising line, on the coarse grid
+    cut_y = lambda x: 50.5 - x * 0.043
+    xs = np.arange(ww)
+    thick = 0.6 + 1.6 * np.sin(np.pi * xs / ww) ** 0.7          # a blade's flash is fat in the middle
+    yy2, xx2 = np.indices((hh, ww))
+    dist = np.abs(yy2 - cut_y(xx2))
+    blade = np.clip(thick[None, :] - dist + 0.5, 0, 1)
+    hair = (dist < 1.0).astype(float)                            # the thin cut left behind
+    sparks = [(rng.integers(8, ww - 8), rng.normal(0, 3.0), rng.integers(0, 3)) for _ in range(34)]
+    drips = [(x, start) for x, start in zip((18, 47, 83, 112, 206, 233, 262, 291, 311), (13, 17, 12, 19, 15, 12, 18, 14, 16))]
+    up = lambda a: np.kron(a, np.ones((P, P)))
+    SWEEP0, SWEEP1 = 4, 8                        # frames during which the tip crosses the banner
+    out_frames = []
+    for f in range(FRAMES):
+        fr = base.copy()
+        # lanterns: every building has its own slow flicker
+        for c in range(1, count + 1):
+            sel = (lamps == c) & lamp
+            fr[sel] *= 0.86 + 0.2 * np.sin(2 * np.pi * (f * (1 + c % 2) / FRAMES + c * 0.37))
+        # the flash
+        tip = (f - SWEEP0 + 1) / (SWEEP1 - SWEEP0) * ww
+        if f >= SWEEP0:
+            age = max(0, f - SWEEP1)
+            drawn = (xx2 <= tip).astype(float)
+            fade = max(0.0, 1 - age / 5.0)
+            core = blade * drawn * fade
+            # close to the tip it burns white, further back it is already cooling
+            hot = np.clip(1 - (tip - xx2) / 60.0, 0, 1) * drawn if f <= SWEEP1 else 0 * drawn
+            glow = ndi.gaussian_filter(core, 2.5) * 2.2
+            layer = np.zeros(base.shape)
+            layer += up(np.clip(glow, 0, 1))[..., None] * np.array([120, 70, 200.0])
+            c = up(np.clip(core * (0.8 + 0.6 * hot), 0, 1))[..., None]
+            behind = (~head)[..., None]
+            fr = np.where(behind, fr + layer, fr)
+            fr = np.where(behind, fr * (1 - c) + c * np.array([245, 235, 255.0]), fr)
+            # sparks fly off the line while it is hot
+            for sx, sy, delay in sparks:
+                t = f - SWEEP0 - (sx / ww) * (SWEEP1 - SWEEP0) - delay
+                if 0 <= t < 4 and sx <= tip:
+                    y = int(cut_y(sx) + sy * (0.4 + 0.35 * t) + 0.25 * t * t); x = int(sx + t * 1.5)
+                    if 0 <= y < hh and 0 <= x < ww and not head[y * P, x * P]:
+                        fr[y * P:(y + 1) * P, x * P:(x + 1) * P] = np.array([255, 240, 255.0]) if t < 2 else np.array([190, 120, 255.0])
+            # what is left is a thin wound that turns red, then closes
+            wound = np.clip((f - SWEEP1) / 3.0, 0, 1) * np.clip((FRAMES - 3 - f) / 5.0, 0, 1)
+            w3 = up(hair * drawn)[..., None] * wound * behind
+            fr = fr * (1 - 0.85 * w3) + 0.85 * w3 * np.array([170, 14, 28.0])
+        # blood: a bead swells on the cut, falls faster and faster, leaves a short trail
+        for dx, start in drips:
+            t = f - start
+            if t < 0:
+                continue
+            y_top = cut_y(dx) + 1
+            if t < 3:
+                cells = [(0, 0), (1, 0)] if t < 2 else [(0, 0), (1, 0), (0, 1), (1, 1)]
+            else:
+                fall = 0.32 * (t - 2) ** 2
+                cells = [(0, fall), (1, fall), (0, fall + 1), (1, fall + 1), (0, fall + 2), (1, fall + 2), (0, fall - 1), (0, fall - 2.5), (0, fall - 4.5)]
+            for i, (ox, oy) in enumerate(cells):
+                y, x = int(y_top + oy), dx + ox
+                if 0 <= y < hh and not head[min(y * P, base.shape[0] - 1), x * P]:
+                    tone = np.array([205, 16, 30.0]) if i < 6 else np.array([125, 8, 20.0])
+                    fr[y * P:(y + 1) * P, x * P:(x + 1) * P] = tone
+        # eyes: dim at rest, a double flare just before the blade goes by
+        flare = max(np.exp(-((f - 2) / 1.2) ** 2), 0.7 * np.exp(-((f - 6) / 1.4) ** 2))
+        fr[eye] = fr[eye] * (0.55 + 0.45 * flare) + flare * np.array([40, 30, 40.0])
+        fr += (eye_halo * flare)[..., None] * np.array([70, 30, 130.0]) * head[..., None]
+        fr[rune] *= 0.85 + 0.25 * np.sin(2 * np.pi * f / FRAMES)
+        out_frames.append(fr)
+    return out_frames
+
+frames = strike_frames() if mode == "strike" else slash_frames() if mode == "slash" else []
+for f in range(0 if mode in ("strike", "slash") else FRAMES):
     if mode == "storm":
         frames.append(storm(f))
         continue
@@ -179,6 +268,6 @@ for f in range(0 if mode == "strike" else FRAMES):
     frames.append(fr)
 strip = np.concatenate(frames, 0).clip(0, 255).astype(np.uint8)
 Image.fromarray(strip, "RGB").save(out + "/banner_" + name + ".png")
-sheet = np.concatenate([frames[k] for k in ((2, 3, 4, 7, 10, 17) if mode == "strike" else (0, 2, 7))], 0).clip(0, 255).astype(np.uint8)
+sheet = np.concatenate([frames[k] for k in ((2, 3, 4, 7, 10, 17) if mode == "strike" else (2, 5, 7, 10, 16, 22) if mode == "slash" else (0, 2, 7))], 0).clip(0, 255).astype(np.uint8)
 Image.fromarray(sheet, "RGB").save(out + "/banner_preview.png")
 print("texture", strip.shape[1], strip.shape[0])

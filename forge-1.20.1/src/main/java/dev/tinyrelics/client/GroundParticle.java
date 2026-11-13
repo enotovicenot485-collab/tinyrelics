@@ -24,16 +24,19 @@ public class GroundParticle extends TextureSheetParticle {
 
     private final SpriteSet sprites;
     private final float yaw;
+    /** More than zero: a plain animation of this many frames played once (the steam swirl), not the crack. */
+    private final int plainFrames;
 
-    protected GroundParticle(ClientLevel level, double x, double y, double z, float size, SpriteSet sprites) {
+    protected GroundParticle(ClientLevel level, double x, double y, double z, float size, SpriteSet sprites, int plainFrames, int lifetime) {
         super(level, x, y, z);
         this.sprites = sprites;
-        this.lifetime = LIFETIME;
+        this.lifetime = lifetime;
+        this.plainFrames = plainFrames;
         this.quadSize = size;
         this.gravity = 0.0F;
         this.hasPhysics = false;
         this.yaw = this.random.nextFloat() * Mth.TWO_PI;
-        setSprite(sprites.get(0, 3));
+        setSprite(sprites.get(0, plainFrames > 0 ? plainFrames - 1 : 3));
     }
 
     @Override
@@ -43,6 +46,10 @@ public class GroundParticle extends TextureSheetParticle {
         this.zo = this.z;
         if (++this.age >= this.lifetime) {
             remove();
+            return;
+        }
+        if (this.plainFrames > 0) {
+            setSprite(this.sprites.get(Math.min(this.plainFrames - 1, this.age * this.plainFrames / this.lifetime), this.plainFrames - 1));
             return;
         }
         int frame = this.age < OPEN_TICKS ? 0 : this.age < SPREAD_TICKS ? 1 : this.age < GLOW_TICKS ? 2 : 3;
@@ -91,14 +98,23 @@ public class GroundParticle extends TextureSheetParticle {
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
 
+        private final int plainFrames;
+        private final int lifetime;
+
         public Provider(SpriteSet sprites) {
+            this(sprites, 0, LIFETIME);
+        }
+
+        public Provider(SpriteSet sprites, int plainFrames, int lifetime) {
             this.sprites = sprites;
+            this.plainFrames = plainFrames;
+            this.lifetime = lifetime;
         }
 
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z,
                                        double size, double unused1, double unused2) {
-            return new GroundParticle(level, x, y, z, (float) size, this.sprites);
+            return new GroundParticle(level, x, y, z, (float) size, this.sprites, this.plainFrames, this.lifetime);
         }
     }
 }

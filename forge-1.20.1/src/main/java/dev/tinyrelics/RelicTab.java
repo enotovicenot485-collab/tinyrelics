@@ -22,6 +22,7 @@ public final class RelicTab {
     /** Banner numbers; the client has one picture for each. */
     public static final int NECROMANCER = 1;
     public static final int THOR = 2;
+    public static final int CHAOS = 3;
 
     private RelicTab() {
     }
@@ -48,11 +49,12 @@ public final class RelicTab {
         banner(output, THOR);
         row(output, nextGap, TinyRelics.THOR_HAMMER.get());
 
-        // No banners for these yet. Chaos Assassin: the armor and its boomerang.
+        banner(output, CHAOS);
         row(output, nextGap,
                 TinyRelics.CHAOS_HELMET.get(), TinyRelics.CHAOS_CHESTPLATE.get(),
                 TinyRelics.CHAOS_LEGGINGS.get(), TinyRelics.CHAOS_BOOTS.get(),
                 TinyRelics.CHAOS_BOOMERANG.get());
+        // No banner for these yet.
         row(output, nextGap, TinyRelics.BLOOD_BLADE.get(), TinyRelics.KEEPING_CHARM.get());
     }
 

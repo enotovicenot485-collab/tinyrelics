@@ -78,10 +78,12 @@ public final class ChaosSet {
         double x = player.getX();
         double y = player.getY();
         double z = player.getZ();
-        level.sendParticles(ParticleTypes.CLOUD, x, y + 1.0D, z, (int) (90 * strength), 0.7D, 0.9D, 0.7D, 0.02D);
-        level.sendParticles(ParticleTypes.POOF, x, y + 1.0D, z, (int) (40 * strength), 0.6D, 0.8D, 0.6D, 0.04D);
-        level.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y + 0.6D, z, (int) (30 * strength), 0.6D, 0.6D, 0.6D, 0.01D);
-        level.sendParticles(ParticleTypes.WITCH, x, y + 1.0D, z, (int) (25 * strength), 0.6D, 0.8D, 0.6D, 0.0D);
+        level.sendParticles(TinyRelics.CHAOS_STEAM.get(), x, y + 1.0D, z, (int) (70 * strength), 0.75D, 0.9D, 0.75D, 0.03D);
+        level.sendParticles(TinyRelics.CHAOS_STEAM.get(), x, y + 0.3D, z, (int) (30 * strength), 1.3D, 0.25D, 1.3D, 0.02D);
+        // Flat swirls on the ground: count 0 makes the first "speed" number the half-width in blocks.
+        level.sendParticles(TinyRelics.CHAOS_SWIRL.get(), x, y + 0.05D, z, 0, 2.2D * strength + 0.6D, 0.0D, 0.0D, 1.0D);
+        level.sendParticles(TinyRelics.CHAOS_SWIRL.get(), x, y + 0.08D, z, 0, 1.2D * strength + 0.4D, 0.0D, 0.0D, 1.0D);
+        level.sendParticles(ParticleTypes.WITCH, x, y + 1.0D, z, (int) (20 * strength), 0.6D, 0.8D, 0.6D, 0.0D);
         level.playSound(null, x, y, z, SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.9F, 0.6F);
         level.playSound(null, x, y, z, SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1.0F, 0.8F);
     }

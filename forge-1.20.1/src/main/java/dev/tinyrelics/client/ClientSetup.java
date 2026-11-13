@@ -83,6 +83,9 @@ public final class ClientSetup {
         event.registerSpriteSet(TinyRelics.THOR_BOLT.get(), sprites -> new ChaosParticle.Provider(sprites, 8, 0.45F, 0.0F));
         event.registerSpriteSet(TinyRelics.THOR_FLASH.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 0.95F, 0.0F));
         event.registerSpriteSet(TinyRelics.THOR_CRACK.get(), GroundParticle.Provider::new);
+        // The assassin's steam: thick puffs that rise a little, and a swirl that spreads flat over the ground.
+        event.registerSpriteSet(TinyRelics.CHAOS_STEAM.get(), sprites -> new ChaosParticle.Provider(sprites, 30, 0.95F, -0.012F));
+        event.registerSpriteSet(TinyRelics.CHAOS_SWIRL.get(), sprites -> new GroundParticle.Provider(sprites, 6, 24));
     }
 
     /** Players and armor stands get the pulsing glow of the necromancer armor. */
