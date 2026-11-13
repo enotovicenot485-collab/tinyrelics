@@ -48,10 +48,12 @@ public final class RelicTab {
         banner(output, THOR);
         row(output, nextGap, TinyRelics.THOR_HAMMER.get());
 
-        // No banners for these yet: one shared row until their pictures exist.
+        // No banners for these yet. Chaos Assassin: the armor and its boomerang.
         row(output, nextGap,
-                TinyRelics.CHAOS_BOOMERANG.get(), TinyRelics.BLOOD_BLADE.get(),
-                TinyRelics.KEEPING_CHARM.get());
+                TinyRelics.CHAOS_HELMET.get(), TinyRelics.CHAOS_CHESTPLATE.get(),
+                TinyRelics.CHAOS_LEGGINGS.get(), TinyRelics.CHAOS_BOOTS.get(),
+                TinyRelics.CHAOS_BOOMERANG.get());
+        row(output, nextGap, TinyRelics.BLOOD_BLADE.get(), TinyRelics.KEEPING_CHARM.get());
     }
 
     private static void banner(CreativeModeTab.Output output, int banner) {

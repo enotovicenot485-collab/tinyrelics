@@ -83,6 +83,12 @@ public final class ClientSetup {
                 return NecroArmorModels.get(slot);
             }
         }, TinyRelics.NECRO_HELMET.get(), TinyRelics.NECRO_CHESTPLATE.get(), TinyRelics.NECRO_LEGGINGS.get(), TinyRelics.NECRO_BOOTS.get());
+        event.registerItem(new IClientItemExtensions() {
+            @Override
+            public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original) {
+                return ChaosArmorModels.get(slot);
+            }
+        }, TinyRelics.CHAOS_HELMET.get(), TinyRelics.CHAOS_CHESTPLATE.get(), TinyRelics.CHAOS_LEGGINGS.get(), TinyRelics.CHAOS_BOOTS.get());
     }
 
     /** Players and armor stands get the pulsing glow of the necromancer armor. */

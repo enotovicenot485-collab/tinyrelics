@@ -74,6 +74,15 @@ public class TinyRelics {
     public static final RegistryObject<Item> NECRO_BOOTS = ITEMS.register("necro_boots",
             () -> new NecroArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
 
+    public static final RegistryObject<Item> CHAOS_HELMET = ITEMS.register("chaos_helmet",
+            () -> new ChaosArmorItem(ArmorItem.Type.HELMET, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final RegistryObject<Item> CHAOS_CHESTPLATE = ITEMS.register("chaos_chestplate",
+            () -> new ChaosArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final RegistryObject<Item> CHAOS_LEGGINGS = ITEMS.register("chaos_leggings",
+            () -> new ChaosArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final RegistryObject<Item> CHAOS_BOOTS = ITEMS.register("chaos_boots",
+            () -> new ChaosArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+
     /** Invisible: fills the cells of the creative tab that hold a banner picture or nothing at all. */
     public static final RegistryObject<Item> TAB_FILLER = ITEMS.register("tab_filler",
             () -> new Item(new Item.Properties().stacksTo(1)));

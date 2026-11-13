@@ -93,6 +93,23 @@ public class TinyRelics {
                     1.0F,
                     0.0F));
 
+    /** 2 + 5 + 2 + 1 = 10 armor points for the full set. */
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> CHAOS_MATERIAL = ARMOR_MATERIALS.register("chaos",
+            () -> new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), defense -> {
+                        defense.put(ArmorItem.Type.HELMET, 2);
+                        defense.put(ArmorItem.Type.CHESTPLATE, 5);
+                        defense.put(ArmorItem.Type.LEGGINGS, 2);
+                        defense.put(ArmorItem.Type.BOOTS, 1);
+                        defense.put(ArmorItem.Type.BODY, 5);
+                    }),
+                    15,
+                    SoundEvents.ARMOR_EQUIP_NETHERITE,
+                    () -> Ingredient.of(Items.AMETHYST_SHARD),
+                    List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(MODID, "chaos"))),
+                    1.0F,
+                    0.0F));
+
     public static final DeferredItem<NecroArmorItem> NECRO_HELMET = ITEMS.register("necro_helmet",
             () -> new NecroArmorItem(ArmorItem.Type.HELMET, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
     public static final DeferredItem<NecroArmorItem> NECRO_CHESTPLATE = ITEMS.register("necro_chestplate",
@@ -101,6 +118,15 @@ public class TinyRelics {
             () -> new NecroArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
     public static final DeferredItem<NecroArmorItem> NECRO_BOOTS = ITEMS.register("necro_boots",
             () -> new NecroArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+
+    public static final DeferredItem<ChaosArmorItem> CHAOS_HELMET = ITEMS.register("chaos_helmet",
+            () -> new ChaosArmorItem(ArmorItem.Type.HELMET, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<ChaosArmorItem> CHAOS_CHESTPLATE = ITEMS.register("chaos_chestplate",
+            () -> new ChaosArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<ChaosArmorItem> CHAOS_LEGGINGS = ITEMS.register("chaos_leggings",
+            () -> new ChaosArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<ChaosArmorItem> CHAOS_BOOTS = ITEMS.register("chaos_boots",
+            () -> new ChaosArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
 
     /** Invisible: fills the cells of the creative tab that hold a banner picture or nothing at all. */
     public static final DeferredItem<Item> TAB_FILLER = ITEMS.register("tab_filler",
