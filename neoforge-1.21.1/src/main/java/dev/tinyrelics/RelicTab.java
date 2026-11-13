@@ -54,11 +54,13 @@ public final class RelicTab {
                 TinyRelics.CHAOS_HELMET.get(), TinyRelics.CHAOS_CHESTPLATE.get(),
                 TinyRelics.CHAOS_LEGGINGS.get(), TinyRelics.CHAOS_BOOTS.get(),
                 TinyRelics.CHAOS_BOOMERANG.get());
-        // No banner for these yet. Blood Master: the armor and its blade.
+        // No banner for these yet. Blood Master: the armor, its blade, and what they are made of.
         row(output, nextGap,
                 TinyRelics.BLOOD_HELMET.get(), TinyRelics.BLOOD_CHESTPLATE.get(),
                 TinyRelics.BLOOD_LEGGINGS.get(), TinyRelics.BLOOD_BOOTS.get(),
-                TinyRelics.BLOOD_BLADE.get());
+                TinyRelics.BLOOD_BLADE.get(), TinyRelics.BLOOD_INGOT.get(),
+                TinyRelics.BLOOD_DROP_ITEM.get(), TinyRelics.DIRTY_BLOOD_ITEM.get(),
+                TinyRelics.BLOOD_ALTAR_ITEM.get());
         row(output, nextGap, TinyRelics.KEEPING_CHARM.get());
     }
 

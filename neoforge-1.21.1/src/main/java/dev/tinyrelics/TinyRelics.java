@@ -16,6 +16,13 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.Items;
@@ -163,6 +170,22 @@ public class TinyRelics {
     public static final DeferredItem<Item> TAB_FILLER = ITEMS.register("tab_filler",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
+    // ---- Blood: what mobs drop, the ingot made of it, and the altar that makes it.
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, MODID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MODID);
+    public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, MODID);
+    public static final DeferredHolder<Block, BloodAltarBlock> BLOOD_ALTAR = BLOCKS.register("blood_altar",
+            () -> new BloodAltarBlock(BlockBehaviour.Properties.of().strength(2.5F).sound(SoundType.NETHER_WOOD)));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BloodAltarBlockEntity>> BLOOD_ALTAR_ENTITY = BLOCK_ENTITIES.register("blood_altar",
+            () -> BlockEntityType.Builder.of(BloodAltarBlockEntity::new, BLOOD_ALTAR.get()).build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<BloodAltarMenu>> BLOOD_ALTAR_MENU = MENUS.register("blood_altar",
+            () -> IMenuTypeExtension.create((id, inventory, extra) -> new BloodAltarMenu(id, inventory)));
+    public static final DeferredItem<Item> BLOOD_DROP_ITEM = ITEMS.register("blood_drop", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> DIRTY_BLOOD_ITEM = ITEMS.register("dirty_blood_drop", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> BLOOD_INGOT = ITEMS.register("blood_ingot", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<BlockItem> BLOOD_ALTAR_ITEM = ITEMS.register("blood_altar",
+            () -> new BlockItem(BLOOD_ALTAR.get(), new Item.Properties()));
+
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
     /** The mod's own creative tab, with Thor's Hammer as its icon. */
@@ -198,6 +221,9 @@ public class TinyRelics {
                     .build("thrown_relic"));
 
     public TinyRelics(IEventBus modBus) {
+        BLOCKS.register(modBus);
+        BLOCK_ENTITIES.register(modBus);
+        MENUS.register(modBus);
         ITEMS.register(modBus);
         ENTITIES.register(modBus);
         TABS.register(modBus);

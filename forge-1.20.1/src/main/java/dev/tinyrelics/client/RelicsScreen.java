@@ -97,6 +97,7 @@ public class RelicsScreen extends Screen {
                         () -> this.edit.rainCooldown, value -> this.edit.rainCooldown = value);
                 addSlider(1, "rain_radius", RelicConfig.MIN_RAIN_RADIUS, RelicConfig.MAX_RAIN_RADIUS,
                         () -> this.edit.rainRadius, value -> this.edit.rainRadius = value);
+                addToggle(2, "craft", this.edit.bloodCraft, value -> this.edit.bloodCraft = value);
             }
             default -> {
                 addSlider(0, "staff_kills", RelicConfig.MIN_KILLS, RelicConfig.MAX_KILLS,

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "tinyrelics:block/blood_altar_top",
+    "side": "tinyrelics:block/blood_altar_side",
+    "bottom": "tinyrelics:block/blood_altar_bottom"
+  }
+}

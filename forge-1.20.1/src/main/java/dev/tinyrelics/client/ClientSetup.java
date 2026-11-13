@@ -9,6 +9,8 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,8 +30,13 @@ public final class ClientSetup {
     private ClientSetup() {
     }
 
+    private static void registerScreens(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> MenuScreens.register(TinyRelics.BLOOD_ALTAR_MENU.get(), BloodAltarScreen::new));
+    }
+
     public static void init(IEventBus modBus) {
         modBus.addListener(ClientSetup::registerKeys);
+        modBus.addListener(ClientSetup::registerScreens);
         modBus.addListener(ClientSetup::registerRenderers);
         modBus.addListener(ClientSetup::registerParticles);
         // The banner pictures of the creative tab: drawing them, and keeping hands off the cells under them.

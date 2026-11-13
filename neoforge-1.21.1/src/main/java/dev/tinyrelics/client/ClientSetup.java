@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
@@ -34,8 +35,13 @@ public final class ClientSetup {
     private ClientSetup() {
     }
 
+    private static void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(TinyRelics.BLOOD_ALTAR_MENU.get(), BloodAltarScreen::new);
+    }
+
     public static void init(IEventBus modBus) {
         modBus.addListener(ClientSetup::registerKeys);
+        modBus.addListener(ClientSetup::registerScreens);
         modBus.addListener(ClientSetup::registerRenderers);
         modBus.addListener(ClientSetup::registerParticles);
         // The banner pictures of the creative tab: drawing them, and keeping hands off the cells under them.

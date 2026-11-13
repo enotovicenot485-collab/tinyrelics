@@ -193,6 +193,23 @@ public final class GameEvents {
         }
     }
 
+    // ---- Blood drops from mobs: one to three, clean from animals, dirty from monsters.
+
+    @SubscribeEvent
+    public static void onBloodDrops(net.neoforged.neoforge.event.entity.living.LivingDropsEvent event) {
+        net.minecraft.world.entity.LivingEntity victim = event.getEntity();
+        if (!(victim.level() instanceof net.minecraft.server.level.ServerLevel level)
+                || !level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT) || Minions.isMinion(victim)) {
+            return;
+        }
+        net.minecraft.world.item.Item blood = BloodSet.bloodOf(victim);
+        if (blood == null) {
+            return;
+        }
+        event.getDrops().add(new net.minecraft.world.entity.item.ItemEntity(level, victim.getX(), victim.getY() + 0.3D, victim.getZ(),
+                new net.minecraft.world.item.ItemStack(blood, 1 + level.random.nextInt(3))));
+    }
+
     // ---- Blood Master armor: blood hearts take the damage first, animals refill them, death empties them.
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

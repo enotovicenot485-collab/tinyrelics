@@ -18,6 +18,10 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.horse.SkeletonHorse;
+import net.minecraft.world.entity.monster.AbstractSkeleton;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
@@ -73,6 +77,19 @@ public final class BloodSet {
 
     public static float hearts(Player player) {
         return kept(player).getFloat(HEARTS);
+    }
+
+    // ---- Blood as loot.
+
+    /** Hostile mobs bleed dirty blood, peaceful animals clean blood, skeletons have none. Null = nothing. */
+    public static Item bloodOf(LivingEntity victim) {
+        if (victim instanceof Enemy) {
+            return victim instanceof AbstractSkeleton ? null : TinyRelics.DIRTY_BLOOD_ITEM.get();
+        }
+        if (victim instanceof Animal && !(victim instanceof SkeletonHorse)) {
+            return TinyRelics.BLOOD_DROP_ITEM.get();
+        }
+        return null;
     }
 
     // ---- Blood hearts.

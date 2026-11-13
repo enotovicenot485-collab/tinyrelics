@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "PDP",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:crimson_planks"
+    },
+    "D": {
+      "item": "tinyrelics:blood_drop"
+    }
+  },
+  "result": {
+    "item": "tinyrelics:blood_altar"
+  }
+}

@@ -46,6 +46,7 @@ public final class Abilities {
     private static final ResourceLocation STAFF_RECIPE = ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, "undead_staff");
     private static final String[] ARMOR_RECIPES = {"necro_helmet", "necro_chestplate", "necro_leggings", "necro_boots"};
     private static final String[] CHAOS_RECIPES = {"chaos_helmet", "chaos_chestplate", "chaos_leggings", "chaos_boots"};
+    private static final String[] BLOOD_RECIPES = {"blood_helmet", "blood_chestplate", "blood_leggings", "blood_boots"};
 
     /** Soul fire burns for 5 seconds over a 30 x 30 block square. */
     private static final int SOUL_FIRE_TICKS = 100;
@@ -298,6 +299,9 @@ public final class Abilities {
         }
         for (String piece : CHAOS_RECIPES) {
             wanted.put(ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, piece), config.chaosCraft);
+        }
+        for (String piece : BLOOD_RECIPES) {
+            wanted.put(ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, piece), config.bloodCraft);
         }
 
         RecipeManager manager = server.getRecipeManager();

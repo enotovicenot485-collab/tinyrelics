@@ -54,6 +54,7 @@ public final class RelicConfig {
     public boolean staffSkullGrief = false;
     public boolean armorCraft = true;
     public boolean chaosCraft = true;
+    public boolean bloodCraft = true;
     /** Seconds the Chaos Assassin stays unseen after using the armor ability. */
     public int vanishSeconds = 10;
     /** Seconds between two blood rains of the Blood Master. */
@@ -74,6 +75,7 @@ public final class RelicConfig {
         c.staffSkullGrief = this.staffSkullGrief;
         c.armorCraft = this.armorCraft;
         c.chaosCraft = this.chaosCraft;
+        c.bloodCraft = this.bloodCraft;
         c.vanishSeconds = this.vanishSeconds;
         c.rainCooldown = this.rainCooldown;
         c.rainRadius = this.rainRadius;
@@ -108,6 +110,7 @@ public final class RelicConfig {
         buffer.writeVarInt(this.vanishSeconds);
         buffer.writeVarInt(this.rainCooldown);
         buffer.writeVarInt(this.rainRadius);
+        buffer.writeBoolean(this.bloodCraft);
     }
 
     public static RelicConfig read(FriendlyByteBuf buffer) {
@@ -128,6 +131,7 @@ public final class RelicConfig {
         c.vanishSeconds = buffer.readVarInt();
         c.rainCooldown = buffer.readVarInt();
         c.rainRadius = buffer.readVarInt();
+        c.bloodCraft = buffer.readBoolean();
         c.clamp();
         return c;
     }

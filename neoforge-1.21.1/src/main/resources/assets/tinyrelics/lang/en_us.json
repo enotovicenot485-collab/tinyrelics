@@ -96,9 +96,15 @@
   "msg.tinyrelics.rain_wait": "Blood rain will be ready in %s s",
   "screen.tinyrelics.name.blood_armor": "Blood Master",
   "screen.tinyrelics.stats.blood_armor": "18 armor with the full set",
-  "screen.tinyrelics.desc.blood_armor": "Crown 4, chestplate 7, leggings 5, boots 2. The full set gives 4 blood hearts: they never heal by themselves, each peaceful animal killed returns one. Key I: blood rain, up to 3 hearts of damage to everyone under the clouds.",
+  "screen.tinyrelics.desc.blood_armor": "Crown 4, chestplate 7, leggings 5, boots 2. The full set gives 4 blood hearts: each peaceful animal killed returns one. Key I: blood rain. Crafted from blood ingots, which the blood altar makes.",
   "screen.tinyrelics.rain_cooldown": "Rain cooldown: %s s",
   "screen.tinyrelics.rain_cooldown.tip": "Seconds between two blood rains. 180 by default.",
   "screen.tinyrelics.rain_radius": "Rain radius: %s blocks",
-  "screen.tinyrelics.rain_radius.tip": "How far the rain reaches from its centre. 4 is nine blocks across. 4 by default."
+  "screen.tinyrelics.rain_radius.tip": "How far the rain reaches from its centre. 4 is nine blocks across. 4 by default.",
+  "item.tinyrelics.blood_drop": "Drop of Blood",
+  "item.tinyrelics.dirty_blood_drop": "Drop of Dirty Blood",
+  "item.tinyrelics.blood_ingot": "Blood Ingot",
+  "block.tinyrelics.blood_altar": "Blood Altar",
+  "container.tinyrelics.blood_altar": "Blood Altar",
+  "container.tinyrelics.blood_altar.water": "Water: %s of %s bottles"
 }

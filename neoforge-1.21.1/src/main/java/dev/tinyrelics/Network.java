@@ -19,7 +19,7 @@ public final class Network {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("10");
+        PayloadRegistrar registrar = event.registrar("11");
         registrar.playToClient(CharmBroken.TYPE, CharmBroken.STREAM_CODEC,
                 (payload, context) -> ClientEffects.charmBroken());
         registrar.playToClient(ConfigSync.TYPE, ConfigSync.STREAM_CODEC,
