@@ -111,8 +111,19 @@ GRIP = np.array([-5.3, -5.3, 0.0])       # where the hand is on the 16x16 sprite
 def view(rotation, translation, old_scale, new_scale):
     # the game does translate, rotate, scale: keep translate + rotate(scale * grip) where it was
     moved = np.array(translation) + rot(*rotation) @ ((old_scale - new_scale) * GRIP)
-    right = {"rotation": rotation, "translation": [round(float(v), 2) for v in moved], "scale": [new_scale, new_scale, DEPTH]}
-    left = dict(right, rotation=[rotation[0], -rotation[1], -rotation[2]])
+    # Held the usual way the edge with the blood on it would point at the sky. The sword is turned
+    # half a turn about its own length (the grip is on that line, so the hand stays where it was).
+    from scipy.spatial.transform import Rotation
+    axis = np.array([1.0, 1.0, 0.0]) / np.sqrt(2.0)
+    turned = rot(*rotation) @ Rotation.from_rotvec(axis * np.pi).as_matrix()
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")                      # "gimbal lock": any of the equal answers will do
+        angles = Rotation.from_matrix(turned).as_euler("XYZ", degrees=True)
+    assert np.allclose(rot(*angles), turned, atol=1e-6)
+    angles = [round(float(v), 2) for v in angles]
+    right = {"rotation": angles, "translation": [round(float(v), 2) for v in moved], "scale": [new_scale, new_scale, DEPTH]}
+    left = dict(right, rotation=[angles[0], -angles[1], -angles[2]])
     return right, left
 
 third_r, third_l = view([0, -90, 55], [0, 4.0, 0.5], 0.85, 1.55)
@@ -161,7 +172,7 @@ model = {"gui_light": "front", "textures": {"layer0": "tinyrelics:item/blood_bla
                      "fixed": {"rotation": [0, 180, 0], "translation": [0, 0, 0], "scale": [1, 1, 1]}},
          "elements": elements}
 json.dump(model, open(out + "/blood_blade.json", "w"), separators=(",", ":"))
-print("boxes in the model:", len(elements))
+print("boxes in the model:", len(elements), third_r, first_r)
 picks = [0, 8, 14, 20, 26, 32, 37]
 prev = np.concatenate([frames[k] for k in picks], 1).clip(0, 255).astype(np.uint8)
 bg = Image.new("RGBA", (prev.shape[1] * 2, prev.shape[0] * 2), (70, 70, 70, 255)); bg.alpha_composite(Image.fromarray(prev, "RGBA").resize(bg.size, Image.NEAREST)); bg.convert("RGB").save(out + "/blade_preview.png")
