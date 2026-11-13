@@ -184,7 +184,6 @@ def slash_frames():
     yy2, xx2 = np.indices((hh, ww))
     dist = np.abs(yy2 - cut_y(xx2))
     blade = np.clip(thick[None, :] - dist + 0.5, 0, 1)
-    hair = (dist < 1.0).astype(float)                            # the thin cut left behind
     sparks = [(rng.integers(8, ww - 8), rng.normal(0, 3.0), rng.integers(0, 3)) for _ in range(34)]
     drips = [(x, start) for x, start in zip((18, 47, 83, 112, 206, 233, 262, 291, 311), (13, 17, 12, 19, 15, 12, 18, 14, 16))]
     up = lambda a: np.kron(a, np.ones((P, P)))
@@ -219,10 +218,27 @@ def slash_frames():
                     y = int(cut_y(sx) + sy * (0.4 + 0.35 * t) + 0.25 * t * t); x = int(sx + t * 1.5)
                     if 0 <= y < hh and 0 <= x < ww and not head[y * P, x * P]:
                         fr[y * P:(y + 1) * P, x * P:(x + 1) * P] = np.array([255, 240, 255.0]) if t < 2 else np.array([190, 120, 255.0])
-            # what is left is a thin wound that turns red, then closes
-            wound = np.clip((f - SWEEP1) / 3.0, 0, 1) * np.clip((FRAMES - 3 - f) / 5.0, 0, 1)
-            w3 = up(hair * drawn)[..., None] * wound * behind
-            fr = fr * (1 - 0.85 * w3) + 0.85 * w3 * np.array([170, 14, 28.0])
+            # where the blade bit, a short tapered nick stays for a while, and a little blood sprays out
+            for dx, start in drips:
+                if dx > tip:
+                    continue
+                since = f - SWEEP0 - (dx / ww) * (SWEEP1 - SWEEP0)
+                strength = np.clip(since / 2.0, 0, 1) * np.clip((FRAMES - 4 - f) / 6.0, 0, 1)
+                for o in range(-4, 5):
+                    x, y = dx + o, int(round(cut_y(dx + o)))
+                    rows = (y, y + 1) if abs(o) <= 1 else (y,)
+                    for yy3 in rows:
+                        if 0 <= x < ww and 0 <= yy3 < hh and not head[yy3 * P, x * P]:
+                            a = strength * (1.0 if abs(o) <= 2 else 0.55)
+                            tone = np.array([150, 10, 24.0]) if abs(o) <= 2 else np.array([90, 6, 18.0])
+                            fr[yy3 * P:(yy3 + 1) * P, x * P:(x + 1) * P] = fr[yy3 * P:(yy3 + 1) * P, x * P:(x + 1) * P] * (1 - a) + a * tone
+                for n in range(4):
+                    t = since - 0.5
+                    if 0 <= t < 4:
+                        ang = (dx * 7 + n * 37) % 100 / 100.0 * np.pi + np.pi   # upwards, fanned out
+                        x = int(dx + np.cos(ang) * (1.5 + 2.2 * t)); y = int(cut_y(dx) + np.sin(ang) * (1.5 + 2.0 * t) + 0.35 * t * t)
+                        if 0 <= x < ww and 0 <= y < hh and not head[y * P, x * P]:
+                            fr[y * P:(y + 1) * P, x * P:(x + 1) * P] = np.array([190, 14, 28.0])
         # blood: a bead swells on the cut, falls faster and faster, leaves a short trail
         for dx, start in drips:
             t = f - start

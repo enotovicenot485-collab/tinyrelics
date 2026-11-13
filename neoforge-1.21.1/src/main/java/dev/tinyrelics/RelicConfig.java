@@ -21,6 +21,8 @@ public final class RelicConfig {
     public static final int MAX_KILLS = 100;
     public static final int MIN_SLAM = 3;
     public static final int MAX_SLAM = 32;
+    public static final int MIN_VANISH = 3;
+    public static final int MAX_VANISH = 60;
 
     /** The copy the game logic reads. */
     public static RelicConfig SERVER = new RelicConfig();
@@ -47,6 +49,9 @@ public final class RelicConfig {
     /** Whether the staff's wither skulls break blocks. */
     public boolean staffSkullGrief = false;
     public boolean armorCraft = true;
+    public boolean chaosCraft = true;
+    /** Seconds the Chaos Assassin stays unseen after using the armor ability. */
+    public int vanishSeconds = 10;
 
     public RelicConfig copy() {
         RelicConfig c = new RelicConfig();
@@ -60,6 +65,8 @@ public final class RelicConfig {
         c.staffKills = this.staffKills;
         c.staffSkullGrief = this.staffSkullGrief;
         c.armorCraft = this.armorCraft;
+        c.chaosCraft = this.chaosCraft;
+        c.vanishSeconds = this.vanishSeconds;
         c.hammerSlamRadius = this.hammerSlamRadius;
         c.hammerSlamFire = this.hammerSlamFire;
         return c;
@@ -69,6 +76,7 @@ public final class RelicConfig {
         this.hammerRadius = Math.max(MIN_RADIUS, Math.min(MAX_RADIUS, this.hammerRadius));
         this.staffKills = Math.max(MIN_KILLS, Math.min(MAX_KILLS, this.staffKills));
         this.hammerSlamRadius = Math.max(MIN_SLAM, Math.min(MAX_SLAM, this.hammerSlamRadius));
+        this.vanishSeconds = Math.max(MIN_VANISH, Math.min(MAX_VANISH, this.vanishSeconds));
     }
 
     public void write(FriendlyByteBuf buffer) {
@@ -84,6 +92,8 @@ public final class RelicConfig {
         buffer.writeBoolean(this.armorCraft);
         buffer.writeVarInt(this.hammerSlamRadius);
         buffer.writeBoolean(this.hammerSlamFire);
+        buffer.writeBoolean(this.chaosCraft);
+        buffer.writeVarInt(this.vanishSeconds);
     }
 
     public static RelicConfig read(FriendlyByteBuf buffer) {
@@ -100,6 +110,8 @@ public final class RelicConfig {
         c.armorCraft = buffer.readBoolean();
         c.hammerSlamRadius = buffer.readVarInt();
         c.hammerSlamFire = buffer.readBoolean();
+        c.chaosCraft = buffer.readBoolean();
+        c.vanishSeconds = buffer.readVarInt();
         c.clamp();
         return c;
     }

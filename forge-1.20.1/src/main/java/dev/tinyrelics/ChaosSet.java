@@ -22,9 +22,9 @@ public final class ChaosSet {
     /** Player data: game time when the ability is ready again, and when the current vanishing ends. */
     private static final String READY = "tinyrelics_vanish_ready";
     private static final String UNTIL = "tinyrelics_vanish_until";
-    /** Two minutes between uses, ten seconds unseen. */
+    /** Two minutes between uses. How long the wearer stays unseen is a setting. */
     private static final int COOLDOWN = 2400;
-    private static final int DURATION = 200;
+    private static final int LONGEST = RelicConfig.MAX_VANISH * 20;
     private static final EquipmentSlot[] ARMOR = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
 
     private ChaosSet() {
@@ -42,7 +42,7 @@ public final class ChaosSet {
     /** True while the wearer is unseen after using the ability. */
     public static boolean isVanished(ServerPlayer player) {
         long left = player.getPersistentData().getLong(UNTIL) - player.serverLevel().getGameTime();
-        return left > 0 && left <= DURATION;
+        return left > 0 && left <= LONGEST;
     }
 
     /** The armor ability key. */
@@ -60,11 +60,12 @@ public final class ChaosSet {
             return;
         }
         data.putLong(READY, now + COOLDOWN);
-        data.putLong(UNTIL, now + DURATION);
+        int duration = RelicConfig.SERVER.vanishSeconds * 20;
+        data.putLong(UNTIL, now + duration);
         steam(level, player, 1.0F);
         // No potion swirls and no icon flicker for others: nothing gives the wearer away.
-        player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, DURATION, 0, false, false, true));
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, DURATION, 4, false, false, true));
+        player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, duration, 0, false, false, true));
+        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, duration, 4, false, false, true));
         // Whatever was chasing the wearer loses the trail.
         for (Mob mob : level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(32.0D))) {
             if (mob.getTarget() == player) {
@@ -101,7 +102,7 @@ public final class ChaosSet {
                     player.removeEffect(MobEffects.INVISIBILITY);
                     player.removeEffect(MobEffects.MOVEMENT_SPEED);
                 }
-                if (!full || now >= until || until - now > DURATION) {
+                if (!full || now >= until || until - now > LONGEST) {
                     data.remove(UNTIL);
                     steam(player.serverLevel(), player, 0.4F);
                 }

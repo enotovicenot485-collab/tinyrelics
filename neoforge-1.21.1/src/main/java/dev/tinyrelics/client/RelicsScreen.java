@@ -87,7 +87,9 @@ public class RelicsScreen extends Screen {
             case 3 -> addToggle(0, "craft", this.edit.bladeCraft, value -> this.edit.bladeCraft = value);
             case 5 -> addToggle(0, "craft", this.edit.armorCraft, value -> this.edit.armorCraft = value);
             case 6 -> {
-                // nothing to set up yet: the Chaos Assassin armor has no recipe
+                addSlider(0, "vanish_seconds", RelicConfig.MIN_VANISH, RelicConfig.MAX_VANISH,
+                        () -> this.edit.vanishSeconds, value -> this.edit.vanishSeconds = value);
+                addToggle(1, "craft", this.edit.chaosCraft, value -> this.edit.chaosCraft = value);
             }
             default -> {
                 addSlider(0, "staff_kills", RelicConfig.MIN_KILLS, RelicConfig.MAX_KILLS,

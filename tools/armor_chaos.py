@@ -101,7 +101,9 @@ def stepped(part, rects, xyz, depth, side, unit=26.67):
     out = []
     for row in range(int(round((y1 - y0) / unit))):
         ya, yb = int(y0 + row * unit), int(y0 + (row + 1) * unit)
-        cols = np.where((~BG[ya:yb, x0:x1]).sum(0) > (yb - ya) * 0.25)[0]
+        # the drawing's black outline is not part of the shape: it would only make the blade fatter
+        metal = ~BG[ya:yb, x0:x1] & (im[ya:yb, x0:x1].mean(-1) > 60)
+        cols = np.where(metal.sum(0) > (yb - ya) * 0.25)[0]
         if len(cols) == 0:
             continue
         pa, pb = x0 + cols[0], x0 + cols[-1] + 1
@@ -123,7 +125,7 @@ def pauldron(side):
         box("right_arm", low, (-4.6, -2.9, -3), (6, 3, 6), None),
         box("right_arm", up, (-4.4, -3.8, -2.5), (4, 1, 5), None),
         # the curved blade: one solid spike, built row by row along the outline of the drawing
-        *stepped("right_arm", BLADE, (-7.5, -7.4, -1), 2, side),
+        *stepped("right_arm", BLADE, (-7.5, -6.8, -0.5), 1, side),
     ]
     return boxes if side < 0 else [mirror(b) for b in boxes]
 

@@ -78,10 +78,12 @@
   "screen.tinyrelics.desc.necro_armor": "Helmet 2, chestplate 5, leggings 3, boots 1. With all four pieces on, every mob or player you kill rises where it died as a zombie or a skeleton and fights for you for 30 seconds. No more than 5 such servants at once.",
   "itemGroup.tinyrelics": "Tiny Relics",
   "item.tinyrelics.tab_filler": " ",
-  "item.tinyrelics.chaos_armor.tooltip2": "[%s] vanish for 10 s and gain Speed V",
+  "item.tinyrelics.chaos_armor.tooltip2": "[%s] vanish and gain Speed V",
   "msg.tinyrelics.vanish_wait": "Vanishing will be ready in %s s",
   "key.tinyrelics.armor": "Armor ability",
   "screen.tinyrelics.name.chaos_armor": "Chaos Assassin Armor",
   "screen.tinyrelics.stats.chaos_armor": "13 armor with the full set",
-  "screen.tinyrelics.desc.chaos_armor": "Hood 3, chestplate 6, leggings 3, boots 1. With all four pieces on, the wearer has Speed III. The armor ability key (I by default): the wearer vanishes in a cloud of steam for 10 seconds, armor and held item included, and gains Speed V. Cooldown 2 minutes."
+  "screen.tinyrelics.desc.chaos_armor": "Hood 3, chestplate 6, leggings 3, boots 1. With all four pieces on, the wearer has Speed III. The armor ability key (I by default): the wearer vanishes in a cloud of steam, cannot be seen at all, armor and weapon included, mobs lose track, and Speed V is granted. The duration is set below, the cooldown is 2 minutes.",
+  "screen.tinyrelics.vanish_seconds": "Invisibility: %s s",
+  "screen.tinyrelics.vanish_seconds.tip": "How many seconds the vanishing and Speed V last. 10 by default."
 }
