@@ -5,6 +5,9 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage as ndi
 src, out, y0 = sys.argv[1], sys.argv[2], int(sys.argv[3])
+# banner.py <picture> <out dir> <first row of the crop> [name] [mode]
+name = sys.argv[4] if len(sys.argv) > 4 else "necromancer"
+mode = sys.argv[5] if len(sys.argv) > 5 else "eyes"
 GW, GH, SCALE, FRAMES = 162, 36, 4, 12
 im = Image.open(src).convert("RGB")
 W, H = im.size
@@ -31,8 +34,28 @@ skulls = len(set(skull_of.values()))
 print("eyes", len(eyes), "skulls", skulls, "sparks", len(sparks))
 rng = np.random.default_rng(3)
 xx = np.indices(cyan.shape)[1]
+def storm(f):
+    """Lightning: every bolt flares up at its own moment and lights the clouds around it."""
+    width = base.shape[1]
+    # how much a pixel is made of light: bolts fully, lit clouds a little, rock and leather not at all
+    glow = np.clip((b - 70) / 110, 0, 1)
+    level = np.zeros(base.shape[:2])
+    total = np.zeros(base.shape[:2])
+    # (where the bolt is, the frame it flares on, how bright it rests); the middle one hits the hammer
+    for centre, flash, rest in ((0.13, 1, 0.7), (0.42, 8, 0.8), (0.53, 4, 0.92), (0.70, 10, 0.8), (0.88, 6, 0.7)):
+        since = (f - flash) % FRAMES
+        value = 1.4 if since == 0 else 1.15 if since == 1 else rest + 0.06 * np.sin(2 * np.pi * (f + flash) / FRAMES)
+        weight = np.exp(-((xx / width - centre) / 0.07) ** 2)
+        level += weight * value
+        total += weight
+    level = (level + 0.02 * 0.8) / (total + 0.02)
+    return base * (1 + glow * (level - 1))[..., None]
+
 frames = []
 for f in range(FRAMES):
+    if mode == "storm":
+        frames.append(storm(f))
+        continue
     fr = base.copy()
     # the mist breathes: a soft wave of light drifts from left to right
     wave = 0.82 + 0.36 * np.clip(np.cos(2 * np.pi * f / FRAMES - xx * 0.035), 0, 1) ** 2
@@ -48,7 +71,7 @@ for f in range(FRAMES):
         fr[m] = fr[m] * rng.choice([0.35, 0.8, 1.0, 1.25])
     frames.append(fr)
 strip = np.concatenate(frames, 0).clip(0, 255).astype(np.uint8)
-Image.fromarray(strip, "RGB").save(out + "/banner_necromancer.png")
+Image.fromarray(strip, "RGB").save(out + "/banner_" + name + ".png")
 sheet = np.concatenate([frames[0], frames[2], frames[7]], 0).clip(0, 255).astype(np.uint8)
 Image.fromarray(sheet, "RGB").save(out + "/banner_preview.png")
 print("texture", strip.shape[1], strip.shape[0])

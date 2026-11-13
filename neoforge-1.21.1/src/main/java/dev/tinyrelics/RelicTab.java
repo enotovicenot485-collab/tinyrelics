@@ -21,6 +21,7 @@ public final class RelicTab {
 
     /** Banner numbers; the client has one picture for each. */
     public static final int NECROMANCER = 1;
+    public static final int THOR = 2;
 
     private RelicTab() {
     }
@@ -44,10 +45,13 @@ public final class RelicTab {
                 TinyRelics.NECRO_LEGGINGS.get(), TinyRelics.NECRO_BOOTS.get(),
                 TinyRelics.UNDEAD_STAFF.get());
 
+        banner(output, THOR);
+        row(output, nextGap, TinyRelics.THOR_HAMMER.get());
+
         // No banners for these yet: one shared row until their pictures exist.
         row(output, nextGap,
-                TinyRelics.THOR_HAMMER.get(), TinyRelics.CHAOS_BOOMERANG.get(),
-                TinyRelics.BLOOD_BLADE.get(), TinyRelics.KEEPING_CHARM.get());
+                TinyRelics.CHAOS_BOOMERANG.get(), TinyRelics.BLOOD_BLADE.get(),
+                TinyRelics.KEEPING_CHARM.get());
     }
 
     private static void banner(CreativeModeTab.Output output, int banner) {

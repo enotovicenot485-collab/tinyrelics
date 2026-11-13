@@ -36,6 +36,7 @@ public final class TabBanners {
     private static final ResourceLocation[] TEXTURES = {
             null,
             ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, "textures/gui/banner_necromancer.png"),
+            ResourceLocation.fromNamespaceAndPath(TinyRelics.MODID, "textures/gui/banner_thor.png"),
     };
 
     private TabBanners() {
