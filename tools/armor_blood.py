@@ -188,9 +188,9 @@ CROWN_FRONT = ((-6, -13.6, -6), (12, 6, 1))
 # rows = the part of the box height (0 = top, 1 = bottom) that is painted; the rest stays see-through.
 SLOTS = {
     "head": [
-        # two shells: the eyes are painted on the inner one and seen through slits cut in the outer one
-        box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.1),
-        dict(box("head", FACE, (-4, -8, -4), (8, 8, 8), None, 0.9), slots=True),
+        # two shells, as on a vanilla helmet: the outer one has the face opening cut out, the eyes are on the inner one
+        box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.15),
+        dict(box("head", FACE, (-4, -8, -4), (8, 8, 8), None, 0.8), slots=True),
         # the crown: a closed ring a little wider than the helm, with solid points, and the ruby standing out in front
         *crown_wall("N", CROWN["N"], 108, (-6, -9.7, -6), 2, {0: 2, 2: 3, 5: 4, 6: 4, 9: 3, 11: 2}),
         *crown_wall("S", CROWN["S"], 108, (-6, -9.7, 5), 1, {0: 2, 2: 3, 5: 4, 6: 4, 9: 3, 11: 2}),
@@ -410,18 +410,15 @@ def paint(sheet, b):
         if name == "N" and (block[..., 3] > 0).any():
             front = tuple(block[block[..., 3] > 0][:, :3].mean(axis=0))
         if name == "N" and b.get("slots"):
-            # Eye slits: where the drawing has the glowing eyes the helm is cut through, so the eyes
-            # painted on the box underneath are seen deep inside. A lighter rim marks the cut edge.
-            top, low = int(0.12 * fh * K), int(0.52 * fh * K)
-            red = np.zeros(block.shape[:2], bool)
-            red[top:low] = (block[top:low, :, 0] > 165) & (block[top:low, :, 1] < 120)
-            labels, count = ndi.label(ndi.binary_dilation(red, iterations=1))
-            hole = np.zeros_like(red)
-            for where in ndi.find_objects(labels):
-                if red[where].sum() >= 6:
-                    hole[where] = True
+            # The face opening, like on a vanilla helmet: the black part of the drawing (the band with
+            # the eyes and the strip running down from it between the tears) is cut out of this shell,
+            # so only the metal round it stands forward and the eyes sit deeper, on the box underneath.
+            rows, cols = block.shape[:2]
+            hole = np.zeros((rows, cols), bool)
+            hole[int(0.26 * rows):int(0.50 * rows), int(0.09 * cols):int(0.91 * cols)] = True
+            hole[int(0.26 * rows):, int(0.29 * cols):int(0.71 * cols)] = True
             rim = ndi.binary_dilation(hole, iterations=1) & ~hole
-            block[rim, :3] = (92, 84, 88)
+            block[rim, :3] = block[rim, :3] * 0.5 + np.array([58, 52, 56]) * 0.5
             block[hole] = 0
         sheet[fy * K:(fy + fh) * K, fx * K:(fx + fw) * K] = block
     if (b["top"] or b["bottom"]) and b["solid"]:
