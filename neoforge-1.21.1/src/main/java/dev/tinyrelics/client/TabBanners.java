@@ -25,8 +25,9 @@ public final class TabBanners {
     /** The texture holds the frames one under another, each drawn at four times the on-screen size. */
     private static final int FRAME_WIDTH = WIDTH * 4;
     private static final int FRAME_HEIGHT = HEIGHT * 4;
-    private static final int FRAMES = 12;
-    private static final int FRAME_MILLIS = 150;
+    /** Per banner, same order as the textures: how many frames its picture holds and how long each one stays. */
+    private static final int[] FRAMES = {0, 12, 24};
+    private static final int[] FRAME_MILLIS = {0, 150, 100};
     /** The scrolling grid of the creative screen: five rows of nine slots. */
     private static final int GRID_LEFT = 8;
     private static final int GRID_TOP = 17;
@@ -60,7 +61,7 @@ public final class TabBanners {
             int cell = RelicTab.cellOf(code);
             int x = slot.x - 1 - (cell % RelicTab.COLUMNS) * 18;
             int y = slot.y - 1 - (cell / RelicTab.COLUMNS) * 18;
-            int frame = (int) (System.currentTimeMillis() / FRAME_MILLIS % FRAMES);
+            int frame = (int) (System.currentTimeMillis() / FRAME_MILLIS[banner] % FRAMES[banner]);
 
             int left = screen.getGuiLeft();
             int top = screen.getGuiTop();
@@ -68,7 +69,7 @@ public final class TabBanners {
             graphics.pose().pushPose();
             graphics.pose().translate(0.0F, 0.0F, 200.0F);
             graphics.blit(TEXTURES[banner], x, y, WIDTH, HEIGHT, 0.0F, frame * FRAME_HEIGHT,
-                    FRAME_WIDTH, FRAME_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT * FRAMES);
+                    FRAME_WIDTH, FRAME_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT * FRAMES[banner]);
             graphics.pose().popPose();
             graphics.disableScissor();
         }

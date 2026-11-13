@@ -8,7 +8,8 @@ src, out, y0 = sys.argv[1], sys.argv[2], int(sys.argv[3])
 # banner.py <picture> <out dir> <first row of the crop> [name] [mode]
 name = sys.argv[4] if len(sys.argv) > 4 else "necromancer"
 mode = sys.argv[5] if len(sys.argv) > 5 else "eyes"
-GW, GH, SCALE, FRAMES = 162, 36, 4, 12
+GW, GH, SCALE = 162, 36, 4
+FRAMES = 24 if mode == "strike" else 12
 im = Image.open(src).convert("RGB")
 W, H = im.size
 ch = round(W * GH / GW)
@@ -51,8 +52,114 @@ def storm(f):
     level = (level + 0.02 * 0.8) / (total + 0.02)
     return base * (1 + glow * (level - 1))[..., None]
 
-frames = []
-for f in range(FRAMES):
+def line(grid, p, q, power):
+    n = int(max(abs(q[0] - p[0]), abs(q[1] - p[1]))) + 1
+    for t in np.linspace(0, 1, n + 1):
+        x, y = int(round(p[0] + (q[0] - p[0]) * t)), int(round(p[1] + (q[1] - p[1]) * t))
+        if 0 <= y < grid.shape[0] and 0 <= x < grid.shape[1]:
+            grid[y, x] = max(grid[y, x], power)
+
+def bolt(rng, start, end, grid, power=1.0, rough=0.28, branches=True):
+    """A jagged pixel bolt from start to end on a coarse grid: the line is broken in the
+    middle again and again, and side branches fork off and die out."""
+    pts = [np.array(start, float), np.array(end, float)]
+    for _ in range(5):
+        nxt = [pts[0]]
+        for p, q in zip(pts, pts[1:]):
+            d = q - p
+            length = np.hypot(*d)
+            mid = (p + q) / 2 + np.array([-d[1], d[0]]) / max(length, 1e-6) * rng.normal(0, rough) * length
+            nxt += [mid, q] if length > 3 else [q]
+        pts = nxt
+    for p, q in zip(pts, pts[1:]):
+        line(grid, p, q, power)
+    if branches:
+        for i in rng.choice(len(pts) - 2, size=min(3, len(pts) - 2), replace=False):
+            p = pts[i + 1]
+            d = np.array(end, float) - np.array(start, float)
+            turn = rng.choice([-1, 1]) * rng.uniform(0.5, 1.1)
+            c, sn = np.cos(turn), np.sin(turn)
+            far_end = p + np.array([d[0] * c - d[1] * sn, d[0] * sn + d[1] * c]) * rng.uniform(0.25, 0.5)
+            bolt(rng, p, far_end, grid, power * 0.55, rough, False)
+
+def strike_frames():
+    """A thunderstorm: bolts hit the hammer, each with its own shape, the sky flares, runes blaze, rain falls."""
+    rng = np.random.default_rng(11)
+    P = 2                                    # one bolt pixel is 2x2 texels, like the picture's own pixels
+    h, w = base.shape[0] // P, base.shape[1] // P
+    gem, head = (361 // P, 36 // P), (316 // P, 78 // P)
+    # (frame it lands on, x at the top of the sky, where it hits)
+    hits = [(2, gem[0] - 70, gem), (10, gem[0] + 85, gem), (17, head[0] - 95, (head[0] - 4, head[1] - 9))]
+    far = [(6, 40, 34), (14, 285, 30), (21, 95, 26)]   # silent bolts deep in the clouds: frame, x, length
+    shapes = {}
+    arcs = {}
+    for f, x, target in hits:
+        g = np.zeros((h, w)); bolt(rng, (x, -2), target, g); shapes[f] = (g, (x + target[0]) / 2)
+        arcs[f] = []
+        for k in range(3):
+            a = np.zeros((h, w))
+            for _ in range(3):
+                p = (head[0] + rng.integers(-16, 30), head[1] + rng.integers(-26, 10))
+                bolt(rng, p, (p[0] + rng.integers(-12, 12), p[1] + rng.integers(4, 14)), a, 0.8, 0.35, False)
+            arcs[f].append(a)
+    for f, x, length in far:
+        g = np.zeros((h, w)); bolt(rng, (x, -2), (x + rng.integers(-30, 30), length), g, 0.6); shapes[f] = (g, x)
+    # how a strike lives: flash, flicker, second flash, thin afterimage, gone
+    life = [1.0, 0.45, 0.85, 0.3, 0.12]
+    rune = cyan.astype(np.float64)
+    halo = ndi.gaussian_filter(rune, 5)
+    halo = halo / halo.max()
+    lum = base.mean(-1) / 255
+    drops = [(rng.integers(0, w + 30), rng.integers(0, h), rng.choice([3, 6])) for _ in range(46)]
+    cols = np.arange(w)[None, :]
+    out_frames = []
+    for f in range(FRAMES):
+        fr = base.copy()
+        core = np.zeros((h, w)); sky = np.zeros((h, w)); charge = 0.0
+        for start, (g, x) in shapes.items():
+            age = (f - start) % FRAMES
+            if age >= len(life):
+                continue
+            level = life[age]
+            core = np.maximum(core, g * level if age < 3 else (g > 0.9) * level)
+            # the clouds light up around the bolt and fade further away
+            sky = np.maximum(sky, level * g.max() * np.exp(-((cols - x) / 90.0) ** 2) * np.ones((h, 1)))
+            if g.max() > 0.9:
+                charge = max(charge, level)
+        # after the hit small arcs crawl over the hammer, a new set every frame
+        for start, sets in arcs.items():
+            age = (f - start) % FRAMES
+            if 1 <= age <= 6:
+                core = np.maximum(core, sets[age % 3] * (1.0 if age < 5 else 0.5))
+        # the charge stays in the hammer a little longer than the bolt lasts
+        for start, _, _ in hits:
+            age = (f - start) % FRAMES
+            if 5 <= age < 9:
+                charge = max(charge, 0.5 - 0.1 * (age - 5))
+        up = lambda a: np.kron(a, np.ones((P, P)))
+        glow = up(np.clip(ndi.gaussian_filter(core, 1.6) * 6, 0, 1))
+        wide = up(np.clip(ndi.gaussian_filter(core, 7) * 14, 0, 1))
+        skyl = up(sky)
+        fr = fr * (1 + 2.2 * skyl * (0.3 + lum))[..., None] + (skyl * (0.15 + lum) * 70)[..., None] * np.array([0.3, 0.5, 1.0])
+        fr += wide[..., None] * np.array([10, 40, 120.0]) + glow[..., None] * np.array([40, 130, 255.0])
+        c = up(core)
+        fr = fr * (1 - np.clip(c * 1.8, 0, 1))[..., None] + np.clip(c * 1.8, 0, 1)[..., None] * np.array([225, 245, 255.0])
+        # runes and cracks: a slow pulse at rest, a blaze when charged
+        rest = 0.8 + 0.12 * np.sin(2 * np.pi * f / FRAMES * 2)
+        fr[cyan] = fr[cyan] * (rest + 0.9 * charge)
+        fr += (halo * charge)[..., None] * np.array([20, 90, 200.0])
+        # rain
+        for x0, phase, speed in drops:
+            t = (f * speed + phase) % h
+            for k in range(4 if speed == 6 else 3):
+                yy, xr = int(t + k), int(x0 - 0.35 * (t + k))
+                if 0 <= yy < h and 0 <= xr < w:
+                    fr[yy * P:(yy + 1) * P, xr * P:(xr + 1) * P] += np.array([10, 28, 70.0]) * (1.5 if speed == 6 else 0.9)
+        out_frames.append(fr)
+    return out_frames
+
+frames = strike_frames() if mode == "strike" else []
+for f in range(0 if mode == "strike" else FRAMES):
     if mode == "storm":
         frames.append(storm(f))
         continue
@@ -72,6 +179,6 @@ for f in range(FRAMES):
     frames.append(fr)
 strip = np.concatenate(frames, 0).clip(0, 255).astype(np.uint8)
 Image.fromarray(strip, "RGB").save(out + "/banner_" + name + ".png")
-sheet = np.concatenate([frames[0], frames[2], frames[7]], 0).clip(0, 255).astype(np.uint8)
+sheet = np.concatenate([frames[k] for k in ((2, 3, 4, 7, 10, 17) if mode == "strike" else (0, 2, 7))], 0).clip(0, 255).astype(np.uint8)
 Image.fromarray(sheet, "RGB").save(out + "/banner_preview.png")
 print("texture", strip.shape[1], strip.shape[0])
