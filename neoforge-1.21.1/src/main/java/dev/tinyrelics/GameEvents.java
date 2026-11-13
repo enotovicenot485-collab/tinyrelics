@@ -1,5 +1,6 @@
 package dev.tinyrelics;
 
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
@@ -104,6 +105,7 @@ public final class GameEvents {
     public static void onServerTick(ServerTickEvent.Post event) {
         Abilities.tick(event.getServer());
         ChaosSet.tick(event.getServer());
+        BloodSet.tick(event.getServer());
     }
 
     // ---- Chaos Boomerang shield: mobs cannot hurt the player while it circles.
@@ -188,6 +190,25 @@ public final class GameEvents {
     public static void onTarget(LivingChangeTargetEvent event) {
         if (event.getNewAboutToBeSetTarget() instanceof ServerPlayer player && ChaosSet.isVanished(player)) {
             event.setCanceled(true);
+        }
+    }
+
+    // ---- Blood Master armor: blood hearts take the damage first, animals refill them, death empties them.
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onBloodDamage(LivingDamageEvent.Pre event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            event.setNewDamage(BloodSet.absorb(player, event.getNewDamage()));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBloodKill(LivingDeathEvent event) {
+        if (event.getSource().getEntity() instanceof ServerPlayer killer) {
+            BloodSet.onKill(killer, event.getEntity());
+        }
+        if (event.getEntity() instanceof ServerPlayer dead) {
+            BloodSet.onDeath(dead);
         }
     }
 

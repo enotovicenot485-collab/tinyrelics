@@ -45,6 +45,13 @@ public final class ClientEffects {
     private ClientEffects() {
     }
 
+    /** Blood hearts of the Blood Master set in half-hearts, as the server last told us; below zero = the set is not on. */
+    public static float bloodHearts = -1.0F;
+
+    public static void receiveBloodHearts(float hearts) {
+        bloodHearts = hearts;
+    }
+
     public static void receiveConfig(RelicConfig received) {
         config = received;
     }

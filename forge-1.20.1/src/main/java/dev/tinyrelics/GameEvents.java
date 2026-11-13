@@ -1,5 +1,6 @@
 package dev.tinyrelics;
 
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
@@ -111,6 +112,7 @@ public final class GameEvents {
         if (server != null) {
             Abilities.tick(server);
             ChaosSet.tick(server);
+            BloodSet.tick(server);
         }
     }
 
@@ -196,6 +198,25 @@ public final class GameEvents {
     public static void onTarget(LivingChangeTargetEvent event) {
         if (event.getNewTarget() instanceof ServerPlayer player && ChaosSet.isVanished(player)) {
             event.setCanceled(true);
+        }
+    }
+
+    // ---- Blood Master armor: blood hearts take the damage first, animals refill them, death empties them.
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onBloodDamage(LivingDamageEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            event.setAmount(BloodSet.absorb(player, event.getAmount()));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBloodKill(LivingDeathEvent event) {
+        if (event.getSource().getEntity() instanceof ServerPlayer killer) {
+            BloodSet.onKill(killer, event.getEntity());
+        }
+        if (event.getEntity() instanceof ServerPlayer dead) {
+            BloodSet.onDeath(dead);
         }
     }
 

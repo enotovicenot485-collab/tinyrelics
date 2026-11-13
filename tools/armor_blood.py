@@ -8,7 +8,7 @@ from scipy import ndimage as ndi
 SRC, OUT_TEX, OUT_JAVA = sys.argv[1], sys.argv[2], sys.argv[3]
 K = 4                      # texels per model unit
 SHEET = 64                 # logical texture size
-FRAMES = 8                 # frames of the glow: for now one slow breath, the game shows a frame every 2 ticks
+FRAMES = 32                # frames of the glow animation; the game shows one every 2 ticks, a 3.2 s loop
 im = np.array(Image.open(SRC).convert("RGB")).astype(np.float64)
 H, W, _ = im.shape
 # green background (the armor glows red), and its fringe on the outline
@@ -205,7 +205,7 @@ SLOTS = {
         box("left_arm", LARM, (-1, -2, -2), (4, 12, 4), (40, 0), 0.6, rows=(0.4, 1.0), lift=True),
         *pauldron(-1), *pauldron(1),
         # the blood orb in its gold frame; thick gauntlets on the forearms
-        relief("body", ORB, (-2, 1.3, -3.6), (4, 4, 1), (-2, 1.3, -3.6), (4, 4, 1), "N", ragged=True),
+        dict(relief("body", ORB, (-2, 1.3, -3.6), (4, 4, 1), (-2, 1.3, -3.6), (4, 4, 1), "N", ragged=True), fx="heart"),
         box("right_arm", part_of(RARM, *ARM_R, (-3, 4, -2), (4, 5, 4)), (-3, 4, -2), (4, 5, 4), None, 1.0),
         box("left_arm", part_of(LARM, *ARM_L, (-1, 4, -2), (4, 5, 4)), (-1, 4, -2), (4, 5, 4), None, 1.0),
     ],
@@ -506,15 +506,60 @@ for slot, boxes in SLOTS.items():
     glow[cyan, 3] = 255
     Image.fromarray(glow.clip(0, 255).astype(np.uint8), "RGBA").save(f"{OUT_TEX}/blood_{slot}_glow.png")
     yy, xx = np.indices(cyan.shape)
+    # Every glowing detail has its own life, and the two of a pair (shoulders, gauntlets, knees,
+    # ankles) always light up together because they share a kind.
+    KINDS = ["veins", "eyes", "tears", "crown", "heart", "pad", "gauntlet", "belt", "knee", "ankle"]
+    kind = np.zeros(cyan.shape, int)
+    relx = np.zeros(cyan.shape); rely = np.zeros(cyan.shape)
+    for b in boxes:
+        w, h, d = b["size"]; u, v = b["uv"]
+        if b.get("fx"):
+            fx = b["fx"]
+        elif slot == "head":
+            fx = "eyes" if b.get("dark") else "tears" if b.get("slots") else "crown"
+        elif slot == "chest":
+            fx = "veins" if b["part"] == "body" else "pad" if b["xyz"][1] < 2 else "gauntlet"
+        elif slot == "legs":
+            fx = "belt" if b["part"] == "body" else "knee"
+        else:
+            fx = "ankle"
+        area = (slice(v * K, (v + d + h) * K), slice(u * K, (u + 2 * (w + d)) * K))
+        kind[area] = KINDS.index(fx)
+        # where a texel is on the front face of its box, 0..1 across and down
+        relx[area] = np.clip((xx[area] - (u + d) * K) / (w * K), 0, 1)
+        rely[area] = np.clip((yy[area] - (v + d) * K) / (h * K), 0, 1)
+    def bump(t, at, width):
+        gap = np.abs((t - at + 0.5) % 1.0 - 0.5)
+        return np.exp(-(gap / width) ** 2)
     for f in range(FRAMES):
-        # for now every glowing detail breathes together; each will get its own life later
-        wave = np.full(cyan.shape, 0.3 + 0.25 * np.sin(2 * np.pi * f / FRAMES))
-        kind = np.zeros(cyan.shape, int)
+        t = f / FRAMES
+        beat = np.maximum.reduce([bump(t - 0, 0.03, 0.025), 0.6 * bump(t - 0, 0.13, 0.03), bump(t - 0, 0.53, 0.025), 0.6 * bump(t - 0, 0.63, 0.03)])
+        spread = np.hypot(relx - 0.5, rely - 0.28) * 0.22           # the beat travels out from the orb along the veins
+        waves = {
+            # a flash runs across both eyes from one side to the other, then once more, weaker
+            "eyes": np.maximum(bump(t - 0.18 * relx, 0.08, 0.035), 0.6 * bump(t - 0.18 * relx, 0.58, 0.035)),
+            # after the flash the light runs down the tears
+            "tears": bump(t - 0.22 * rely, 0.28, 0.05),
+            "crown": bump(t, 0.86, 0.10) * np.ones(cyan.shape),
+            # the orb beats like a heart, twice a loop
+            "heart": beat * np.ones(cyan.shape),
+            "veins": np.maximum.reduce([bump(t - spread, 0.07, 0.05), 0.6 * bump(t - spread, 0.17, 0.05), bump(t - spread, 0.57, 0.05), 0.6 * bump(t - spread, 0.67, 0.05)]),
+            "pad": bump(t, 0.40, 0.07) * np.ones(cyan.shape),
+            "gauntlet": bump(t - 0.2 * rely, 0.70, 0.06),
+            "belt": bump(t, 0.25, 0.07) * np.ones(cyan.shape),
+            "knee": bump(t - 0.2 * rely, 0.44, 0.06),
+            "ankle": bump(t, 0.92, 0.08) * np.ones(cyan.shape),
+        }
+        wave = np.zeros(cyan.shape)
+        for k, name in enumerate(KINDS):
+            wave[kind == k] = (0.14 + 0.86 * waves[name])[kind == k]
         frame = sheet.copy()
         # the eyes are almost white in the drawing: at rest they are dimmed more, so the flare is seen
-        rest = np.where(kind == 1, 0.3, 0.75)[..., None]
+        # at rest a detail keeps the drawing's own red (the eyes a little dimmer); a wave heats it towards white
+        rest = np.where(kind == 1, 0.62, 0.8)[..., None]
         lit = frame[..., :3] * (rest + (1 - rest) * wave[..., None])
-        lit = lit * (1 - 0.75 * wave[..., None]) + np.array([255.0, 220.0, 195.0]) * 0.75 * wave[..., None]
+        heat = (np.clip((wave - 0.3) / 0.7, 0, 1) * 0.72)[..., None]
+        lit = lit * (1 - heat) + np.array([255.0, 232.0, 196.0]) * heat
         frame[cyan, :3] = lit[cyan]
         Image.fromarray(frame.clip(0, 255).astype(np.uint8), "RGBA").save(f"{OUT_TEX}/blood_{slot}_{f}.png")
     print(slot, "glowing texels", int(cyan.sum()))

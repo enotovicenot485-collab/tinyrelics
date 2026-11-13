@@ -17,7 +17,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class Network {
-    private static final String VERSION = "8";
+    private static final String VERSION = "9";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(TinyRelics.MODID, "main"),
@@ -41,6 +41,22 @@ public final class Network {
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         CHANNEL.registerMessage(6, ArmorAbility.class, ArmorAbility::encode, ArmorAbility::decode, ArmorAbility::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        CHANNEL.registerMessage(7, BloodHearts.class, BloodHearts::encode, BloodHearts::decode, BloodHearts::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+    }
+
+    /** The armor ability key: whichever full set is on answers. */
+    private static void armorAbility(ServerPlayer sender) {
+        if (BloodSet.hasFullSet(sender)) {
+            BloodSet.tryRain(sender);
+        } else {
+            ChaosSet.tryVanish(sender);
+        }
+    }
+
+    /** Tells a player how many blood hearts to draw; below zero hides them. */
+    public static void sendBloodHearts(ServerPlayer player, float hearts) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new BloodHearts(hearts));
     }
 
     /** Called on the client when the armor ability key is pressed. */
@@ -146,6 +162,29 @@ public final class Network {
         }
     }
 
+    /** Server -> client: the blood hearts of the Blood Master set. */
+    public static final class BloodHearts {
+        private final float hearts;
+
+        public BloodHearts(float hearts) {
+            this.hearts = hearts;
+        }
+
+        public static void encode(BloodHearts message, FriendlyByteBuf buffer) {
+            buffer.writeFloat(message.hearts);
+        }
+
+        public static BloodHearts decode(FriendlyByteBuf buffer) {
+            return new BloodHearts(buffer.readFloat());
+        }
+
+        public static void handle(BloodHearts message, Supplier<NetworkEvent.Context> context) {
+            context.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                    () -> () -> ClientEffects.receiveBloodHearts(message.hearts)));
+            context.get().setPacketHandled(true);
+        }
+    }
+
     /** Server -> client: a blood vortex starts around this entity. */
     public static final class VortexStart {
         private final int entityId;
@@ -205,7 +244,7 @@ public final class Network {
             ServerPlayer sender = context.get().getSender();
             context.get().enqueueWork(() -> {
                 if (sender != null) {
-                    ChaosSet.tryVanish(sender);
+                    armorAbility(sender);
                 }
             });
             context.get().setPacketHandled(true);

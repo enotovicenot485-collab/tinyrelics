@@ -90,5 +90,8 @@
   "item.tinyrelics.blood_chestplate": "Blood Master Chestplate",
   "item.tinyrelics.blood_leggings": "Blood Master Leggings",
   "item.tinyrelics.blood_boots": "Blood Master Boots",
-  "item.tinyrelics.blood_armor.tooltip": "Blood Master armor"
+  "item.tinyrelics.blood_armor.tooltip": "Full set: 4 blood hearts",
+  "item.tinyrelics.blood_armor.tooltip2": "Only the blood of peaceful animals refills them",
+  "item.tinyrelics.blood_armor.tooltip3": "[%s] blood rain over 9x9",
+  "msg.tinyrelics.rain_wait": "Blood rain will be ready in %s s"
 }

@@ -45,6 +45,7 @@ public final class ClientSetup {
         NeoForge.EVENT_BUS.addListener(TabBanners::onKeyPressed);
         NeoForge.EVENT_BUS.addListener(TabBanners::onTooltip);
         NeoForge.EVENT_BUS.addListener(ClientSetup::hideVanished);
+        NeoForge.EVENT_BUS.addListener(BloodHud::onRender);
         modBus.addListener(ClientSetup::addLayers);
         modBus.addListener(ClientSetup::registerExtensions);
     }

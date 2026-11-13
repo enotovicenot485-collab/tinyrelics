@@ -90,5 +90,8 @@
   "item.tinyrelics.blood_chestplate": "Нагрудник Мастера Крови",
   "item.tinyrelics.blood_leggings": "Поножи Мастера Крови",
   "item.tinyrelics.blood_boots": "Ботинки Мастера Крови",
-  "item.tinyrelics.blood_armor.tooltip": "Броня Мастера Крови"
+  "item.tinyrelics.blood_armor.tooltip": "Полный комплект: 4 кровавых сердца",
+  "item.tinyrelics.blood_armor.tooltip2": "Сердца восполняет только кровь мирных животных",
+  "item.tinyrelics.blood_armor.tooltip3": "[%s] кровавый дождь 9x9",
+  "msg.tinyrelics.rain_wait": "Кровавый дождь будет готов через %s с"
 }

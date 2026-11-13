@@ -19,7 +19,7 @@ public final class Network {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("8");
+        PayloadRegistrar registrar = event.registrar("9");
         registrar.playToClient(CharmBroken.TYPE, CharmBroken.STREAM_CODEC,
                 (payload, context) -> ClientEffects.charmBroken());
         registrar.playToClient(ConfigSync.TYPE, ConfigSync.STREAM_CODEC,
@@ -34,10 +34,12 @@ public final class Network {
                 (payload, context) -> ClientEffects.startVortex(payload.entityId()));
         registrar.playToClient(Shockwave.TYPE, Shockwave.STREAM_CODEC,
                 (payload, context) -> ClientEffects.startShockwave(payload.x(), payload.y(), payload.z(), payload.radius(), payload.full()));
+        registrar.playToClient(BloodHearts.TYPE, BloodHearts.STREAM_CODEC,
+                (payload, context) -> ClientEffects.receiveBloodHearts(payload.hearts()));
         registrar.playToServer(ArmorAbility.TYPE, ArmorAbility.STREAM_CODEC,
                 (payload, context) -> {
                     if (context.player() instanceof ServerPlayer sender) {
-                        ChaosSet.tryVanish(sender);
+                        armorAbility(sender);
                     }
                 });
         registrar.playToServer(StaffSuper.TYPE, StaffSuper.STREAM_CODEC,
@@ -46,6 +48,20 @@ public final class Network {
                         Slam.superKey(sender);
                     }
                 });
+    }
+
+    /** The armor ability key: whichever full set is on answers. */
+    private static void armorAbility(ServerPlayer sender) {
+        if (BloodSet.hasFullSet(sender)) {
+            BloodSet.tryRain(sender);
+        } else {
+            ChaosSet.tryVanish(sender);
+        }
+    }
+
+    /** Tells a player how many blood hearts to draw; below zero hides them. */
+    public static void sendBloodHearts(ServerPlayer player, float hearts) {
+        PacketDistributor.sendToPlayer(player, new BloodHearts(hearts));
     }
 
     /** Called on the client when the armor ability key is pressed. */
@@ -151,6 +167,18 @@ public final class Network {
                 ByteBufCodecs.VAR_INT, Shockwave::radius,
                 ByteBufCodecs.BOOL, Shockwave::full,
                 Shockwave::new);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Server -> client: the blood hearts of the Blood Master set. */
+    public record BloodHearts(float hearts) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<BloodHearts> TYPE = new CustomPacketPayload.Type<>(id("blood_hearts"));
+        public static final StreamCodec<ByteBuf, BloodHearts> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.FLOAT, BloodHearts::hearts, BloodHearts::new);
 
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

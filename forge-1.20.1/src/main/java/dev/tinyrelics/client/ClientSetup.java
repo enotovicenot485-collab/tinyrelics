@@ -39,6 +39,7 @@ public final class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(TabBanners::onKeyPressed);
         MinecraftForge.EVENT_BUS.addListener(TabBanners::onTooltip);
         MinecraftForge.EVENT_BUS.addListener(ClientSetup::hideVanished);
+        MinecraftForge.EVENT_BUS.addListener(BloodHud::onRender);
         modBus.addListener(ClientSetup::addLayers);
     }
 

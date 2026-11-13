@@ -112,15 +112,15 @@ public class TinyRelics {
                     1.0F,
                     0.0F));
 
-    /** 3 + 6 + 4 + 2 = 15 armor points for the full set. */
+    /** 4 + 7 + 5 + 2 = 18 armor points for the full set. */
     public static final DeferredHolder<ArmorMaterial, ArmorMaterial> BLOOD_MATERIAL = ARMOR_MATERIALS.register("blood",
             () -> new ArmorMaterial(
                     Util.make(new EnumMap<>(ArmorItem.Type.class), defense -> {
-                        defense.put(ArmorItem.Type.HELMET, 3);
-                        defense.put(ArmorItem.Type.CHESTPLATE, 6);
-                        defense.put(ArmorItem.Type.LEGGINGS, 4);
+                        defense.put(ArmorItem.Type.HELMET, 4);
+                        defense.put(ArmorItem.Type.CHESTPLATE, 7);
+                        defense.put(ArmorItem.Type.LEGGINGS, 5);
                         defense.put(ArmorItem.Type.BOOTS, 2);
-                        defense.put(ArmorItem.Type.BODY, 6);
+                        defense.put(ArmorItem.Type.BODY, 7);
                     }),
                     15,
                     SoundEvents.ARMOR_EQUIP_NETHERITE,
