@@ -17,7 +17,8 @@ BG = (im[..., 1] - im[..., 0] > 40) & (im[..., 1] - im[..., 2] > 40)
 # Source rectangles (x0, y0, x1, y1) in the concept image for each face of each box.
 # N = front, S = back, W = the character's right side, E = the character's left side.
 # The crown stands on top of the helm, so the helm takes the picture below the crown's band.
-FACE = dict(N=(160, 138, 390, 272), S=(648, 140, 862, 245), W=(1065, 140, 1255, 255), E=(1497, 140, 1690, 255))
+# the sides of the helm are plain, like its back: in the side views the eyes wrap round the corner
+FACE = dict(N=(160, 138, 390, 272), S=(648, 140, 862, 245), W=(648, 140, 862, 245), E=(648, 140, 862, 245))
 CROWN = dict(N=(153, 18, 397, 165), S=(643, 18, 867, 140), W=(1062, 22, 1258, 140), E=(1494, 22, 1693, 140))
 # the side walls of the crown run between the front and the back wall: the middle eight units of the side views
 CROWN = dict(CROWN, W=(1062 + 20, 22, 1258 - 20, 135), E=(1494 + 20, 22, 1693 - 20, 135), S=(643, 18, 867, 135))
@@ -132,8 +133,7 @@ def crown_wall(face, rect, band_px, origin, band_height, points):
     x0, y0, x1, y1 = rect
     ox, oy, oz = origin                      # the corner of the band where the wall starts
     along_x = face in ("N", "S")
-    n = max(points) + 1 if not along_x else 10
-    n = 10 if along_x else 8
+    n = 12 if along_x else 10                # front and back walls cover the corners, so the ring is closed
     size = (n, band_height, 1) if along_x else (1, band_height, n)
     band = dict.fromkeys("NSWE", (x0, band_px, x1, y1))
     out = [relief("head", band, origin, size, origin, size, face)]
@@ -151,7 +151,7 @@ def pauldron(side):
         box("right_arm", pad, *plate, None),
         relief("right_arm", pad, *plate, (-5.7, -2.4, -2), (1, 3, 4), "W"),
         relief("right_arm", pad, *plate, (-6.3, -1.9, -1), (1, 2, 2), "W"),
-        *stepped("right_arm", CLAW, (-5.3, -7.2, -1), 2, side, min_lum=14),
+        *stepped("right_arm", CLAW, (-5.3, -7.2, -0.5), 1, side, min_lum=14),
     ]
     return boxes if side < 0 else [mirror(b) for b in boxes]
 
@@ -183,18 +183,20 @@ def boot_gems(side):
 
 HEAD_BOX, ARM_R, ARM_L, LEG = ((-4, -8, -4), (8, 8, 8)), ((-3, -2, -2), (4, 12, 4)), ((-1, -2, -2), (4, 12, 4)), ((-2, 0, -2), (4, 12, 4))
 BODY_BOX = ((-4, 0, -2), (8, 12, 4))
-CROWN_FRONT = ((-5, -13.6, -5.7), (10, 6, 1))
+CROWN_FRONT = ((-6, -13.6, -6), (12, 6, 1))
 
 # rows = the part of the box height (0 = top, 1 = bottom) that is painted; the rest stays see-through.
 SLOTS = {
     "head": [
-        box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.8),
-        # the crown: a band round the top of the helm with solid points, and the ruby standing out in front
-        *crown_wall("N", CROWN["N"], 108, (-5, -9.7, -5.7), 2, {0: 2, 2: 3, 4: 4, 5: 4, 7: 3, 9: 2}),
-        *crown_wall("S", CROWN["S"], 108, (-5, -9.7, 4.7), 1, {0: 2, 2: 3, 4: 4, 5: 4, 7: 3, 9: 2}),
-        *crown_wall("W", CROWN["W"], 108, (-5.7, -9.7, -4), 1, {1: 2, 3: 3, 4: 3, 6: 2}),
-        *crown_wall("E", CROWN["E"], 108, (4.7, -9.7, -4), 1, {1: 2, 3: 3, 4: 3, 6: 2}),
-        relief("head", CROWN, *CROWN_FRONT, (-1, -10.7, -6.3), (2, 3, 1), "N"),
+        # two shells: the eyes are painted on the inner one and seen through slits cut in the outer one
+        box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.1),
+        dict(box("head", FACE, (-4, -8, -4), (8, 8, 8), None, 0.9), slots=True),
+        # the crown: a closed ring a little wider than the helm, with solid points, and the ruby standing out in front
+        *crown_wall("N", CROWN["N"], 108, (-6, -9.7, -6), 2, {0: 2, 2: 3, 5: 4, 6: 4, 9: 3, 11: 2}),
+        *crown_wall("S", CROWN["S"], 108, (-6, -9.7, 5), 1, {0: 2, 2: 3, 5: 4, 6: 4, 9: 3, 11: 2}),
+        *crown_wall("W", CROWN["W"], 108, (-6, -9.7, -5), 1, {2: 2, 4: 3, 5: 3, 7: 2}),
+        *crown_wall("E", CROWN["E"], 108, (5, -9.7, -5), 1, {2: 2, 4: 3, 5: 3, 7: 2}),
+        relief("head", CROWN, *CROWN_FRONT, (-1, -10.7, -6.6), (2, 3, 1), "N"),
     ],
     "chest": [
         box("body", BODY, (-4, 0, -2), (8, 12, 4), (0, 0), 0.8),
@@ -407,6 +409,20 @@ def paint(sheet, b):
             block[:j0] = block[j0][None, :, :]
         if name == "N" and (block[..., 3] > 0).any():
             front = tuple(block[block[..., 3] > 0][:, :3].mean(axis=0))
+        if name == "N" and b.get("slots"):
+            # Eye slits: where the drawing has the glowing eyes the helm is cut through, so the eyes
+            # painted on the box underneath are seen deep inside. A lighter rim marks the cut edge.
+            top, low = int(0.12 * fh * K), int(0.52 * fh * K)
+            red = np.zeros(block.shape[:2], bool)
+            red[top:low] = (block[top:low, :, 0] > 165) & (block[top:low, :, 1] < 120)
+            labels, count = ndi.label(ndi.binary_dilation(red, iterations=1))
+            hole = np.zeros_like(red)
+            for where in ndi.find_objects(labels):
+                if red[where].sum() >= 6:
+                    hole[where] = True
+            rim = ndi.binary_dilation(hole, iterations=1) & ~hole
+            block[rim, :3] = (92, 84, 88)
+            block[hole] = 0
         sheet[fy * K:(fy + fh) * K, fx * K:(fx + fw) * K] = block
     if (b["top"] or b["bottom"]) and b["solid"]:
         # the steel of this box: the average of its darker half on the front
