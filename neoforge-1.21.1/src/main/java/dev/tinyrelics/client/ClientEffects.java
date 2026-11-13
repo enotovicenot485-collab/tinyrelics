@@ -80,6 +80,7 @@ public final class ClientEffects {
         }
         tickVortexes(mc);
         tickShockwaves(mc);
+        tickBladeDrips(mc);
         while (ClientSetup.ARMOR_KEY.consumeClick()) {
             if (mc.screen == null && mc.player != null) {
                 Network.requestArmorAbility();
@@ -176,6 +177,32 @@ public final class ClientEffects {
             return y;
         }
         return y;
+    }
+
+    /** Now and then a drop of blood falls off a Blood Blade that someone is holding. */
+    private static void tickBladeDrips(Minecraft mc) {
+        if (mc.level == null || mc.isPaused()) {
+            return;
+        }
+        for (net.minecraft.world.entity.player.Player player : mc.level.players()) {
+            if (player.isInvisible() || player.getRandom().nextInt(50) != 0) {
+                continue;
+            }
+            boolean main = player.getMainHandItem().getItem() instanceof dev.tinyrelics.BloodBladeItem;
+            if (!main && !(player.getOffhandItem().getItem() instanceof dev.tinyrelics.BloodBladeItem)) {
+                continue;
+            }
+            // which side of the body the sword is on, then a point somewhere along the blade
+            boolean rightSide = (player.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT) == main;
+            boolean ownEyes = player == mc.player && mc.options.getCameraType().isFirstPerson();
+            double yaw = Math.toRadians(ownEyes ? player.getYRot() : player.yBodyRot);
+            double side = rightSide ? 0.42D : -0.42D;
+            double ahead = 0.45D + player.getRandom().nextDouble() * 0.6D;
+            double x = player.getX() - Math.cos(yaw) * side - Math.sin(yaw) * ahead;
+            double z = player.getZ() - Math.sin(yaw) * side + Math.cos(yaw) * ahead;
+            double y = player.getY() + 0.85D + (ahead - 0.45D) * 0.9D;
+            mc.level.addParticle(TinyRelics.BLOOD_DROP.get(), x, y, z, 0.0D, 0.0D, 0.0D);
+        }
     }
 
     private static void tickShockwaves(Minecraft mc) {

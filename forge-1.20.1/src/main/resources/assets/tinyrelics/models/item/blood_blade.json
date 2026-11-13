@@ -2,5 +2,75 @@
   "parent": "minecraft:item/handheld",
   "textures": {
     "layer0": "tinyrelics:item/blood_blade"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        -90,
+        55
+      ],
+      "translation": [
+        -0.0,
+        9.17,
+        -0.41
+      ],
+      "scale": [
+        1.55,
+        1.55,
+        0.85
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        90,
+        -55
+      ],
+      "translation": [
+        -0.0,
+        9.17,
+        -0.41
+      ],
+      "scale": [
+        1.55,
+        1.55,
+        0.85
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -90,
+        25
+      ],
+      "translation": [
+        1.13,
+        5.81,
+        2.08
+      ],
+      "scale": [
+        1.05,
+        1.05,
+        0.68
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        90,
+        -25
+      ],
+      "translation": [
+        1.13,
+        5.81,
+        2.08
+      ],
+      "scale": [
+        1.05,
+        1.05,
+        0.68
+      ]
+    }
   }
 }
