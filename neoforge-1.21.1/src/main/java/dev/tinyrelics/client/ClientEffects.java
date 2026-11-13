@@ -179,29 +179,52 @@ public final class ClientEffects {
         return y;
     }
 
-    /** Now and then a drop of blood falls off a Blood Blade that someone is holding. */
+    /** Rarely a small drop of blood falls off a Blood Blade that someone is holding. */
     private static void tickBladeDrips(Minecraft mc) {
         if (mc.level == null || mc.isPaused()) {
             return;
         }
         for (net.minecraft.world.entity.player.Player player : mc.level.players()) {
-            if (player.isInvisible() || player.getRandom().nextInt(50) != 0) {
+            if (player.isInvisible() || player.getRandom().nextInt(110) != 0) {
                 continue;
             }
             boolean main = player.getMainHandItem().getItem() instanceof dev.tinyrelics.BloodBladeItem;
             if (!main && !(player.getOffhandItem().getItem() instanceof dev.tinyrelics.BloodBladeItem)) {
                 continue;
             }
-            // which side of the body the sword is on, then a point somewhere along the blade
             boolean rightSide = (player.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT) == main;
-            boolean ownEyes = player == mc.player && mc.options.getCameraType().isFirstPerson();
-            double yaw = Math.toRadians(ownEyes ? player.getYRot() : player.yBodyRot);
-            double side = rightSide ? 0.42D : -0.42D;
-            double ahead = 0.45D + player.getRandom().nextDouble() * 0.6D;
-            double x = player.getX() - Math.cos(yaw) * side - Math.sin(yaw) * ahead;
-            double z = player.getZ() - Math.sin(yaw) * side + Math.cos(yaw) * ahead;
-            double y = player.getY() + 0.85D + (ahead - 0.45D) * 0.9D;
-            mc.level.addParticle(TinyRelics.BLOOD_DROP.get(), x, y, z, 0.0D, 0.0D, 0.0D);
+            double side = rightSide ? 1.0D : -1.0D;
+            // how far along the blade, from the guard (0) to the tip (1)
+            double along = player.getRandom().nextDouble();
+            double x;
+            double y;
+            double z;
+            if (player == mc.player && mc.options.getCameraType().isFirstPerson()) {
+                // In first person the sword is drawn on the screen, not in the world: the drop
+                // goes where the blade is seen, low and to the side of where the eyes look.
+                net.minecraft.world.phys.Vec3 look = player.getLookAngle();
+                net.minecraft.world.phys.Vec3 right = look.cross(new net.minecraft.world.phys.Vec3(0.0D, 1.0D, 0.0D));
+                if (right.lengthSqr() < 1.0E-4D) {
+                    continue;
+                }
+                right = right.normalize();
+                net.minecraft.world.phys.Vec3 up = right.cross(look);
+                net.minecraft.world.phys.Vec3 at = player.getEyePosition()
+                        .add(look.scale(0.75D + along * 0.25D))
+                        .add(right.scale(side * (0.42D - along * 0.12D)))
+                        .add(up.scale(-0.30D + along * 0.38D));
+                x = at.x;
+                y = at.y;
+                z = at.z;
+            } else {
+                // Seen from outside: the hand is at the hip, the blade runs forward from it and rises a little.
+                double yaw = Math.toRadians(player.yBodyRot);
+                double ahead = 0.35D + along * 1.25D;
+                x = player.getX() - Math.cos(yaw) * side * 0.38D - Math.sin(yaw) * ahead;
+                z = player.getZ() - Math.sin(yaw) * side * 0.38D + Math.cos(yaw) * ahead;
+                y = player.getY() + 0.78D + along * 0.45D;
+            }
+            mc.level.addParticle(TinyRelics.BLADE_DRIP.get(), x, y, z, 0.0D, 0.0D, 0.0D);
         }
     }
 

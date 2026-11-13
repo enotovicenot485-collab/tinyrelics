@@ -1,6 +1,6 @@
 """Builds the Blood Blade: a 128x128 item texture with a strip of frames, its .mcmeta
-(mostly still, now and then a shimmer along the blood channel, now and then a glint on
-the gems) and the item model that makes the sword long in the hand.
+(mostly still, now and then a shimmer along the blood channel, now and then the gems
+light up red) and the item model that makes the sword long in the hand.
 
     python3 blade.py <concept on green> <out folder>"""
 import sys, json
@@ -43,20 +43,16 @@ def frame(shimmer=None, glint=None):
         near = ndi.binary_dilation(channel, iterations=2) & ~channel & (base[..., 3] > 0)
         fr[near, :3] = (base[..., :3] + np.array([70.0, 8.0, 10.0]) * wave[..., None])[near]
     if glint is not None:
-        size = [1, 2, 3, 2, 1][glint]
-        fr[gems, :3] = np.minimum(255, base[..., :3] * 1.25 + 30)[gems]
-        for cy, cx in centres:
-            cy, cx = int(round(cy)) - 1, int(round(cx)) - 1           # the sparkle sits on the gem's highlight
-            for k in range(-size, size + 1):
-                for y, x in ((cy + k, cx), (cy, cx + k)):
-                    if 0 <= y < N and 0 <= x < N:
-                        tone = 255 if abs(k) < size else 215
-                        fr[y, x] = (255, tone, tone, 255)
+        # the gems light up from inside: no sparkle, just a red glow that swells and fades
+        power = [0.35, 0.7, 1.0, 0.7, 0.35][glint]
+        fr[gems, :3] = (base[..., :3] * (1 - 0.6 * power) + np.array([255.0, 70.0, 60.0]) * 0.6 * power)[gems]
+        halo = ndi.binary_dilation(gems, iterations=1) & ~gems & (base[..., 3] > 0)
+        fr[halo, :3] = np.minimum(255, base[..., :3] + np.array([120.0, 10.0, 10.0]) * power)[halo]
     return fr
 
 frames = [frame()] + [frame(shimmer=k / 9.0) for k in range(10)] + [frame(glint=k) for k in range(5)]
 Image.fromarray(np.concatenate(frames, 0).clip(0, 255).astype(np.uint8), "RGBA").save(out + "/blood_blade.png")
-# still for a few seconds, a shimmer, still again, a glint: "now and then", never both at once
+# still for a few seconds, a shimmer, still again, the gems glow: "now and then", never both at once
 order = [{"index": 0, "time": 90}] + list(range(1, 11)) + [{"index": 0, "time": 60}] + list(range(11, 16)) + [{"index": 0, "time": 40}]
 json.dump({"animation": {"frametime": 2, "frames": order}}, open(out + "/blood_blade.png.mcmeta", "w"))
 

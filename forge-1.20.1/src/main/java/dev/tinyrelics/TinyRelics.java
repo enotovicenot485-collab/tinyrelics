@@ -44,6 +44,7 @@ public class TinyRelics {
     public static final RegistryObject<SimpleParticleType> CHAOS_SWIRL = PARTICLES.register("chaos_swirl", () -> new SimpleParticleType(false));
     /** The falling drop and the crescent streak of the Blood Blade. */
     public static final RegistryObject<SimpleParticleType> BLOOD_DROP = PARTICLES.register("blood_drop", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> BLADE_DRIP = PARTICLES.register("blade_drip", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> BLOOD_CLOUD = PARTICLES.register("blood_cloud", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> BLOOD_RAIN = PARTICLES.register("blood_rain", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> BLOOD_SPLASH = PARTICLES.register("blood_splash", () -> new SimpleParticleType(false));
