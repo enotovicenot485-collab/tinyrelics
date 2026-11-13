@@ -12,14 +12,19 @@ import net.minecraftforge.client.event.RenderGuiEvent;
 
 /**
  * The Blood Master's blood hearts: a row of four above the armor bar, drawn only while
- * the full set is on. Each has its own frames in one picture: empty, half, full.
+ * the full set is on. Full hearts drip blood now and then.
  */
 public final class BloodHud {
     private static final ResourceLocation TEXTURE = new ResourceLocation(TinyRelics.MODID, "textures/gui/blood_hearts.png");
-    private static final int CELL_WIDTH = 9;
-    private static final int CELL_HEIGHT = 11;
-    private static final int SHEET_WIDTH = 27;
-    private static final int SHEET_HEIGHT = 11;
+    /** Cells left to right: empty, half, full, then four frames of a drop forming under a full heart and falling. */
+    private static final int CELL_WIDTH = 13;
+    private static final int CELL_HEIGHT = 18;
+    private static final int SHEET_WIDTH = 91;
+    private static final int SHEET_HEIGHT = 18;
+    /** The heart itself is 11 high; the rest of a cell is room for the drop. */
+    private static final int SPACING = 14;
+    /** A drop takes eight ticks of a forty-tick cycle; the hearts drip one after another. */
+    private static final int DRIP_CYCLE = 40;
 
     private BloodHud() {
     }
@@ -38,13 +43,19 @@ public final class BloodHud {
         float maxHealth = Math.max((float) player.getAttributeValue(Attributes.MAX_HEALTH), player.getHealth());
         int healthRows = Mth.ceil((maxHealth + Mth.ceil(player.getAbsorptionAmount())) / 2.0F / 10.0F);
         int rowHeight = Math.max(10 - (healthRows - 2), 3);
-        int y = height - 39 - (healthRows - 1) * rowHeight - 10 - (player.getArmorValue() > 0 ? 10 : 0);
+        int y = height - 39 - (healthRows - 1) * rowHeight - (player.getArmorValue() > 0 ? 10 : 0) - CELL_HEIGHT - 1;
         int x = width / 2 - 91;
         int slots = (int) (BloodSet.MAX_HEARTS / 2.0F);
         for (int i = 0; i < slots; i++) {
             float filled = hearts - i * 2.0F;
             int cell = filled >= 2.0F ? 2 : filled >= 1.0F ? 1 : 0;
-            graphics.blit(TEXTURE, x + i * 8, y, CELL_WIDTH, CELL_HEIGHT, cell * CELL_WIDTH, 0.0F,
+            if (cell == 2) {
+                int moment = (player.tickCount + i * 11) % DRIP_CYCLE;
+                if (moment < 8) {
+                    cell = 3 + moment / 2;
+                }
+            }
+            graphics.blit(TEXTURE, x + i * SPACING, y, CELL_WIDTH, CELL_HEIGHT, cell * CELL_WIDTH, 0.0F,
                     CELL_WIDTH, CELL_HEIGHT, SHEET_WIDTH, SHEET_HEIGHT);
         }
     }

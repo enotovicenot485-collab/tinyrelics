@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -20,8 +19,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
-import org.joml.Vector3f;
 
 /**
  * The full Blood Master armor. Passive: four extra "blood hearts" that take damage before
@@ -37,8 +36,8 @@ public final class BloodSet {
     private static final String HEARTS_GIVEN = "tinyrelics_blood_hearts_given";
     private static final String RAIN_READY = "tinyrelics_blood_rain_ready";
 
-    /** One minute between rains; a rain falls for six seconds. */
-    private static final int COOLDOWN = 1200;
+    /** Three minutes between rains; a rain falls for six seconds. */
+    private static final int COOLDOWN = 3600;
     private static final int RAIN_TICKS = 120;
     private static final int HIT_EVERY = 10;
     /** The most one rain takes from one victim: three hearts. */
@@ -46,8 +45,6 @@ public final class BloodSet {
     private static final double HALF_SIDE = 4.5D;
     private static final double CLOUD_HEIGHT = 6.0D;
     private static final EquipmentSlot[] ARMOR = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
-    private static final DustParticleOptions CLOUD = new DustParticleOptions(new Vector3f(0.42F, 0.02F, 0.05F), 4.0F);
-    private static final DustParticleOptions CLOUD_DARK = new DustParticleOptions(new Vector3f(0.2F, 0.0F, 0.02F), 4.0F);
 
     private static final List<Rain> RAINS = new ArrayList<>();
     /** What each player's screen was last told, so the hearts are sent only when they change. */
@@ -146,17 +143,23 @@ public final class BloodSet {
             ServerLevel level = rain.level;
             RandomSource random = level.random;
             double top = rain.y + CLOUD_HEIGHT;
-            // The cloud: a thick dark red sheet over the whole square.
-            for (int i = 0; i < 14; i++) {
-                level.sendParticles(i % 3 == 0 ? CLOUD_DARK : CLOUD,
-                        rain.x + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE, top + random.nextDouble() * 0.8D,
-                        rain.z + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE, 1, 0.3D, 0.1D, 0.3D, 0.0D);
+            // The cloud: thick puffs over the whole square, drifting a little.
+            for (int i = 0; i < 5; i++) {
+                level.sendParticles(TinyRelics.BLOOD_CLOUD.get(),
+                        rain.x + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE, top + random.nextDouble() * 1.2D,
+                        rain.z + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE, 0, random.nextDouble() - 0.5D, 0.0D, random.nextDouble() - 0.5D, 0.03D);
             }
-            // The rain: drops all the way down from the cloud.
-            for (int i = 0; i < 36; i++) {
-                level.sendParticles(TinyRelics.BLOOD_DROP.get(),
-                        rain.x + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE, rain.y - 1.0D + random.nextDouble() * (CLOUD_HEIGHT + 1.0D),
-                        rain.z + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+            // The rain: every drop falls straight from the cloud and splashes where it lands.
+            for (int i = 0; i < 12; i++) {
+                double dx = rain.x + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE;
+                double dz = rain.z + (random.nextDouble() * 2.0D - 1.0D) * HALF_SIDE;
+                // count 0: the three numbers are the direction and the last one the speed
+                level.sendParticles(TinyRelics.BLOOD_RAIN.get(), dx, top - random.nextDouble() * 1.5D, dz, 0, 0.0D, -1.0D, 0.0D, 0.8D);
+                if (i < 5) {
+                    int ground = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(dx), (int) Math.floor(dz));
+                    double floor = Math.abs(ground - rain.y) <= 5.0D ? ground : rain.y;
+                    level.sendParticles(TinyRelics.BLOOD_SPLASH.get(), dx, floor + 0.3D, dz, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+                }
             }
             if (rain.age % 30 == 1) {
                 level.playSound(null, rain.x, rain.y, rain.z, SoundEvents.WEATHER_RAIN, SoundSource.PLAYERS, 0.9F, 0.7F);

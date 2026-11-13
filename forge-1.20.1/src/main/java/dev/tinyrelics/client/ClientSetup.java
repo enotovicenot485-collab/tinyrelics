@@ -84,6 +84,10 @@ public final class ClientSetup {
         event.registerSpriteSet(TinyRelics.THOR_BOLT.get(), sprites -> new ChaosParticle.Provider(sprites, 8, 0.45F, 0.0F));
         event.registerSpriteSet(TinyRelics.THOR_FLASH.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 0.95F, 0.0F));
         event.registerSpriteSet(TinyRelics.THOR_CRACK.get(), GroundParticle.Provider::new);
+        // Blood rain: slow heavy clouds, drops that fall fast and straight, a splash where they land.
+        event.registerSpriteSet(TinyRelics.BLOOD_CLOUD.get(), sprites -> new ChaosParticle.Provider(sprites, 34, 1.5F, 0.0F));
+        event.registerSpriteSet(TinyRelics.BLOOD_RAIN.get(), sprites -> new ChaosParticle.Provider(sprites, 9, 0.45F, 0.0F));
+        event.registerSpriteSet(TinyRelics.BLOOD_SPLASH.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 0.5F, 0.0F));
         // The assassin's steam: thick puffs that rise a little, and a swirl that spreads flat over the ground.
         event.registerSpriteSet(TinyRelics.CHAOS_STEAM.get(), sprites -> new ChaosParticle.Provider(sprites, 30, 0.95F, -0.012F));
         event.registerSpriteSet(TinyRelics.CHAOS_SWIRL.get(), sprites -> new GroundParticle.Provider(sprites, 6, 24));

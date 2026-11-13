@@ -46,6 +46,9 @@ public class TinyRelics {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CHAOS_SWIRL = PARTICLES.register("chaos_swirl", () -> new SimpleParticleType(false));
     /** The falling drop and the crescent streak of the Blood Blade. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BLOOD_DROP = PARTICLES.register("blood_drop", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BLOOD_CLOUD = PARTICLES.register("blood_cloud", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BLOOD_RAIN = PARTICLES.register("blood_rain", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BLOOD_SPLASH = PARTICLES.register("blood_splash", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BLOOD_SLASH = PARTICLES.register("blood_slash", () -> new SimpleParticleType(false));
     /** The same pictures, but circling the player in the blood tornado. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> VORTEX_DROP = PARTICLES.register("vortex_drop", () -> new SimpleParticleType(false));
