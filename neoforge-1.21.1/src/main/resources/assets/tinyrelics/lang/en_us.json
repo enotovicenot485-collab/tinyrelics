@@ -81,7 +81,7 @@
   "item.tinyrelics.chaos_armor.tooltip2": "[%s] vanish and gain Speed V",
   "msg.tinyrelics.vanish_wait": "Vanishing will be ready in %s s",
   "key.tinyrelics.armor": "Armor ability",
-  "screen.tinyrelics.name.chaos_armor": "Chaos Assassin Armor",
+  "screen.tinyrelics.name.chaos_armor": "Assassin Armor",
   "screen.tinyrelics.stats.chaos_armor": "13 armor with the full set",
   "screen.tinyrelics.desc.chaos_armor": "Hood 3, chestplate 6, leggings 3, boots 1. The full set gives Speed III. Key I: the wearer vanishes in a cloud of steam, armor and weapon included, mobs lose track, and Speed V is granted. Cooldown 2 minutes.",
   "screen.tinyrelics.vanish_seconds": "Invisibility: %s s",

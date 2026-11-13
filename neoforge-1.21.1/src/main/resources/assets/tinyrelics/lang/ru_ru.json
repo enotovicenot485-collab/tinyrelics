@@ -81,7 +81,7 @@
   "item.tinyrelics.chaos_armor.tooltip2": "[%s] исчезнуть и получить Скорость V",
   "msg.tinyrelics.vanish_wait": "Исчезновение будет готово через %s с",
   "key.tinyrelics.armor": "Способность брони",
-  "screen.tinyrelics.name.chaos_armor": "Броня Ассасина Хаоса",
+  "screen.tinyrelics.name.chaos_armor": "Броня Ассасина",
   "screen.tinyrelics.stats.chaos_armor": "13 брони в полном комплекте",
   "screen.tinyrelics.desc.chaos_armor": "Капюшон 3, нагрудник 6, поножи 3, ботинки 1. Полный комплект даёт Скорость III. Клавиша I: владелец исчезает в облаке пара вместе с бронёй и оружием, мобы его теряют, и он получает Скорость V. Перезарядка 2 минуты.",
   "screen.tinyrelics.vanish_seconds": "Невидимость: %s с",
