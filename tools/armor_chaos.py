@@ -123,9 +123,9 @@ def pauldron(side):
     low, up = (PAD_LOW, PAD_UP) if side < 0 else (flip(PAD_LOW), flip(PAD_UP))
     boxes = [
         box("right_arm", low, (-4.6, -2.9, -3), (6, 3, 6), None),
-        box("right_arm", up, (-4.4, -3.8, -2.5), (4, 1, 5), None),
+        # no second plate on top: its edge showed as a ledge beside the blade
         # the curved blade: one solid spike, built row by row along the outline of the drawing
-        *stepped("right_arm", BLADE, (-6.2, -4.8, -0.5), 1, side),
+        *stepped("right_arm", BLADE, (-6.5, -6.2, -0.5), 1, side),
     ]
     return boxes if side < 0 else [mirror(b) for b in boxes]
 
