@@ -17,6 +17,14 @@ small = np.array(Image.fromarray(rgba, "RGBA").resize((N, N), Image.BOX)).astype
 small[..., 3] = np.where(small[..., 3] > 127, 255, 0)
 small[small[..., 3] == 0] = 0
 base = small
+# The thin sides of the sword in the hand take their colour from the outermost texels. Where the
+# drawing has bright steel right at the edge those sides come out almost white and look like
+# holes against the sky, so the contour is made dark all the way round.
+opaque = base[..., 3] > 0
+rim = opaque & ~ndi.binary_erosion(opaque, structure=np.ones((3, 3), bool), border_value=0)
+bright = rim & (base[..., :3].mean(-1) > 45)
+base[bright, :3] = base[bright, :3] * 0.22 + np.array([10.0, 4.0, 6.0])
+print("rim texels darkened:", int(bright.sum()), "of", int(rim.sum()))
 r, g, b = base[..., 0], base[..., 1], base[..., 2]
 red = (base[..., 3] > 0) & (r > 150) & (g < 80) & (b < 80)
 yy, xx = np.indices((N, N))

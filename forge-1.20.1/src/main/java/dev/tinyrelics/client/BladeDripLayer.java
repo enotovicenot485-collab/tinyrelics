@@ -22,7 +22,7 @@ import org.joml.Vector3f;
  */
 public class BladeDripLayer<T extends LivingEntity, M extends EntityModel<T>> extends RenderLayer<T, M> {
     /** The three notches on the lower edge of the blade, in sprite coordinates: 0..1 across, 0..1 up. */
-    private static final float[][] NOTCHES = {{0.50F, 0.55F}, {0.66F, 0.72F}, {0.84F, 0.90F}};
+    private static final float[][] NOTCHES = {{0.559F, 0.496F}, {0.730F, 0.652F}, {0.902F, 0.840F}};
     /** thirdperson_righthand of the item model: translation in sixteenths, rotation, scale. */
     private static final float MOVE_Y = 9.17F / 16.0F;
     private static final float MOVE_Z = -0.41F / 16.0F;
