@@ -54,6 +54,78 @@ for name, tile in zip(("top", "side", "bottom"), pieces(src + "/altar_block.png"
     t[..., 3] = 255
     Image.fromarray(t, "RGBA").save(f"{out}/blood_altar_{name}.png")
 
+# ---- the block comes alive: the game plays a tall strip of frames named by a .mcmeta file
+FRAMES = 16
+
+def bump(t, at, width):
+    gap = np.abs((t - at + 0.5) % 1.0 - 0.5)
+    return np.exp(-(gap / width) ** 2)
+
+def heat(rgb, amount):
+    """Brighten towards a hot pale red."""
+    amount = np.clip(amount, 0, 1)[..., None]
+    return rgb * (1 - amount) + np.array([255.0, 150.0, 120.0]) * amount
+
+def strip(name, frames, frametime, interpolate):
+    Image.fromarray(np.concatenate(frames, 0).clip(0, 255).astype(np.uint8), "RGBA").save(f"{out}/blood_altar_{name}.png")
+    meta = '{"animation": {"frametime": %d%s}}' % (frametime, ', "interpolate": true' if interpolate else "")
+    open(f"{out}/blood_altar_{name}.png.mcmeta", "w").write(meta + "\n")
+
+yy, xx = np.indices((64, 64))
+# top: the blood in the basin swirls, the runes round it light up one after another
+top = np.array(Image.open(f"{out}/blood_altar_top.png")).astype(float)
+r, g, b = top[..., 0], top[..., 1], top[..., 2]
+red = (r > 110) & (g < 70) & (b < 70)
+away = np.hypot(xx - 31.5, yy - 31.5)
+turn = np.arctan2(yy - 31.5, xx - 31.5)
+blood = (away < 18.5) & (r > 60) & (g < 60)
+runes = red & (away >= 19.5) & (away < 29)
+frames = []
+for f in range(FRAMES):
+    t = f / FRAMES
+    fr = top.copy()
+    swirl = 0.5 + 0.5 * np.sin(2 * turn + away * 0.45 - 2 * np.pi * t)
+    fr[blood, :3] = (top[..., :3] * (0.72 + 0.5 * swirl[..., None]))[blood]
+    glint = blood & (swirl > 0.93)
+    fr[glint, :3] = heat(fr[..., :3], np.full(top.shape[:2], 0.45))[glint]
+    lit = bump(turn / (2 * np.pi) + 0.5, t, 0.09)             # one bright arc going round the ring
+    fr[runes, :3] = heat(top[..., :3] * 0.55, lit * 0.9)[runes] + (top[..., :3] * 0.6 * lit[..., None])[runes]
+    frames.append(fr)
+strip("top", frames, 3, True)
+
+# side: the rune breathes, a brighter bead runs down every streak and a drop falls off its end
+side = np.array(Image.open(f"{out}/blood_altar_side.png")).astype(float)
+r, g, b = side[..., 0], side[..., 1], side[..., 2]
+red = (r > 150) & (g < 70) & (b < 70)
+rune = red & (xx >= 21) & (xx <= 42) & (yy >= 19)
+drips = red & ~rune & (yy < 40)
+labels, count = ndi.label(ndi.binary_dilation(drips, iterations=1))
+streaks = []
+for k in range(1, count + 1):
+    ys, xs = np.where((labels == k) & drips)
+    if len(ys) >= 4:
+        streaks.append((int(np.round(xs[ys == ys.max()].mean())), int(ys.min()), int(ys.max()), (labels == k) & drips))
+frames = []
+for f in range(FRAMES):
+    t = f / FRAMES
+    fr = side.copy()
+    fr[rune, :3] = heat(side[..., :3] * (0.7 + 0.3 * np.sin(2 * np.pi * t)), np.full(side.shape[:2], 0.25 + 0.25 * np.sin(2 * np.pi * t)))[rune]
+    for n, (x, y0, y1, mask) in enumerate(streaks):
+        own = (t + n * 0.31) % 1.0
+        # the bead takes the first 60% of the loop to run down the streak
+        along = (yy - y0) / max(y1 - y0, 1)
+        bead = np.exp(-((along - own / 0.6) / 0.18) ** 2) * (own < 0.75)
+        fr[mask, :3] = heat(side[..., :3] * 0.8, bead * 0.8)[mask]
+        if own >= 0.55:                                      # then a drop lets go and falls to the gold band
+            fall = (own - 0.55) / 0.45
+            y = int(y1 + 1 + fall * fall * (53 - y1))
+            for k, tone in enumerate(((200, 20, 28), (130, 10, 18))):
+                if y - k > y1 and y - k < 54:
+                    fr[y - k, x, :3] = tone
+    frames.append(fr)
+strip("side", frames, 3, False)
+print("streaks on the side:", [(x, y0, y1) for x, y0, y1, _ in streaks])
+
 # ---- the window
 S = 2
 parts = pieces(src + "/altar_gui_parts.png")
