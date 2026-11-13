@@ -14,14 +14,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
-/** One piece of the Chaos Assassin armor. The four pieces together give 10 armor points. */
+/** One piece of the Chaos Assassin armor. The four pieces together give 13 armor points. */
 public class ChaosArmorItem extends ArmorItem {
     public ChaosArmorItem(Type type, Properties properties) {
         super(TinyRelics.CHAOS_MATERIAL, type, properties.durability(type.getDurability(30)));
     }
 
     /** Frames of the shimmer that runs over the violet details. */
-    private static final int FRAMES = 8;
+    private static final int FRAMES = 32;
     private static final Map<EquipmentSlot, ResourceLocation[]> TEXTURES = new EnumMap<>(EquipmentSlot.class);
 
     private static ResourceLocation[] frames(EquipmentSlot slot) {
@@ -34,7 +34,7 @@ public class ChaosArmorItem extends ArmorItem {
     }
 
     /**
-     * Every slot has its own picture, and each picture comes in eight frames. The game asks
+     * Every slot has its own picture, and each picture comes in 32 frames. The game asks
      * for the texture every time it draws the armor, so answering with the frame for the
      * current moment animates it.
      */
@@ -47,5 +47,6 @@ public class ChaosArmorItem extends ArmorItem {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.tinyrelics.chaos_armor.tooltip").withStyle(ChatFormatting.DARK_PURPLE));
+        tooltip.add(Component.translatable("item.tinyrelics.chaos_armor.tooltip2", Component.keybind("key.tinyrelics.armor")).withStyle(ChatFormatting.DARK_PURPLE));
     }
 }

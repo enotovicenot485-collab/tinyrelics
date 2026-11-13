@@ -66,7 +66,7 @@
   "item.tinyrelics.chaos_chestplate": "Нагрудник Ассасина Хаоса",
   "item.tinyrelics.chaos_leggings": "Поножи Ассасина Хаоса",
   "item.tinyrelics.chaos_boots": "Ботинки Ассасина Хаоса",
-  "item.tinyrelics.chaos_armor.tooltip": "Броня Ассасина Хаоса",
+  "item.tinyrelics.chaos_armor.tooltip": "Полный комплект: Скорость III",
   "item.tinyrelics.necro_helmet": "Шлем Некроманта",
   "item.tinyrelics.necro_chestplate": "Нагрудник Некроманта",
   "item.tinyrelics.necro_leggings": "Поножи Некроманта",
@@ -77,5 +77,11 @@
   "screen.tinyrelics.stats.necro_armor": "11 брони в полном комплекте",
   "screen.tinyrelics.desc.necro_armor": "Шлем 2, нагрудник 5, поножи 3, ботинки 1. Когда надеты все четыре части, каждый убитый тобой моб или игрок встаёт на месте смерти зомби или скелетом и 30 секунд сражается за тебя. Одновременно не больше 5 таких слуг.",
   "itemGroup.tinyrelics": "Tiny Relics",
-  "item.tinyrelics.tab_filler": " "
+  "item.tinyrelics.tab_filler": " ",
+  "item.tinyrelics.chaos_armor.tooltip2": "[%s] исчезнуть на 10 с и получить Скорость V",
+  "msg.tinyrelics.vanish_wait": "Исчезновение будет готово через %s с",
+  "key.tinyrelics.armor": "Способность брони",
+  "screen.tinyrelics.name.chaos_armor": "Броня Ассасина Хаоса",
+  "screen.tinyrelics.stats.chaos_armor": "13 брони в полном комплекте",
+  "screen.tinyrelics.desc.chaos_armor": "Капюшон 3, нагрудник 6, поножи 3, ботинки 1. Когда надеты все четыре части, владелец получает Скорость III. Клавиша способности брони (по умолчанию I): владелец исчезает в облаке пара на 10 секунд, его не видно вместе с бронёй и предметом в руке, и он получает Скорость V. Перезарядка 2 минуты."
 }

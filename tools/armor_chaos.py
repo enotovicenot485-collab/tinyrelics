@@ -8,7 +8,7 @@ from scipy import ndimage as ndi
 SRC, OUT_TEX, OUT_JAVA = sys.argv[1], sys.argv[2], sys.argv[3]
 K = 4                      # texels per model unit
 SHEET = 64                 # logical texture size
-FRAMES = 8                 # frames of the violet shimmer
+FRAMES = 32                # frames of the glow animation; the game shows one every 2 ticks, a 3.2 s loop
 im = np.array(Image.open(SRC).convert("RGB")).astype(np.float64)
 H, W, _ = im.shape
 # green background (the armor glows violet, so magenta would not do), and its fringe on the outline
@@ -37,7 +37,7 @@ TABARD = dict(N=(220, 520, 345, 690), S=(695, 520, 800, 690), W=(220, 520, 345, 
 def box(part, src, xyz, size, uv, inflate=0.0, rows=(0.0, 1.0), top=True, bottom=True, solid=True, lift=False):
     """lift = the rows above the painted part repeat its first row (the shoulder under the pauldron)."""
     """solid = holes left by the concept's background are filled in, so the body never shows through."""
-    return dict(part=part, src=src, xyz=xyz, size=size, uv=uv, inflate=inflate, rows=rows, top=top, bottom=bottom, solid=solid, bone=False, skull=None, relief=None, shade=1.0, ragged=False, lift=lift, colour=None)
+    return dict(part=part, src=src, xyz=xyz, size=size, uv=uv, inflate=inflate, rows=rows, top=top, bottom=bottom, solid=solid, bone=False, skull=None, relief=None, shade=1.0, ragged=False, lift=lift, colour=None, fx=None)
 
 def part_of(src, ref_xyz, ref_size, xyz, size):
     """The pictures for a small box that is a piece of a bigger reference box (a step of a horn)."""
@@ -93,14 +93,37 @@ def flip(rects, front_centre=285, back_centre=760):
     (a, b, c, d), (e, f, g, h) = rects["N"], rects["S"]
     return dict(N=(2 * front_centre - c, b, 2 * front_centre - a, d), S=(2 * back_centre - g, f, 2 * back_centre - e, h), W=rects["E"], E=rects["W"])
 
+def stepped(part, rects, xyz, depth, side, unit=26.67):
+    """A solid shape that follows a drawing's outline: one box for every unit of height, as wide as
+    the drawing is on that row, carrying its slice of the picture on the front and back.
+    Built for the right side; for the left the mirrored picture is used and mirror() moves the box."""
+    x0, y0, x1, y1 = rects["N"]
+    out = []
+    for row in range(int(round((y1 - y0) / unit))):
+        ya, yb = int(y0 + row * unit), int(y0 + (row + 1) * unit)
+        cols = np.where((~BG[ya:yb, x0:x1]).sum(0) > (yb - ya) * 0.25)[0]
+        if len(cols) == 0:
+            continue
+        pa, pb = x0 + cols[0], x0 + cols[-1] + 1
+        width = max(1, int(round((pb - pa) / unit)))
+        centre = xyz[0] + ((pa + pb) / 2 - x0) / unit
+        rect = dict(N=(pa, ya, pb, yb))
+        if side > 0:
+            rect = flip(dict(rect, S=rect["N"], W=rect["N"], E=rect["N"]))
+        rect = {k: rect["N"] for k in "NSWE"}
+        b = box(part, rect, (round(centre - width / 2, 2), xyz[1] + row, xyz[2]), (width, 1, depth), None)
+        b["relief"] = "N"
+        out.append(b)
+    return out
+
 def pauldron(side):
     """A shoulder: two stacked plates painted from all four views, a blade curving up and a spike below it."""
-    low, up, blade = (PAD_LOW, PAD_UP, BLADE) if side < 0 else (flip(PAD_LOW), flip(PAD_UP), flip(BLADE))
+    low, up = (PAD_LOW, PAD_UP) if side < 0 else (flip(PAD_LOW), flip(PAD_UP))
     boxes = [
         box("right_arm", low, (-4.6, -2.9, -3), (6, 3, 6), None),
         box("right_arm", up, (-4.4, -3.8, -2.5), (4, 1, 5), None),
-        # the curved blade is cut out of the concept itself: a flat plate with the drawing's own outline
-        relief("right_arm", blade, (-7.5, -7.4, -0.5), (3, 5, 1), (-7.5, -7.4, -0.5), (3, 5, 1), "N", ragged=True),
+        # the curved blade: one solid spike, built row by row along the outline of the drawing
+        *stepped("right_arm", BLADE, (-7.5, -7.4, -1), 2, side),
     ]
     return boxes if side < 0 else [mirror(b) for b in boxes]
 
@@ -117,7 +140,7 @@ def boot_blades(side):
 SLOTS = {
     "head": [
         # the face sits deep inside: the hood's plates reach 1.5 further forward than the mask
-        box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.5),
+        dict(box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.5), fx="eyes"),
         relief("head", HOOD, (-5.3, -9, -6), (1, 8, 11), (-5.3, -9, -6), (1, 8, 11), "W"),
         relief("head", HOOD, (4.3, -9, -6), (1, 8, 11), (4.3, -9, -6), (1, 8, 11), "E"),
         relief("head", HOOD, (-4.5, -8.8, 4.6), (9, 10, 1), (-4.5, -8.8, 4.6), (9, 10, 1), "S"),
@@ -134,7 +157,7 @@ SLOTS = {
         box("left_arm", LARM, (-1, -2, -2), (4, 12, 4), (40, 0), 0.6, rows=(0.3, 1.0), lift=True),
         *pauldron(-1), *pauldron(1),
         # the vortex emblem stands out from the chest; thick bracers with runes on the forearms
-        relief("body", BODY, *BODY_BOX, (-2, 0.6, -3.5), (4, 4, 1)),
+        dict(relief("body", BODY, *BODY_BOX, (-2, 0.6, -3.5), (4, 4, 1)), fx="vortex"),
         box("right_arm", part_of(RARM, *ARM_R, (-3, 4, -2), (4, 4, 4)), (-3, 4, -2), (4, 4, 4), None, 1.0),
         box("left_arm", part_of(LARM, *ARM_L, (-1, 4, -2), (4, 4, 4)), (-1, 4, -2), (4, 4, 4), None, 1.0),
     ],
@@ -415,11 +438,35 @@ for slot, boxes in SLOTS.items():
     glow[cyan, 3] = 255
     Image.fromarray(glow.clip(0, 255).astype(np.uint8), "RGBA").save(f"{OUT_TEX}/chaos_{slot}_glow.png")
     yy, xx = np.indices(cyan.shape)
+    # Every glowing detail has its own life. kind: 0 slow breath, 1 eyes, 2 vortex, 3 arm runes, 4 knee runes
+    kind = np.zeros(cyan.shape, int)
+    centre = (0.0, 0.0)
+    for b in boxes:
+        w, h, d = b["size"]; u, v = b["uv"]
+        fx = b["fx"] or ("arm" if slot == "chest" and "arm" in b["part"] else "knee" if slot == "legs" and "leg" in b["part"] else "slow")
+        kind[v * K:(v + d + h) * K, u * K:(u + 2 * (w + d)) * K] = {"slow": 0, "eyes": 1, "vortex": 2, "arm": 3, "knee": 4}[fx]
+        if fx == "vortex":
+            centre = ((u + d + w / 2) * K, (v + d + h / 2) * K)
+    angle = np.arctan2(yy - centre[1], xx - centre[0]); radius = np.hypot(yy - centre[1], xx - centre[0])
+    def bump(t, at, width):
+        gap = np.abs((t - at + 0.5) % 1.0 - 0.5)
+        return np.exp(-(gap / width) ** 2)
     for f in range(FRAMES):
-        phase = 2 * np.pi * f / FRAMES - (xx * 0.09 + yy * 0.13)
-        wave = np.clip(np.cos(phase), 0, 1) ** 2
+        t = f / FRAMES
+        wave = np.full(cyan.shape, 0.3 + 0.25 * np.sin(2 * np.pi * t))
+        # the eyes flare up twice in a row, then smoulder
+        wave[kind == 1] = 0.2 + 0.8 * max(bump(t, 0.10, 0.03), 0.75 * bump(t, 0.19, 0.035))
+        # two bright arms turn round the centre of the vortex
+        spin = 0.12 + 0.88 * np.clip(np.cos(2 * angle - radius * 0.3 - 2 * np.pi * t), 0, 1) ** 2
+        wave[kind == 2] = spin[kind == 2]
+        # the runes light up once a loop, the arms first, the knees later; the light runs down the rune
+        run = (yy % (16 * K)) / (16.0 * K) * 0.08
+        wave[kind == 3] = (0.12 + 0.88 * bump(t - run, 0.45, 0.07))[kind == 3]
+        wave[kind == 4] = (0.12 + 0.88 * bump(t - run, 0.72, 0.07))[kind == 4]
         frame = sheet.copy()
-        lit = frame[..., :3] * (0.6 + 0.4 * wave[..., None])
+        # the eyes are almost white in the drawing: at rest they are dimmed more, so the flare is seen
+        rest = np.where(kind == 1, 0.3, 0.6)[..., None]
+        lit = frame[..., :3] * (rest + (1 - rest) * wave[..., None])
         lit = lit * (1 - 0.75 * wave[..., None]) + np.array([250.0, 230.0, 255.0]) * 0.75 * wave[..., None]
         frame[cyan, :3] = lit[cyan]
         Image.fromarray(frame.clip(0, 255).astype(np.uint8), "RGBA").save(f"{OUT_TEX}/chaos_{slot}_{f}.png")

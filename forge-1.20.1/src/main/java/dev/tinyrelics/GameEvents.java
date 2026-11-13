@@ -1,5 +1,6 @@
 package dev.tinyrelics;
 
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -109,6 +110,7 @@ public final class GameEvents {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) {
             Abilities.tick(server);
+            ChaosSet.tick(server);
         }
     }
 
@@ -185,6 +187,15 @@ public final class GameEvents {
         if (source != null && source.getPersistentData().getBoolean(UndeadStaffItem.STAFF_SKULL)
                 && !RelicConfig.SERVER.staffSkullGrief) {
             event.getAffectedBlocks().clear();
+        }
+    }
+
+    // ---- Chaos Assassin armor: nothing can pick a vanished wearer as its target.
+
+    @SubscribeEvent
+    public static void onTarget(LivingChangeTargetEvent event) {
+        if (event.getNewTarget() instanceof ServerPlayer player && ChaosSet.isVanished(player)) {
+            event.setCanceled(true);
         }
     }
 

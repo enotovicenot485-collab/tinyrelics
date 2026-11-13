@@ -17,7 +17,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class Network {
-    private static final String VERSION = "6";
+    private static final String VERSION = "7";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(TinyRelics.MODID, "main"),
@@ -39,6 +39,13 @@ public final class Network {
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         CHANNEL.registerMessage(5, Shockwave.class, Shockwave::encode, Shockwave::decode, Shockwave::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(6, ArmorAbility.class, ArmorAbility::encode, ArmorAbility::decode, ArmorAbility::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+    }
+
+    /** Called on the client when the armor ability key is pressed. */
+    public static void requestArmorAbility() {
+        CHANNEL.sendToServer(new ArmorAbility());
     }
 
     /** Called on the client when the super ability key is pressed. */
@@ -181,6 +188,26 @@ public final class Network {
         public static void handle(ConfigSync message, Supplier<NetworkEvent.Context> context) {
             context.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> ClientEffects.receiveConfig(message.config)));
+            context.get().setPacketHandled(true);
+        }
+    }
+
+    /** Client -> server: the armor ability key was pressed. */
+    public static final class ArmorAbility {
+        public static void encode(ArmorAbility message, FriendlyByteBuf buffer) {
+        }
+
+        public static ArmorAbility decode(FriendlyByteBuf buffer) {
+            return new ArmorAbility();
+        }
+
+        public static void handle(ArmorAbility message, Supplier<NetworkEvent.Context> context) {
+            ServerPlayer sender = context.get().getSender();
+            context.get().enqueueWork(() -> {
+                if (sender != null) {
+                    ChaosSet.tryVanish(sender);
+                }
+            });
             context.get().setPacketHandled(true);
         }
     }

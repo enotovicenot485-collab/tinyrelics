@@ -19,7 +19,7 @@ public final class Network {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("6");
+        PayloadRegistrar registrar = event.registrar("7");
         registrar.playToClient(CharmBroken.TYPE, CharmBroken.STREAM_CODEC,
                 (payload, context) -> ClientEffects.charmBroken());
         registrar.playToClient(ConfigSync.TYPE, ConfigSync.STREAM_CODEC,
@@ -34,12 +34,23 @@ public final class Network {
                 (payload, context) -> ClientEffects.startVortex(payload.entityId()));
         registrar.playToClient(Shockwave.TYPE, Shockwave.STREAM_CODEC,
                 (payload, context) -> ClientEffects.startShockwave(payload.x(), payload.y(), payload.z(), payload.radius(), payload.full()));
+        registrar.playToServer(ArmorAbility.TYPE, ArmorAbility.STREAM_CODEC,
+                (payload, context) -> {
+                    if (context.player() instanceof ServerPlayer sender) {
+                        ChaosSet.tryVanish(sender);
+                    }
+                });
         registrar.playToServer(StaffSuper.TYPE, StaffSuper.STREAM_CODEC,
                 (payload, context) -> {
                     if (context.player() instanceof ServerPlayer sender) {
                         Slam.superKey(sender);
                     }
                 });
+    }
+
+    /** Called on the client when the armor ability key is pressed. */
+    public static void requestArmorAbility() {
+        PacketDistributor.sendToServer(ArmorAbility.INSTANCE);
     }
 
     /** Called on the client when the super ability key is pressed. */
@@ -99,6 +110,18 @@ public final class Network {
         public static final CharmBroken INSTANCE = new CharmBroken();
         public static final CustomPacketPayload.Type<CharmBroken> TYPE = new CustomPacketPayload.Type<>(id("charm_broken"));
         public static final StreamCodec<ByteBuf, CharmBroken> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Client -> server: the super ability key was pressed. */
+    public record ArmorAbility() implements CustomPacketPayload {
+        public static final ArmorAbility INSTANCE = new ArmorAbility();
+        public static final CustomPacketPayload.Type<ArmorAbility> TYPE = new CustomPacketPayload.Type<>(id("armor_ability"));
+        public static final StreamCodec<ByteBuf, ArmorAbility> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

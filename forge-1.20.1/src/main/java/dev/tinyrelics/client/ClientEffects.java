@@ -76,6 +76,11 @@ public final class ClientEffects {
         }
         tickVortexes(mc);
         tickShockwaves(mc);
+        while (ClientSetup.ARMOR_KEY.consumeClick()) {
+            if (mc.screen == null && mc.player != null) {
+                Network.requestArmorAbility();
+            }
+        }
         while (ClientSetup.SUPER_KEY.consumeClick()) {
             if (mc.screen == null && mc.player != null) {
                 Network.requestStaffSuper();

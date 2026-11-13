@@ -1,5 +1,6 @@
 package dev.tinyrelics;
 
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -102,6 +103,7 @@ public final class GameEvents {
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         Abilities.tick(event.getServer());
+        ChaosSet.tick(event.getServer());
     }
 
     // ---- Chaos Boomerang shield: mobs cannot hurt the player while it circles.
@@ -177,6 +179,15 @@ public final class GameEvents {
         if (source != null && source.getPersistentData().getBoolean(UndeadStaffItem.STAFF_SKULL)
                 && !RelicConfig.SERVER.staffSkullGrief) {
             event.getAffectedBlocks().clear();
+        }
+    }
+
+    // ---- Chaos Assassin armor: nothing can pick a vanished wearer as its target.
+
+    @SubscribeEvent
+    public static void onTarget(LivingChangeTargetEvent event) {
+        if (event.getNewAboutToBeSetTarget() instanceof ServerPlayer player && ChaosSet.isVanished(player)) {
+            event.setCanceled(true);
         }
     }
 

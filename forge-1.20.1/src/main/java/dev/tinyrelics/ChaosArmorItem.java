@@ -21,17 +21,17 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
-/** One piece of the Chaos Assassin armor. The four pieces together give 10 armor points. */
+/** One piece of the Chaos Assassin armor. The four pieces together give 13 armor points. */
 public class ChaosArmorItem extends ArmorItem {
     public ChaosArmorItem(Type type, Properties properties) {
         super(Material.INSTANCE, type, properties);
     }
 
     /** Frames of the shimmer that runs over the violet details. */
-    private static final int FRAMES = 8;
+    private static final int FRAMES = 32;
 
     /**
-     * Every slot has its own picture, and each picture comes in eight frames. The game asks
+     * Every slot has its own picture, and each picture comes in 32 frames. The game asks
      * for the texture every time it draws the armor, so answering with the frame for the
      * current moment animates it.
      */
@@ -54,6 +54,7 @@ public class ChaosArmorItem extends ArmorItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.tinyrelics.chaos_armor.tooltip").withStyle(ChatFormatting.DARK_PURPLE));
+        tooltip.add(Component.translatable("item.tinyrelics.chaos_armor.tooltip2", Component.keybind("key.tinyrelics.armor")).withStyle(ChatFormatting.DARK_PURPLE));
     }
 
     private enum Material implements ArmorMaterial {
@@ -73,9 +74,9 @@ public class ChaosArmorItem extends ArmorItem {
         @Override
         public int getDefenseForType(Type type) {
             return switch (type) {
-                case HELMET -> 2;
-                case CHESTPLATE -> 5;
-                case LEGGINGS -> 2;
+                case HELMET -> 3;
+                case CHESTPLATE -> 6;
+                case LEGGINGS -> 3;
                 case BOOTS -> 1;
             };
         }

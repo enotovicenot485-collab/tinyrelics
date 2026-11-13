@@ -1,6 +1,8 @@
 package dev.tinyrelics.client;
 
+import dev.tinyrelics.ChaosSet;
 import dev.tinyrelics.TinyRelics;
+import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -26,6 +28,9 @@ public final class ClientSetup {
     public static final KeyMapping SUPER_KEY =
             new KeyMapping("key.tinyrelics.super", GLFW.GLFW_KEY_R, "key.categories.tinyrelics");
 
+    public static final KeyMapping ARMOR_KEY =
+            new KeyMapping("key.tinyrelics.armor", GLFW.GLFW_KEY_I, "key.categories.tinyrelics");
+
     private ClientSetup() {
     }
 
@@ -39,13 +44,25 @@ public final class ClientSetup {
         NeoForge.EVENT_BUS.addListener(TabBanners::onMouseReleased);
         NeoForge.EVENT_BUS.addListener(TabBanners::onKeyPressed);
         NeoForge.EVENT_BUS.addListener(TabBanners::onTooltip);
+        NeoForge.EVENT_BUS.addListener(ClientSetup::hideVanished);
         modBus.addListener(ClientSetup::addLayers);
         modBus.addListener(ClientSetup::registerExtensions);
+    }
+
+    /**
+     * Invisibility alone still shows armor and the item in hand. A wearer of the full
+     * Chaos Assassin set is not drawn at all while invisible.
+     */
+    private static void hideVanished(RenderPlayerEvent.Pre event) {
+        if (event.getEntity().isInvisible() && ChaosSet.hasFullSet(event.getEntity())) {
+            event.setCanceled(true);
+        }
     }
 
     private static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(MENU_KEY);
         event.register(SUPER_KEY);
+        event.register(ARMOR_KEY);
     }
 
     private static void registerParticles(RegisterParticleProvidersEvent event) {
