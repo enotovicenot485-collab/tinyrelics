@@ -33,8 +33,8 @@ public final class BloodArmorModels {
         switch (slot) {
             case HEAD -> {
                 root.addOrReplaceChild("head", CubeListBuilder.create()
-                        .texOffs(0, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.15F))
-                        .texOffs(32, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.8F))
+                        .texOffs(0, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.55F))
+                        .texOffs(32, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.85F))
                         .texOffs(0, 16).addBox(-6.0F, -9.7F, -6.0F, 12.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
                         .texOffs(26, 16).addBox(-6.0F, -11.7F, -6.0F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
                         .texOffs(30, 16).addBox(-4.0F, -12.7F, -6.0F, 1.0F, 3.0F, 1.0F, new CubeDeformation(0.0F))

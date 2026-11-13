@@ -189,8 +189,9 @@ CROWN_FRONT = ((-6, -13.6, -6), (12, 6, 1))
 SLOTS = {
     "head": [
         # two shells, as on a vanilla helmet: the outer one has the face opening cut out, the eyes are on the inner one
-        box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.15),
-        dict(box("head", FACE, (-4, -8, -4), (8, 8, 8), None, 0.8), slots=True),
+        # the inner one must stay outside the hat layer of the skin, which is 0.5 out: any thinner and the skin shows in the opening
+        dict(box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.55), dark=True),
+        dict(box("head", FACE, (-4, -8, -4), (8, 8, 8), None, 0.85), slots=True),
         # the crown: a closed ring a little wider than the helm, with solid points, and the ruby standing out in front
         *crown_wall("N", CROWN["N"], 108, (-6, -9.7, -6), 2, {0: 2, 2: 3, 5: 4, 6: 4, 9: 3, 11: 2}),
         *crown_wall("S", CROWN["S"], 108, (-6, -9.7, 5), 1, {0: 2, 2: 3, 5: 4, 6: 4, 9: 3, 11: 2}),
@@ -416,10 +417,17 @@ def paint(sheet, b):
             rows, cols = block.shape[:2]
             hole = np.zeros((rows, cols), bool)
             hole[int(0.26 * rows):int(0.50 * rows), int(0.09 * cols):int(0.91 * cols)] = True
-            hole[int(0.26 * rows):, int(0.29 * cols):int(0.71 * cols)] = True
+            hole[int(0.26 * rows):, int(0.345 * cols):int(0.655 * cols)] = True      # between the tears, which stay on the metal
             rim = ndi.binary_dilation(hole, iterations=1) & ~hole
             block[rim, :3] = block[rim, :3] * 0.5 + np.array([58, 52, 56]) * 0.5
             block[hole] = 0
+        if b.get("dark"):
+            # the inside of the helm: darkness, and in front only the glowing eyes
+            keep = np.zeros(block.shape[:2], bool)
+            if name == "N":
+                top, low = int(0.2 * fh * K), int(0.52 * fh * K)
+                keep[top:low] = (block[top:low, :, 0] > 140) & (block[top:low, :, 0] - block[top:low, :, 2] > 60)
+            block[~keep] = (9, 7, 9, 255)
         sheet[fy * K:(fy + fh) * K, fx * K:(fx + fw) * K] = block
     if (b["top"] or b["bottom"]) and b["solid"]:
         # the steel of this box: the average of its darker half on the front

@@ -20,6 +20,8 @@ boxes = []
 for part, xyz, size in (("head", (-4, -8, -4), (8, 8, 8)), ("body", (-4, 0, -2), (8, 12, 4)), ("right_arm", (-3, -2, -2), (4, 12, 4)),
                         ("left_arm", (-1, -2, -2), (4, 12, 4)), ("right_leg", (-2, 0, -2), (4, 12, 4)), ("left_leg", (-2, 0, -2), (4, 12, 4))):
     boxes.append(dict(part=part, xyz=xyz, size=size, inflate=0, tex=None, uv=(0, 0)))
+# the hat layer of the skin: it sticks out half a unit, and armor thinner than that lets it through
+boxes.append(dict(part="head", xyz=(-4, -8, -4), size=(8, 8, 8), inflate=0.5, tex=None, uv=(0, 0)))
 for slot, items in data["slots"].items():
     tex = np.array(Image.open(f"{folder}/{data['prefix']}{slot}.png").convert("RGBA")).astype(np.float64)
     for b in items:

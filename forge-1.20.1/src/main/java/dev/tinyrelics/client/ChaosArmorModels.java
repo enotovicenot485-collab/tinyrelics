@@ -33,7 +33,7 @@ public final class ChaosArmorModels {
         switch (slot) {
             case HEAD -> {
                 root.addOrReplaceChild("head", CubeListBuilder.create()
-                        .texOffs(0, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.5F))
+                        .texOffs(0, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.55F))
                         .texOffs(32, 0).addBox(-5.3F, -9.0F, -6.0F, 1.0F, 8.0F, 11.0F, new CubeDeformation(0.0F))
                         .texOffs(0, 16).addBox(4.3F, -9.0F, -6.0F, 1.0F, 8.0F, 11.0F, new CubeDeformation(0.0F))
                         .texOffs(24, 19).addBox(-4.5F, -8.8F, 4.6F, 9.0F, 10.0F, 1.0F, new CubeDeformation(0.0F))

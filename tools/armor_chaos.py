@@ -143,7 +143,8 @@ def boot_blades(side):
 SLOTS = {
     "head": [
         # the face sits deep inside: the hood's plates reach 1.5 further forward than the mask
-        dict(box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.5), fx="eyes"),
+        # 0.55, not 0.5: the hat layer of the skin is exactly 0.5 out and would flicker through
+        dict(box("head", FACE, (-4, -8, -4), (8, 8, 8), (0, 0), 0.55), fx="eyes"),
         relief("head", HOOD, (-5.3, -9, -6), (1, 8, 11), (-5.3, -9, -6), (1, 8, 11), "W"),
         relief("head", HOOD, (4.3, -9, -6), (1, 8, 11), (4.3, -9, -6), (1, 8, 11), "E"),
         relief("head", HOOD, (-4.5, -8.8, 4.6), (9, 10, 1), (-4.5, -8.8, 4.6), (9, 10, 1), "S"),
