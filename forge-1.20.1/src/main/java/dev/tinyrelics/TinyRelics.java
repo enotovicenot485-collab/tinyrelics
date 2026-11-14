@@ -104,6 +104,13 @@ public class TinyRelics {
     public static final RegistryObject<Item> BLOOD_BOOTS = ITEMS.register("blood_boots",
             () -> new BloodArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
 
+    public static final RegistryObject<Item> THOR_CHESTPLATE = ITEMS.register("thor_chestplate",
+            () -> new ThorArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final RegistryObject<Item> THOR_LEGGINGS = ITEMS.register("thor_leggings",
+            () -> new ThorArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+    public static final RegistryObject<Item> THOR_BOOTS = ITEMS.register("thor_boots",
+            () -> new ThorArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+
     /** Invisible: fills the cells of the creative tab that hold a banner picture or nothing at all. */
     public static final RegistryObject<Item> TAB_FILLER = ITEMS.register("tab_filler",
             () -> new Item(new Item.Properties().stacksTo(1)));

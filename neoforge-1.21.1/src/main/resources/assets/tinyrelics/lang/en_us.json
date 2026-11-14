@@ -106,5 +106,9 @@
   "item.tinyrelics.blood_ingot": "Blood Ingot",
   "block.tinyrelics.blood_altar": "Blood Altar",
   "container.tinyrelics.blood_altar": "Blood Altar",
-  "container.tinyrelics.blood_altar.water": "Water: %s of %s bottles"
+  "container.tinyrelics.blood_altar.water": "Water: %s of %s bottles",
+  "item.tinyrelics.thor_chestplate": "Storm God Mantle",
+  "item.tinyrelics.thor_leggings": "Storm God Leggings",
+  "item.tinyrelics.thor_boots": "Storm God Boots",
+  "item.tinyrelics.thor_armor.tooltip": "Storm God armor"
 }

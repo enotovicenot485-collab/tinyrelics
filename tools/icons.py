@@ -1,4 +1,4 @@
-"""Cuts a row of item icons out of a concept sheet with a plain green background.
+"""Cuts a row of item icons out of a concept sheet with a plain background.
 
     python3 icons.py <sheet> <out folder> <name> <name> ..."""
 import sys
@@ -6,7 +6,8 @@ import numpy as np
 from PIL import Image
 src, out, names = sys.argv[1], sys.argv[2], sys.argv[3:]
 im = np.array(Image.open(src).convert("RGB")).astype(int)
-bg = (im[..., 1] - im[..., 0] > 40) & (im[..., 1] - im[..., 2] > 40)
+# the background is whatever colour the corner has (green or magenta sheets)
+bg = np.abs(im - im[3, 3]).sum(-1) < 150
 cols = np.where((~bg).sum(0) > 2)[0]
 groups, start, prev = [], cols[0], cols[0]
 for c in cols[1:]:

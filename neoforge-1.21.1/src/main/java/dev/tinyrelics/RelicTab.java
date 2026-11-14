@@ -48,7 +48,8 @@ public final class RelicTab {
                 TinyRelics.UNDEAD_STAFF.get());
 
         banner(output, THOR);
-        row(output, nextGap, TinyRelics.THOR_HAMMER.get());
+        row(output, nextGap, TinyRelics.THOR_HAMMER.get(), TinyRelics.THOR_CHESTPLATE.get(),
+                TinyRelics.THOR_LEGGINGS.get(), TinyRelics.THOR_BOOTS.get());
 
         banner(output, CHAOS);
         row(output, nextGap,

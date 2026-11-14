@@ -126,6 +126,16 @@ public final class ClientSetup {
                 return BloodArmorModels.get(slot);
             }
         }, TinyRelics.BLOOD_HELMET.get(), TinyRelics.BLOOD_CHESTPLATE.get(), TinyRelics.BLOOD_LEGGINGS.get(), TinyRelics.BLOOD_BOOTS.get());
+        event.registerItem(new IClientItemExtensions() {
+            @Override
+            public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original) {
+                HumanoidModel<LivingEntity> model = ThorArmorModels.get(slot);
+                if (slot == EquipmentSlot.CHEST) {
+                    ThorCloak.pose(model, entity);
+                }
+                return model;
+            }
+        }, TinyRelics.THOR_CHESTPLATE.get(), TinyRelics.THOR_LEGGINGS.get(), TinyRelics.THOR_BOOTS.get());
     }
 
     /** Players and armor stands get the pulsing glow of the necromancer armor. */

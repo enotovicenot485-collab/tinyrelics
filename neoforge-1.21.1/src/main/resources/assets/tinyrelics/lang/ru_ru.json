@@ -106,5 +106,9 @@
   "item.tinyrelics.blood_ingot": "Кровавый слиток",
   "block.tinyrelics.blood_altar": "Кровавый алтарь",
   "container.tinyrelics.blood_altar": "Кровавый алтарь",
-  "container.tinyrelics.blood_altar.water": "Вода: %s из %s бутылок"
+  "container.tinyrelics.blood_altar.water": "Вода: %s из %s бутылок",
+  "item.tinyrelics.thor_chestplate": "Мантия Громовержца",
+  "item.tinyrelics.thor_leggings": "Поножи Громовержца",
+  "item.tinyrelics.thor_boots": "Сапоги Громовержца",
+  "item.tinyrelics.thor_armor.tooltip": "Броня Громовержца"
 }
