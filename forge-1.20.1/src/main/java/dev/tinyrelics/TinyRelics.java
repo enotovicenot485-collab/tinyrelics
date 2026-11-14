@@ -72,10 +72,10 @@ public class TinyRelics {
             () -> new ThorHammerItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
     public static final RegistryObject<Item> CHAOS_BOOMERANG = ITEMS.register("chaos_boomerang",
-            () -> new ChaosBoomerangItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+            () -> new ChaosBoomerangItem(new Item.Properties().durability(1561).rarity(Rarity.EPIC).fireResistant()));
 
     public static final RegistryObject<Item> BLOOD_BLADE = ITEMS.register("blood_blade",
-            () -> new BloodBladeItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+            () -> new BloodBladeItem(new Item.Properties().durability(1561).rarity(Rarity.EPIC).fireResistant()));
 
     public static final RegistryObject<Item> NECRO_HELMET = ITEMS.register("necro_helmet",
             () -> new NecroArmorItem(ArmorItem.Type.HELMET, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
@@ -147,7 +147,7 @@ public class TinyRelics {
     }
 
     public static final RegistryObject<Item> UNDEAD_STAFF = ITEMS.register("undead_staff",
-            () -> new UndeadStaffItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+            () -> new UndeadStaffItem(new Item.Properties().durability(2031).rarity(Rarity.EPIC).fireResistant()));
 
     public static final RegistryObject<EntityType<ThrownRelic>> THROWN_RELIC = ENTITIES.register("thrown_relic",
             () -> EntityType.Builder.<ThrownRelic>of(ThrownRelic::new, MobCategory.MISC)

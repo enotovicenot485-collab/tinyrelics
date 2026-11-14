@@ -17,7 +17,7 @@ import net.minecraft.world.item.TooltipFlag;
 /** One piece of the necromancer armor. The four pieces together give 11 armor points. */
 public class NecroArmorItem extends ArmorItem {
     public NecroArmorItem(Type type, Properties properties) {
-        super(TinyRelics.NECRO_MATERIAL, type, properties.durability(type.getDurability(30)));
+        super(TinyRelics.NECRO_MATERIAL, type, properties.durability(type.getDurability(37)));
     }
 
     /** Frames of the shimmer that runs over the cyan details. */

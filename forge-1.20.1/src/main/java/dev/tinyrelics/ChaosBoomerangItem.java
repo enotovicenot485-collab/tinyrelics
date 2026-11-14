@@ -40,12 +40,14 @@ public class ChaosBoomerangItem extends RelicWeaponItem {
                 ThrownRelic.launch(server, serverPlayer, stack, ThrownRelic.ORBIT);
                 serverPlayer.getPersistentData().putLong(SHIELD_UNTIL, server.getGameTime() + SHIELD_TICKS);
                 player.getCooldowns().addCooldown(this, SHIELD_TICKS + COOLDOWN);
+                wear(stack, player);
                 server.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.6F);
             } else {
                 ThrownRelic.launch(server, serverPlayer, stack, ThrownRelic.CHAIN);
                 // Replaced by the real 10 second cooldown when the boomerang comes back.
                 player.getCooldowns().addCooldown(this, FLIGHT_COOLDOWN);
+                wear(stack, player);
                 server.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0F, 1.4F);
             }

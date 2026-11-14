@@ -81,10 +81,10 @@ public class TinyRelics {
             () -> new ThorHammerItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
     public static final DeferredItem<ChaosBoomerangItem> CHAOS_BOOMERANG = ITEMS.register("chaos_boomerang",
-            () -> new ChaosBoomerangItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+            () -> new ChaosBoomerangItem(new Item.Properties().durability(1561).rarity(Rarity.EPIC).fireResistant()));
 
     public static final DeferredItem<BloodBladeItem> BLOOD_BLADE = ITEMS.register("blood_blade",
-            () -> new BloodBladeItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+            () -> new BloodBladeItem(new Item.Properties().durability(1561).rarity(Rarity.EPIC).fireResistant()));
 
     public static final DeferredRegister<ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, MODID);
 
@@ -134,7 +134,7 @@ public class TinyRelics {
                     }),
                     15,
                     SoundEvents.ARMOR_EQUIP_NETHERITE,
-                    () -> Ingredient.of(Items.REDSTONE_BLOCK),
+                    () -> Ingredient.of(BLOOD_INGOT.get()),
                     List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(MODID, "blood"))),
                     1.0F,
                     0.0F));
@@ -210,7 +210,7 @@ public class TinyRelics {
     }
 
     public static final DeferredItem<UndeadStaffItem> UNDEAD_STAFF = ITEMS.register("undead_staff",
-            () -> new UndeadStaffItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+            () -> new UndeadStaffItem(new Item.Properties().durability(2031).rarity(Rarity.EPIC).fireResistant()));
 
     public static final DeferredHolder<EntityType<?>, EntityType<ThrownRelic>> THROWN_RELIC = ENTITIES.register("thrown_relic",
             () -> EntityType.Builder.<ThrownRelic>of(ThrownRelic::new, MobCategory.MISC)

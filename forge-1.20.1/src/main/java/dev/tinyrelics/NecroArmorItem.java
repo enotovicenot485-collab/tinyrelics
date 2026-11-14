@@ -68,7 +68,7 @@ public class NecroArmorItem extends ArmorItem {
                 case LEGGINGS -> 15;
                 case BOOTS -> 13;
             };
-            return base * 30;
+            return base * 37;
         }
 
         @Override

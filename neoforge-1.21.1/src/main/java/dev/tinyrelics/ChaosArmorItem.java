@@ -17,7 +17,7 @@ import net.minecraft.world.item.TooltipFlag;
 /** One piece of the Chaos Assassin armor. The four pieces together give 13 armor points. */
 public class ChaosArmorItem extends ArmorItem {
     public ChaosArmorItem(Type type, Properties properties) {
-        super(TinyRelics.CHAOS_MATERIAL, type, properties.durability(type.getDurability(30)));
+        super(TinyRelics.CHAOS_MATERIAL, type, properties.durability(type.getDurability(33)));
     }
 
     /** Frames of the shimmer that runs over the violet details. */

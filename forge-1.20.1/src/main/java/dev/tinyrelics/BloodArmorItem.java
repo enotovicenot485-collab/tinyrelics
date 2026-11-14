@@ -69,7 +69,7 @@ public class BloodArmorItem extends ArmorItem {
                 case LEGGINGS -> 15;
                 case BOOTS -> 13;
             };
-            return base * 30;
+            return base * 42;
         }
 
         @Override
@@ -94,7 +94,7 @@ public class BloodArmorItem extends ArmorItem {
 
         @Override
         public Ingredient getRepairIngredient() {
-            return Ingredient.of(Items.REDSTONE_BLOCK);
+            return Ingredient.of(TinyRelics.BLOOD_INGOT.get());
         }
 
         @Override

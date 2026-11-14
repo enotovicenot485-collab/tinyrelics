@@ -68,7 +68,7 @@ public class ChaosArmorItem extends ArmorItem {
                 case LEGGINGS -> 15;
                 case BOOTS -> 13;
             };
-            return base * 30;
+            return base * 33;
         }
 
         @Override

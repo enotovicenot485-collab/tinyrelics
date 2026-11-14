@@ -57,6 +57,7 @@ public class UndeadStaffItem extends RelicWeaponItem {
             } else {
                 shootSkull(server, serverPlayer);
                 player.getCooldowns().addCooldown(this, SKULL_COOLDOWN);
+                wear(stack, player);
             }
             player.awardStat(Stats.ITEM_USED.get(this));
         }
@@ -79,6 +80,7 @@ public class UndeadStaffItem extends RelicWeaponItem {
                     target.getX(), target.getY() + target.getBbHeight() * 0.6D, target.getZ(),
                     6, target.getBbWidth() * 0.3D, target.getBbHeight() * 0.2D, target.getBbWidth() * 0.3D, 0.01D);
         }
+        wear(stack, attacker);
         return true;
     }
 

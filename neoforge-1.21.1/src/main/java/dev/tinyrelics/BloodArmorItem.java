@@ -17,7 +17,7 @@ import net.minecraft.world.item.TooltipFlag;
 /** One piece of the Blood Master armor. The four pieces together give 18 armor points. */
 public class BloodArmorItem extends ArmorItem {
     public BloodArmorItem(Type type, Properties properties) {
-        super(TinyRelics.BLOOD_MATERIAL, type, properties.durability(type.getDurability(30)));
+        super(TinyRelics.BLOOD_MATERIAL, type, properties.durability(type.getDurability(42)));
     }
 
     /** Frames of the shimmer that runs over the red details. */

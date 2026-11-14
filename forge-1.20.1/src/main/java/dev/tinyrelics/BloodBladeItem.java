@@ -49,6 +49,7 @@ public class BloodBladeItem extends RelicWeaponItem {
                 Abilities.startVortex(serverPlayer);
                 data.putLong(VORTEX_READY, now + COOLDOWN);
                 player.getCooldowns().addCooldown(this, 10);
+                wear(stack, player);
                 player.awardStat(Stats.ITEM_USED.get(this));
                 return InteractionResultHolder.success(stack);
             }
@@ -70,6 +71,7 @@ public class BloodBladeItem extends RelicWeaponItem {
             // Each ability has its own two minutes, so one never locks the other.
             data.putLong(DRAIN_READY, now + COOLDOWN);
             player.getCooldowns().addCooldown(this, 10);
+            wear(stack, player);
             player.awardStat(Stats.ITEM_USED.get(this));
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
@@ -94,6 +96,7 @@ public class BloodBladeItem extends RelicWeaponItem {
                 Abilities.bleed(target, attacker);
             }
         }
+        wear(stack, attacker);
         return true;
     }
 

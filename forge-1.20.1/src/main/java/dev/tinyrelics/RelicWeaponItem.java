@@ -6,9 +6,14 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
-/** A weapon with fixed melee damage and no durability, so it never breaks. */
+/**
+ * A weapon with fixed melee damage. If it was given durability it wears by one point for every
+ * hit and every use of an ability; without durability (Thor's hammer) it never breaks.
+ */
 public class RelicWeaponItem extends Item {
     private final Multimap<Attribute, AttributeModifier> modifiers;
 
@@ -29,5 +34,16 @@ public class RelicWeaponItem extends Item {
     @SuppressWarnings("deprecation")
     public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
         return slot == EquipmentSlot.MAINHAND ? this.modifiers : super.getDefaultAttributeModifiers(slot);
+    }
+
+    /** One point of wear. Does nothing on the client, in creative mode, or for a weapon without durability. */
+    protected static void wear(ItemStack stack, LivingEntity holder) {
+        stack.hurtAndBreak(1, holder, entity -> entity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+    }
+
+    @Override
+    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+        wear(stack, attacker);
+        return true;
     }
 }
