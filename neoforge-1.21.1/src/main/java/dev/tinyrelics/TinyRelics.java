@@ -134,7 +134,7 @@ public class TinyRelics {
                     }),
                     15,
                     SoundEvents.ARMOR_EQUIP_NETHERITE,
-                    () -> Ingredient.of(BLOOD_INGOT.get()),
+                    () -> Ingredient.of(TinyRelics.BLOOD_INGOT.get()),
                     List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(MODID, "blood"))),
                     1.0F,
                     0.0F));
