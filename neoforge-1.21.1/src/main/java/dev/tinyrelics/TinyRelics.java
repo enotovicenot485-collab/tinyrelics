@@ -78,6 +78,9 @@ public class TinyRelics {
 
     public static final DeferredItem<KeepingCharmItem> KEEPING_CHARM = ITEMS.register("keeping_charm",
             () -> new KeepingCharmItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
+    /** The guide: given once on first login, and crafted from a book and a gold nugget. */
+    public static final DeferredItem<Item> GUIDE_BOOK = ITEMS.register("guide_book",
+            () -> new GuideBookItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<ThorHammerItem> THOR_HAMMER = ITEMS.register("thor_hammer",
             () -> new ThorHammerItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));

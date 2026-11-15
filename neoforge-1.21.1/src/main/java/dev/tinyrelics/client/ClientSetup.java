@@ -57,6 +57,7 @@ public final class ClientSetup {
         NeoForge.EVENT_BUS.addListener(ClientSetup::hideVanished);
         NeoForge.EVENT_BUS.addListener(BloodHud::onRender);
         NeoForge.EVENT_BUS.addListener(CharmEffect::onRender);
+        NeoForge.EVENT_BUS.addListener(GuideScreen::onRightClick);
         modBus.addListener(ClientSetup::addLayers);
         modBus.addListener(ClientSetup::registerExtensions);
     }

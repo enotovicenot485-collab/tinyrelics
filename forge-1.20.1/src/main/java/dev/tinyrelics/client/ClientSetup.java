@@ -54,6 +54,7 @@ public final class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(ClientSetup::hideVanished);
         MinecraftForge.EVENT_BUS.addListener(BloodHud::onRender);
         MinecraftForge.EVENT_BUS.addListener(CharmEffect::onRender);
+        MinecraftForge.EVENT_BUS.addListener(GuideScreen::onRightClick);
         modBus.addListener(ClientSetup::addLayers);
     }
 

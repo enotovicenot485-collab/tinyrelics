@@ -46,6 +46,16 @@ public final class TabBanners {
     private TabBanners() {
     }
 
+    /** A banner drawn anywhere, at any size: the guide book shows them on its pages. */
+    public static void draw(GuiGraphics graphics, int banner, int x, int y, int width, int height) {
+        if (banner <= 0 || banner >= TEXTURES.length) {
+            return;
+        }
+        int frame = (int) (System.currentTimeMillis() / FRAME_MILLIS[banner] % FRAMES[banner]);
+        graphics.blit(TEXTURES[banner], x, y, width, height, 0.0F, frame * FRAME_HEIGHT,
+                FRAME_WIDTH, FRAME_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT * FRAMES[banner]);
+    }
+
     /** Runs after the slots are drawn and before tooltips, already shifted to the window's corner. */
     public static void onForeground(ContainerScreenEvent.Render.Foreground event) {
         if (!(event.getContainerScreen() instanceof CreativeModeInventoryScreen screen)) {

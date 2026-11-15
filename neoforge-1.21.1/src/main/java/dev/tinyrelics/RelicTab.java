@@ -68,7 +68,7 @@ public final class RelicTab {
                 TinyRelics.BLOOD_DROP_ITEM.get(), TinyRelics.DIRTY_BLOOD_ITEM.get(),
                 TinyRelics.BLOOD_ALTAR_ITEM.get());
         banner(output, SHOP);
-        row(output, nextGap, TinyRelics.KEEPING_CHARM.get());
+        row(output, nextGap, TinyRelics.KEEPING_CHARM.get(), TinyRelics.GUIDE_BOOK.get());
     }
 
     private static void banner(CreativeModeTab.Output output, int banner) {

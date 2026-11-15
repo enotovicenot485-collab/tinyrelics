@@ -96,6 +96,17 @@ public final class GameEvents {
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             Network.sendConfig(player);
+            // the guide, once per player: the mark lives in the part of the data that is copied over on death
+            CompoundTag data = player.getPersistentData();
+            CompoundTag kept = data.getCompound("PlayerPersisted");
+            if (!kept.getBoolean(GuideBookItem.GIVEN)) {
+                kept.putBoolean(GuideBookItem.GIVEN, true);
+                data.put("PlayerPersisted", kept);
+                net.minecraft.world.item.ItemStack book = new net.minecraft.world.item.ItemStack(TinyRelics.GUIDE_BOOK.get());
+                if (!player.getInventory().add(book)) {
+                    player.drop(book, false);
+                }
+            }
         }
     }
 
