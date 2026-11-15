@@ -19,8 +19,10 @@ import net.minecraft.world.level.Level;
 public class ChaosBoomerangItem extends RelicWeaponItem {
     /** Player data key: game time until which the shield blocks mob hits. */
     public static final String SHIELD_UNTIL = "tinyrelics_shield_until";
-    /** The shield lasts 30 seconds. */
-    public static final int SHIELD_TICKS = 600;
+    /** The shield lasts 20 seconds. */
+    public static final int SHIELD_TICKS = 400;
+    /** After the shield is over: 30 seconds. */
+    public static final int SHIELD_COOLDOWN = 600;
     /** Cooldown after either ability: 10 seconds. */
     public static final int COOLDOWN = 200;
     /** After a throw, once the boomerang is back in the hand: half a second. It is the assassin's main weapon. */
@@ -41,7 +43,7 @@ public class ChaosBoomerangItem extends RelicWeaponItem {
             if (player.isShiftKeyDown()) {
                 ThrownRelic.launch(server, serverPlayer, stack, ThrownRelic.ORBIT);
                 serverPlayer.getPersistentData().putLong(SHIELD_UNTIL, server.getGameTime() + SHIELD_TICKS);
-                player.getCooldowns().addCooldown(this, SHIELD_TICKS + COOLDOWN);
+                player.getCooldowns().addCooldown(this, SHIELD_TICKS + SHIELD_COOLDOWN);
                 wear(stack, player);
                 server.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.6F);
