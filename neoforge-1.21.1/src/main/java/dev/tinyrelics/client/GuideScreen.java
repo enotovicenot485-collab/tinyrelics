@@ -297,8 +297,9 @@ public class GuideScreen extends Screen {
             boolean lit = i == open || over(mx, my, x, y, TAB_W, TAB_H);
             graphics.blit(PARTS, x, y, TAB_W, TAB_H, (float) (i * 64), lit ? 88.0F : 40.0F, 60, 44, 512, 512);
             graphics.pose().pushPose();
-            graphics.pose().translate(x + 8.5F, y + 4.5F, 0.0F);
-            graphics.pose().scale(0.75F, 0.75F, 1.0F);
+            // the icon fills the tab's round socket: 10 pixels across, centred on it (measured on the tab picture)
+            graphics.pose().translate(x + 12.5F - 5.0F, y + 11.25F - 5.0F, 0.0F);
+            graphics.pose().scale(0.625F, 0.625F, 1.0F);
             graphics.renderItem(new ItemStack(this.chapters.get(i).icon()), 0, 0);
             graphics.pose().popPose();
             if (over(mx, my, x, y, TAB_W, TAB_H)) {
