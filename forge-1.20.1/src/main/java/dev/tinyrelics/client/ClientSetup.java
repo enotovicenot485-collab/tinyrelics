@@ -53,6 +53,7 @@ public final class ClientSetup {
         MinecraftForge.EVENT_BUS.addListener(TabBanners::onTooltip);
         MinecraftForge.EVENT_BUS.addListener(ClientSetup::hideVanished);
         MinecraftForge.EVENT_BUS.addListener(BloodHud::onRender);
+        MinecraftForge.EVENT_BUS.addListener(CharmEffect::onRender);
         modBus.addListener(ClientSetup::addLayers);
     }
 
@@ -103,6 +104,7 @@ public final class ClientSetup {
         event.registerSpriteSet(TinyRelics.BLOOD_SPLASH.get(), sprites -> new ChaosParticle.Provider(sprites, 10, 0.5F, 0.0F));
         // The assassin's steam: thick puffs that rise a little, and a swirl that spreads flat over the ground.
         event.registerSpriteSet(TinyRelics.CHAOS_STEAM.get(), sprites -> new ChaosParticle.Provider(sprites, 30, 0.95F, -0.012F));
+        event.registerSpriteSet(TinyRelics.CHARM_SPARK.get(), sprites -> new ChaosParticle.Provider(sprites, 26, 0.16F, 0.0F));
         event.registerSpriteSet(TinyRelics.CHAOS_SWIRL.get(), sprites -> new GroundParticle.Provider(sprites, 6, 24));
     }
 

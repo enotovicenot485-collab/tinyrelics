@@ -50,6 +50,8 @@ public class TinyRelics {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CHAOS_VORTEX = PARTICLES.register("chaos_vortex", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CHAOS_SPARK = PARTICLES.register("chaos_spark", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CHAOS_STEAM = PARTICLES.register("chaos_steam", () -> new SimpleParticleType(false));
+    /** The golden spark of a Charm of Keeping breaking. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CHARM_SPARK = PARTICLES.register("charm_spark", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CHAOS_SWIRL = PARTICLES.register("chaos_swirl", () -> new SimpleParticleType(false));
     /** The falling drop and the crescent streak of the Blood Blade. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BLOOD_DROP = PARTICLES.register("blood_drop", () -> new SimpleParticleType(false));

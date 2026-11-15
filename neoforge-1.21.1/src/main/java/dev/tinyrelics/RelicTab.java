@@ -24,6 +24,8 @@ public final class RelicTab {
     public static final int THOR = 2;
     public static final int CHAOS = 3;
     public static final int BLOOD = 4;
+    /** The curio shop: the charm, and whatever small wonders come later. */
+    public static final int SHOP = 5;
 
     private RelicTab() {
     }
@@ -65,6 +67,7 @@ public final class RelicTab {
                 TinyRelics.BLOOD_BLADE.get(), TinyRelics.BLOOD_INGOT.get(),
                 TinyRelics.BLOOD_DROP_ITEM.get(), TinyRelics.DIRTY_BLOOD_ITEM.get(),
                 TinyRelics.BLOOD_ALTAR_ITEM.get());
+        banner(output, SHOP);
         row(output, nextGap, TinyRelics.KEEPING_CHARM.get());
     }
 

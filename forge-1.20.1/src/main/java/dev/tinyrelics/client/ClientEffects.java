@@ -56,18 +56,14 @@ public final class ClientEffects {
         config = received;
     }
 
-    /** The charm floats up in front of the screen, like a totem of undying. */
+    /** The charm has saved the inventory and broken: its own scene plays (see CharmEffect). */
     public static void charmBroken() {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null || mc.level == null) {
             return;
         }
-        mc.gameRenderer.displayItemActivation(new ItemStack(TinyRelics.KEEPING_CHARM.get()));
-        mc.particleEngine.createTrackingEmitter(player, ParticleTypes.TOTEM_OF_UNDYING, 30);
-        mc.level.playLocalSound(player.getX(), player.getY(), player.getZ(),
-                SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 0.6F, 1.2F, false);
-        shatterTimer = 36;
+        CharmEffect.start();
     }
 
     @SubscribeEvent
@@ -93,9 +89,7 @@ public final class ClientEffects {
                 Network.requestStaffSuper();
             }
         }
-        if (shatterTimer >= 0 && --shatterTimer < 0) {
-            shatter();
-        }
+        CharmEffect.tick();
     }
 
     /**
