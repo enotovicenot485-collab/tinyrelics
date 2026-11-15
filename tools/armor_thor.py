@@ -36,6 +36,8 @@ FUR_CHEST = dict.fromkeys("NSWE", (150, 250, 215, 405))
 CLOAK = dict.fromkeys("NSWE", (498, 372, 806, 866))
 # the leather kilt with its silver points, front and side
 KILT = dict(N=(138, 545, 240, 695), S=(138, 545, 240, 695), W=(952, 545, 1075, 700), E=(1290, 545, 1410, 700))
+FOOT = dict(N=(130, 868, 238, 935), S=(655, 868, 755, 935), W=(955, 868, 1105, 935), E=(1262, 868, 1410, 935))
+TOE = dict.fromkeys("NSWE", (138, 884, 232, 935))
 CUFF = dict(N=(128, 742, 240, 795), S=(128, 742, 240, 795), W=(950, 742, 1070, 795), E=(1296, 742, 1412, 795))
 
 def box(part, src, xyz, size, uv, inflate=0.0, rows=(0.0, 1.0), top=True, bottom=True, solid=True, lift=False):
@@ -144,15 +146,15 @@ def fur(side):
     rects = FUR if side < 0 else flip(FUR)
     core = ((-5.4, -4.6, -3.6), (7, 5, 7))
     boxes = [
-        # the body of the fur is plain fur; the drawing goes on plates laid over each side of it
+        # the body of the fur is plain fur; the drawing goes on plates laid over each side of it.
+        # Every plate is sunk a little into the lump behind it: two faces in one plane flicker.
         fur_box("right_arm", (-5.0, -4.2, -3.2), (6, 4, 6), 0.95),
         fur_box("right_arm", (-4.7, -5.1, -2.9), (4, 1, 3), 1.0),
         fur_box("right_arm", (-2.6, -5.0, -0.6), (3, 1, 3), 0.9),
-        fur_box("right_arm", (-3.9, -5.9, -1.9), (2, 1, 2), 1.05),
-        fur_box("right_arm", (-5.8, -3.3, -1.4), (1, 2, 3), 0.9),
-        tuft("right_arm", rects, core[0], (7, 7, 7), (-5.4, -4.6, -4.2), (7, 7, 1), "N"),
-        tuft("right_arm", rects, core[0], (7, 7, 7), (-6.0, -4.6, -3.6), (1, 7, 7), "W"),
-        tuft("right_arm", rects, core[0], (7, 7, 7), (-5.4, -4.6, 3.2), (7, 7, 1), "S"),
+        fur_box("right_arm", (-3.9, -5.9, -1.7), (2, 1, 2), 1.05),
+        tuft("right_arm", rects, core[0], (7, 7, 7), (-5.4, -4.6, -4.0), (7, 7, 1), "N"),
+        tuft("right_arm", rects, core[0], (7, 7, 7), (-5.8, -4.75, -3.6), (1, 7, 7), "W"),
+        tuft("right_arm", rects, core[0], (7, 7, 7), (-5.4, -4.6, 2.45), (7, 7, 1), "S"),
     ]
     return boxes if side < 0 else [mirror(b) for b in boxes]
 
@@ -165,17 +167,26 @@ def kilt(side):
     rects = KILT if side < 0 else flip(KILT)
     boxes = [
         relief("right_leg", rects, (-2.6, 0, -3.2), (5, 7, 1), (-2.6, 0, -3.2), (5, 7, 1), "N", ragged=True),
-        relief("right_leg", rects, (-3.3, 0, -3), (1, 7, 6), (-3.3, 0, -3), (1, 7, 6), "W", ragged=True),
+        relief("right_leg", rects, (-3.3, 0.15, -3), (1, 7, 6), (-3.3, 0.15, -3), (1, 7, 6), "W", ragged=True),
     ]
     return boxes if side < 0 else [mirror(b) for b in boxes]
 
-def cuff(side):
-    """The fur round the top of a boot: a thick band, and a ragged fringe over the lacing."""
-    rects, part, x = (CUFF, "right_leg", -3.0) if side < 0 else (flip(CUFF), "left_leg", -2.0)
-    return [
-        dict(box(part, rects, (x, 5.6, -2.5), (5, 2, 5), None, 0.25), bottom=True),
-        tuft(part, rects, (x, 5.6, -3.1), (5, 3, 1), (x, 6.4, -3.1), (5, 2, 1), "N"),
+def boot(side):
+    """A boot with a shape: a slim shaft, a foot that reaches forward with a toe cap on its end, a step
+    over the instep, the lacing standing out on the shin, and a thick band of fur round the top
+    with a fringe hanging over the lacing. Nothing reaches past the middle between the legs,
+    or the two boots would flicker where they run into each other."""
+    leg, foot, toe, cuff = (RLEG, FOOT, TOE, CUFF) if side < 0 else (LLEG, flip(FOOT), flip(TOE), flip(CUFF))
+    boxes = [
+        box("right_leg", leg, (-2, 0, -2), (4, 12, 4), None, 0.6, rows=(0.5, 1.0), top=False),
+        box("right_leg", foot, (-2.7, 9.7, -4.3), (4, 3, 7), None, 0.3),
+        relief("right_leg", toe, (-2.55, 10.4, -5.3), (4, 2, 1), (-2.55, 10.4, -5.3), (4, 2, 1), "N"),
+        relief("right_leg", leg, *LEG, (-2.2, 8.35, -3.8), (4, 2, 2)),
+        relief("right_leg", leg, *LEG, (-1.5, 7.2, -3.2), (3, 2, 1)),
+        dict(box("right_leg", cuff, (-3.2, 5.4, -3.0), (5, 2, 6), None), bottom=True),
+        tuft("right_leg", cuff, (-3.35, 5.4, -3.45), (5, 3, 1), (-3.35, 6.2, -3.45), (5, 2, 1), "N"),
     ]
+    return boxes if side < 0 else [mirror(b) for b in boxes]
 
 HEAD_BOX, ARM_R, ARM_L, LEG = ((-4, -8, -4), (8, 8, 8)), ((-3, -2, -2), (4, 12, 4)), ((-1, -2, -2), (4, 12, 4)), ((-2, 0, -2), (4, 12, 4))
 BODY_BOX = ((-4, 0, -2), (8, 12, 4))
@@ -196,16 +207,17 @@ SLOTS = {
         *fur(-1), *fur(1),
         bracer(-1), bracer(1),
         # the mantle behind the neck: a roll of fur across the back and the long tufts hanging from it
-        fur_box("body", (-5, -2.2, 1.3), (10, 3, 3), 0.95),
-        fur_box("body", (-4, -3.0, 1.7), (3, 1, 2), 1.0),
-        fur_box("body", (0.5, -2.9, 2.1), (3, 1, 2), 0.9),
-        tuft("body", FUR_BACK, (-5.5, -2, 3.7), (11, 8, 1), (-5.5, -2, 3.7), (11, 8, 1), "S"),
+        # (its faces are kept a quarter of a unit away from the shoulders' fur, the cloak and each other)
+        fur_box("body", (-5, -2.45, 0.25), (10, 3, 3), 0.95),
+        fur_box("body", (-4, -3.35, 0.6), (3, 1, 2), 1.0),
+        fur_box("body", (0.5, -3.25, 0.95), (3, 1, 2), 0.9),
+        tuft("body", FUR_BACK, (-5.5, -2, 4.2), (11, 8, 1), (-5.5, -2, 4.2), (11, 8, 1), "S"),
         # fur coming down over the chest beside the neck, the two brooches and the chain between them
         tuft("body", FUR_CHEST, (-4.6, -1.6, -3.7), (3, 7, 1), (-4.6, -1.6, -3.7), (3, 7, 1), "N"),
         tuft("body", flip(FUR_CHEST), (1.6, -1.6, -3.7), (3, 7, 1), (1.6, -1.6, -3.7), (3, 7, 1), "N"),
         relief("body", BROOCH_R, (-4.5, 0.4, -4.4), (2, 2, 1), (-4.5, 0.4, -4.4), (2, 2, 1), "N", ragged=True),
         relief("body", BROOCH_L, (2.5, 0.4, -4.4), (2, 2, 1), (2.5, 0.4, -4.4), (2, 2, 1), "N", ragged=True),
-        relief("body", CHAIN, (-2.5, 0.9, -4.0), (5, 2, 1), (-2.5, 0.9, -4.0), (5, 2, 1), "N", ragged=True),
+        relief("body", CHAIN, (-2.6, 0.9, -4.0), (5, 2, 1), (-2.6, 0.9, -4.0), (5, 2, 1), "N", ragged=True),
         # the rune plate, the belt as a band of its own and the round buckle on it
         dict(relief("body", RUNE, (-2, 3, -3.5), (4, 5, 1), (-2, 3, -3.5), (4, 5, 1), "N"), fx="rune"),
         box("body", BELT, (-4.5, 9.2, -2.6), (9, 3, 5), None, 0.45),
@@ -219,11 +231,7 @@ SLOTS = {
         *kilt(-1), *kilt(1),
     ],
     "feet": [
-        box("right_leg", RLEG, (-2, 0, -2), (4, 12, 4), (0, 0), 1.0, rows=(0.5, 1.0), top=False),
-        box("left_leg", LLEG, (-2, 0, -2), (4, 12, 4), (16, 0), 1.0, rows=(0.5, 1.0), top=False),
-        *cuff(-1), *cuff(1),
-        relief("right_leg", RLEG, *LEG, (-2, 10.4, -3.9), (4, 2, 1)),
-        relief("left_leg", LLEG, *LEG, (-2, 10.4, -3.9), (4, 2, 1)),
+        *boot(-1), *boot(1),
     ],
 }
 
