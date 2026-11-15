@@ -17,13 +17,23 @@ SRC, OUT = sys.argv[1], sys.argv[2]
 def load(name):
     return np.array(Image.open(f"{SRC}/{name}.png").convert("RGB")).astype(int)
 
-def cut(a, x0, y0, x1, y1):
-    """The purple tab is close to the magenta sheet: only what is nearly the sheet's corner colour is background."""
+def cut(a, x0, y0, x1, y1, purple=False):
+    """Background: anything pinkish-purple, where the drawing was blended into the magenta sheet too. The purple
+    tab itself is such a colour, so for it only what is nearly the sheet's corner colour counts as background."""
     part = a[y0:y1, x0:x1]
-    solid = np.abs(part - a[2, 2]).sum(-1) > 110
+    if purple:
+        solid = np.abs(part - a[2, 2]).sum(-1) > 110
+    else:
+        solid = ~((part[..., 0] - part[..., 1] > 45) & (part[..., 2] - part[..., 1] > 45))
     return np.dstack([part, np.where(solid, 255, 0)]).astype(np.uint8)
 
 def size(rgba, w, h):
+    # see-through pixels take the colour of the nearest drawn one, so shrinking blends no magenta into the edge
+    rgba = rgba.copy()
+    hole = rgba[..., 3] == 0
+    if hole.any() and (~hole).any():
+        idx = ndi.distance_transform_edt(hole, return_distances=False, return_indices=True)
+        rgba[..., :3] = rgba[idx[0], idx[1], :3]
     small = np.array(Image.fromarray(rgba, "RGBA").resize((w, h), Image.BOX))
     small[..., 3] = np.where(small[..., 3] > 127, 255, 0)
     return small
@@ -34,7 +44,10 @@ def save(a, path):
 
 # ---- the spread: 400 x 233 GUI pixels
 spread = load("guide_spread")
-save(size(cut(spread, 83, 58, 1535, 904), 800, 466), f"{OUT}/textures/gui/guide_book.png")
+book = size(cut(spread, 83, 58, 1535, 904), 800, 466)
+c = book[..., :3].astype(int)
+book[(c[..., 0] - c[..., 1] > 35) & (c[..., 2] - c[..., 1] > 35), :3] = (38, 20, 12)     # the book has no purple: what is left of the sheet goes dark brown
+save(book, f"{OUT}/textures/gui/guide_book.png")
 
 # ---- the parts
 parts = load("guide_parts")
@@ -58,7 +71,7 @@ def recolour(tab, hue):
     return out
 
 TABS = ((69, 261, 277, 417), (315, 261, 518, 417), (553, 261, 758, 417), (794, 261, 1000, 417), (1039, 261, 1243, 417))
-tabs = [size(cut(parts, *box), 60, 44) for box in TABS]
+tabs = [size(cut(parts, *box, purple=True), 60, 44) for box in TABS]
 tabs = [recolour(tabs[0], 0.30)] + tabs                                 # contents, necromancer, assassin, blood, thor, shop
 for i, tab in enumerate(tabs):
     put(tab, i * 64, 40)

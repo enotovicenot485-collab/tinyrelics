@@ -176,9 +176,9 @@ public class GuideScreen extends Screen {
                     this.y += 41;
                 }
                 case DIVIDER -> {
-                    room(12);
+                    room(20);
                     page().add(new Placed(DIVIDER, this.y, null, 0, 0, null));
-                    this.y += 14;
+                    this.y += 22;
                 }
                 case TEXT_BLOCK -> pourText(Component.translatable(block.value()).getString(), chapter.colour());
                 default -> {
