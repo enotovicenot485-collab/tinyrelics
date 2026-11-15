@@ -46,32 +46,6 @@
   {
    "from": [
     4,
-    0,
-    -0.01
-   ],
-   "to": [
-    12,
-    4.6,
-    0.5
-   ],
-   "faces": {
-    "north": {
-     "texture": "#front"
-    },
-    "up": {
-     "texture": "#iron"
-    },
-    "west": {
-     "texture": "#iron"
-    },
-    "east": {
-     "texture": "#iron"
-    }
-   }
-  },
-  {
-   "from": [
-    4,
     5,
     4.5
    ],

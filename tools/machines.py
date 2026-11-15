@@ -227,6 +227,8 @@ def element(frm, to, faces, rotation=None):
     for direction, spec in faces.items():
         if isinstance(spec, tuple):
             out["faces"][direction] = {"texture": "#" + spec[0], "uv": [round(v, 3) for v in spec[1]]}
+            if len(spec) > 2:
+                out["faces"][direction]["rotation"] = spec[2]
         else:
             out["faces"][direction] = {"texture": "#" + spec}
     if rotation:
@@ -289,8 +291,8 @@ def crusher_block():
         element((0.5, 12, 2.5), (2.5, 16, 13.5), {"west": "side", "east": I, "up": "top"}),
         element((13.5, 12, 2.5), (15.5, 16, 13.5), {"east": "side", "west": I, "up": "top"}),
         # two rollers lying in the hopper
-        element((3.5, 12, 3), (7.5, 15, 13.5), {"up": "top", "north": I, "south": I, "west": ("top", [3.5, 3, 4.5, 13.5]), "east": ("top", [6.5, 3, 7.5, 13.5])}),
-        element((9, 12, 3), (13, 15, 13.5), {"up": "top", "north": I, "south": I, "west": ("top", [9, 3, 10, 13.5]), "east": ("top", [12, 3, 13, 13.5])}),
+        element((3.5, 12, 3), (7.5, 15, 13.5), {"up": "top", "north": I, "south": I, "west": ("top", [3.5, 3, 6.5, 13.5], 90), "east": ("top", [4.5, 3, 7.5, 13.5], 90)}),
+        element((9, 12, 3), (13, 15, 13.5), {"up": "top", "north": I, "south": I, "west": ("top", [9, 3, 12, 13.5], 90), "east": ("top", [10, 3, 13, 13.5], 90)}),
     ]
     # corner posts stand out of every side
     for x in (0, 13):
@@ -340,7 +342,6 @@ def press_block():
         elements = [
             # the base with the furnace in it
             element((0, 0, 0), (16, 5, 16), {"north": "front", "south": "side", "west": "side", "east": "side", "down": I, "up": "top"}),
-            element((4, 0, -0.01), (12, 4.6, 0.5), {"north": "front", "up": I, "west": I, "east": I}),
             # the mould on it
             element((4, 5, 4.5), (12, 6.5, 11.5), {"north": ("front", MOULD), "south": ("front", MOULD), "west": ("front", MOULD), "east": ("front", MOULD), "up": I}),
             # the frame: two posts and the beam across them
