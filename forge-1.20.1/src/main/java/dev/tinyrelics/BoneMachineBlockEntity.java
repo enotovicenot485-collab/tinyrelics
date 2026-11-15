@@ -47,6 +47,8 @@ public class BoneMachineBlockEntity extends BlockEntity implements Container, Me
     public static final int MODE_PLAIN = 0;
     public static final int MODE_SAND_EMPTY = 1;
     public static final int MODE_SAND_SOUL = 2;
+    /** The press only: the powder for this ingot has left its slot and is on the belt. */
+    public static final int MODE_LOADED = 3;
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
     private int progress;
@@ -80,6 +82,11 @@ public class BoneMachineBlockEntity extends BlockEntity implements Container, Me
         super(TinyRelics.BONE_MACHINE_ENTITY.get(), pos, state);
     }
 
+    /** Powder already taken for an ingot that is not finished: a broken press gives it back. */
+    public ItemStack onTheBelt() {
+        return isPress() && this.mode == MODE_LOADED ? new ItemStack(TinyRelics.BONE_POWDER.get(), POWDER_PER_INGOT) : ItemStack.EMPTY;
+    }
+
     public boolean isPress() {
         return getBlockState().is(TinyRelics.SOUL_PRESS.get());
     }
@@ -104,8 +111,9 @@ public class BoneMachineBlockEntity extends BlockEntity implements Container, Me
         ItemStack input = this.items.get(SLOT_INPUT);
         ItemStack output = this.items.get(SLOT_OUTPUT);
         if (press) {
-            return input.is(TinyRelics.BONE_POWDER.get()) && input.getCount() >= POWDER_PER_INGOT
-                    && fits(output, TinyRelics.BONE_INGOT.get()) ? 1 : 0;
+            boolean enough = this.mode == MODE_LOADED
+                    || (input.is(TinyRelics.BONE_POWDER.get()) && input.getCount() >= POWDER_PER_INGOT);
+            return enough && fits(output, TinyRelics.BONE_INGOT.get()) ? 1 : 0;
         }
         if (input.is(Items.BONE)) {
             return fits(output, TinyRelics.BONE_POWDER.get()) ? 1 : 0;
@@ -144,7 +152,14 @@ public class BoneMachineBlockEntity extends BlockEntity implements Container, Me
             if (machine.fuel > 0) {
                 working = true;
                 boolean sand = job == 2;
-                if (machine.progress == 0 || sand != (machine.mode != MODE_PLAIN)) {
+                if (press) {
+                    if (machine.mode != MODE_LOADED) {
+                        // a new ingot: the powder leaves its slot at once and rides the belt
+                        machine.items.get(SLOT_INPUT).shrink(POWDER_PER_INGOT);
+                        machine.mode = MODE_LOADED;
+                        machine.progress = 0;
+                    }
+                } else if (machine.progress == 0 || sand != (machine.mode != MODE_PLAIN)) {
                     // a new job: whether the sand gives up its soul is settled now, so the window can show it
                     machine.progress = 0;
                     machine.mode = !sand ? MODE_PLAIN : level.random.nextFloat() < SOUL_CHANCE ? MODE_SAND_SOUL : MODE_SAND_EMPTY;
@@ -159,7 +174,7 @@ public class BoneMachineBlockEntity extends BlockEntity implements Container, Me
                 }
             }
         }
-        if (!working && machine.progress != 0) {
+        if (!working && machine.progress != 0 && !(press && machine.mode == MODE_LOADED)) {
             machine.progress = 0;
             changed = true;
         }
@@ -177,7 +192,7 @@ public class BoneMachineBlockEntity extends BlockEntity implements Container, Me
         this.progress = 0;
         this.fuel--;
         if (press) {
-            this.items.get(SLOT_INPUT).shrink(POWDER_PER_INGOT);
+            this.mode = MODE_PLAIN;
             give(TinyRelics.BONE_INGOT.get());
             return;
         }

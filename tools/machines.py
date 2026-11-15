@@ -93,12 +93,19 @@ def dim(sheet, box):
     green = (part[..., 1] - part[..., 2] > 30)[..., None]
     sheet[y0:y1, x0:x1, :3] = np.where(green, grey * 0.22 + 8, part)
 
+def blank(sheet, scale, px_box, like_px):
+    """Paints a slot's inside plain, the colour of another slot's inside (the gunpowder picture is not wanted)."""
+    x0, y0, x1, y1 = region(sheet, scale, px_box)
+    lx, ly = int(like_px[0] * scale), int(like_px[1] * scale)
+    sheet[y0:y1, x0:x1, :3] = np.median(sheet[ly - 6:ly + 6, lx - 6:lx + 6, :3].reshape(-1, 3), axis=0)
+
 LAYOUT = {}
 
 def crusher_window():
     a, sheet, scale, rows = window("crusher_gui", (18, 53, 781, 974), 548)
     cell = fit(cut(a, 18 + 49, 53 + 559, 18 + 127, 53 + 637), 36, 36, keep_shape=False)
     end = inventory(sheet, cell, rows)
+    blank(sheet, scale, (80, 328, 170, 414), (402, 80))
     gauge = region(sheet, scale, (90, 135, 152, 285))
     paste(sheet, sheet[gauge[1]:gauge[3], gauge[0]:gauge[2]].copy(), 360, 0)
     dim(sheet, gauge)
@@ -125,6 +132,7 @@ def press_window():
     a, sheet, scale, rows = window("press_gui", (18, 96, 785, 920), 448)
     cell = fit(cut(a, 18 + 58, 96 + 472, 18 + 128, 96 + 542), 36, 36, keep_shape=False)
     end = inventory(sheet, cell, rows)
+    blank(sheet, scale, (74, 299, 146, 370), (116, 213))
     gauge = region(sheet, scale, (172, 288, 213, 392))
     paste(sheet, sheet[gauge[1]:gauge[3], gauge[0]:gauge[2]].copy(), 360, 0)
     dim(sheet, gauge)
@@ -269,55 +277,81 @@ def crusher_block():
     save(cog, f"{OUT}/textures/block/bone_crusher_cog.png")
     save(only(front, (22, 14, 44, 38), lambda c: (c[..., 0] > 120) & (c[..., 0] - c[..., 2] > 12)), f"{OUT}/textures/block/bone_crusher_skull.png")
     save(plain((58, 56, 52)), f"{OUT}/textures/block/machine_iron.png")
-    # the top: at rest, and working - the rollers turn towards each other and the bones between them jump
-    still = top.copy(); glow = is_fire(still)
+    # the back is plain boards: the cog and the chain are for the two sides only
+    back = side.copy()
+    tone = side[44:58, 12:18, :3].reshape(-1, 3).mean(0)
+    for x in range(10, 54):
+        for y in range(10, 54):
+            shade = 0.6 if (x - 10) % 6 == 0 else 1.1 if (x - 10) % 6 == 1 else 0.9 + 0.1 * ((x * 7 + y * 13) % 3)
+            back[y, x, :3] = np.clip(tone * shade, 0, 255)
+    save(back, f"{OUT}/textures/block/bone_crusher_back.png")
+    save(top, f"{OUT}/textures/block/bone_crusher_top.png")
+    # the hopper's floor: the drawing's top without its painted rollers - the real ones turn above it
+    floor = top.copy().astype(float)
+    for x0, x1 in ((12, 31), (35, 54)):
+        floor[8:58, x0:x1, :3] = floor[8:58, x0:x1, :3] * 0.18 + 6
+    floor = floor.astype(np.uint8)
+    still = floor.copy(); glow = is_fire(still)
     still[glow, :3] = (still[glow, :3].astype(float).mean(-1, keepdims=True) * 0.3 + 8).astype(np.uint8)
-    save(still, f"{OUT}/textures/block/bone_crusher_top.png")
+    save(still, f"{OUT}/textures/block/bone_crusher_floor.png")
     frames = []
-    left, right, gap, rows = (14, 30), (36, 52), (30, 36), (12, 54)
-    for f in range(8):
-        frame = top.copy()
-        frame[rows[0]:rows[1], left[0]:left[1]] = np.roll(top[rows[0]:rows[1], left[0]:left[1]], 2 * f, axis=1)
-        frame[rows[0]:rows[1], right[0]:right[1]] = np.roll(top[rows[0]:rows[1], right[0]:right[1]], -2 * f, axis=1)
-        frame[rows[0]:rows[1], gap[0]:gap[1]] = np.roll(top[rows[0]:rows[1], gap[0]:gap[1]], (0, 2, 4, 2, 0, -2, -4, -2)[f], axis=0)
+    for f in range(8):          # working: the bones between the rollers jump
+        frame = floor.copy()
+        frame[12:54, 31:35] = np.roll(floor[12:54, 31:35], (0, 2, 4, 2, 0, -2, -4, -2)[f], axis=0)
         frames.append(frame)
-    animated(np.concatenate(frames, axis=0), f"{OUT}/textures/block/bone_crusher_top_lit.png")
+    animated(np.concatenate(frames, axis=0), f"{OUT}/textures/block/bone_crusher_floor_lit.png")
+    save(plain((66, 65, 61), 8, 7), f"{OUT}/textures/block/crusher_roller.png")
+    save(plain((142, 140, 132), 8, 9), f"{OUT}/textures/block/crusher_spike.png")
     I = "iron"
     elements = [
-        # the body, a little inside the corner posts, and the hopper's rim on top of it
-        element((0.5, 0, 0.5), (15.5, 12, 15.5), {"north": "front", "south": "side", "west": "side", "east": "side", "down": I, "up": "top"}),
-        element((0.5, 12, 0.5), (15.5, 16, 2.5), {"north": "front", "south": I, "up": "top", "west": "side", "east": "side"}),
-        element((0.5, 12, 13.5), (15.5, 16, 15.5), {"south": "side", "north": I, "up": "top", "west": "side", "east": "side"}),
-        element((0.5, 12, 2.5), (2.5, 16, 13.5), {"west": "side", "east": I, "up": "top"}),
-        element((13.5, 12, 2.5), (15.5, 16, 13.5), {"east": "side", "west": I, "up": "top"}),
-        # two rollers lying in the hopper
-        element((3.5, 12, 3), (7.5, 15, 13.5), {"up": "top", "north": I, "south": I, "west": ("top", [3.5, 3, 6.5, 13.5], 90), "east": ("top", [4.5, 3, 7.5, 13.5], 90)}),
-        element((9, 12, 3), (13, 15, 13.5), {"up": "top", "north": I, "south": I, "west": ("top", [9, 3, 12, 13.5], 90), "east": ("top", [10, 3, 13, 13.5], 90)}),
+        # the body, a little inside the corner posts, and the hopper's walls on top of it
+        element((0.5, 0, 0.5), (15.5, 10, 15.5), {"north": "front", "south": "back", "west": "side", "east": "side", "down": I, "up": "floor"}),
+        element((0.5, 10, 0.5), (15.5, 16, 2.5), {"north": "front", "south": I, "up": "top", "west": "side", "east": "side"}),
+        element((0.5, 10, 13.5), (15.5, 16, 15.5), {"south": "back", "north": I, "up": "top", "west": "side", "east": "side"}),
+        element((0.5, 10, 2.5), (2.5, 16, 13.5), {"west": "side", "east": I, "up": "top"}),
+        element((13.5, 10, 2.5), (15.5, 16, 13.5), {"east": "side", "west": I, "up": "top"}),
     ]
     # corner posts stand out of every side
     for x in (0, 13):
         for z in (0, 13):
-            faces = {"north": "front" if z == 0 else I, "south": "side" if z == 13 else I,
+            faces = {"north": "front" if z == 0 else I, "south": "back" if z == 13 else I,
                      "west": "side" if x == 0 else I, "east": "side" if x == 13 else I, "up": "top", "down": I}
             elements.append(element((x, 0, z), (x + 3, 16, z + 3), faces))
     # raised on the front: the skull and the frame of the furnace door
     elements.append(element((5, 6.5, 0), (11, 12.5, 0.5), all_faces("skull")))
     elements.append(element((3.5, 0, 0), (12.5, 6, 0.5), {"north": "front", "up": I, "west": I, "east": I}))
-    # raised on the other three sides: the cog
+    # raised on the two sides: the cog
     # (the disc covers tile columns 1.75..10.25 and rows 1.5..10; the game projects the tile onto each side)
-    elements.append(element((1.75, 6, 15.5), (10.25, 14.5, 16), {"south": "cog"}))
     elements.append(element((0, 6, 1.75), (0.5, 14.5, 10.25), {"west": "cog"}))
     elements.append(element((15.5, 6, 5.75), (16, 14.5, 14.25), {"east": "cog"}))
-    textures = dict(top="bone_crusher_top", front="bone_crusher_front", side="bone_crusher_side", cog="bone_crusher_cog",
-                    skull="bone_crusher_skull", iron="machine_iron")
+    textures = dict(top="bone_crusher_top", front="bone_crusher_front", side="bone_crusher_side", back="bone_crusher_back",
+                    floor="bone_crusher_floor", cog="bone_crusher_cog", skull="bone_crusher_skull", iron="machine_iron")
     write_model("bone_crusher", textures, elements)
-    write_model("bone_crusher_lit", dict(textures, top="bone_crusher_top_lit", front="bone_crusher_front_lit"), elements)
+    write_model("bone_crusher_lit", dict(textures, floor="bone_crusher_floor_lit", front="bone_crusher_front_lit"), elements)
+
+    # One roller, lying along z through the middle of its own block: an eight-sided core with rings of spikes.
+    # In the world it is drawn by BoneMachineRenderer, which turns it; ROLLERS are the two places it goes.
+    def roller(dx=0.0, dy=0.0):
+        def at(frm, to, texture, turned):
+            rotation = {"origin": [8 + dx, 8 + dy, 8], "axis": "z", "angle": 45} if turned else None
+            return element((frm[0] + dx, frm[1] + dy, frm[2]), (to[0] + dx, to[1] + dy, to[2]), all_faces(texture), rotation)
+        out = [at((6.5, 6.5, 3), (9.5, 9.5, 13), "roller", False), at((6.5, 6.5, 3), (9.5, 9.5, 13), "roller", True)]
+        for z, turned in ((3.5, False), (6, True), (8.5, False), (11, True)):
+            for frm, to in (((7.5, 9.5), (8.5, 10.5)), ((7.5, 5.5), (8.5, 6.5)), ((5.5, 7.5), (6.5, 8.5)), ((9.5, 7.5), (10.5, 8.5))):
+                out.append(at((frm[0], frm[1], z), (to[0], to[1], z + 1.5), "spike", turned))
+        return out
+    roller_textures = dict(roller="crusher_roller", spike="crusher_spike", side="crusher_roller")
+    write_model("crusher_roller", roller_textures, roller())
+    write_json(f"{OUT}/blockstates/crusher_roller.json", {"variants": {"": {"model": "tinyrelics:block/crusher_roller"}}})
+    # in the hand and in the inventory nothing turns, so there the rollers are part of the model
+    in_hand = elements + roller(5.5 - 8, 12.75 - 8) + roller(10.5 - 8, 12.75 - 8)
+    write_model("bone_crusher_inventory", dict(textures, **dict(roller_textures, side="bone_crusher_side")), in_hand)
     variants = {}
     for facing, turn in FACING.items():
         for lit in (False, True):
             variants[f"facing={facing},lit={str(lit).lower()}"] = dict(model="tinyrelics:block/bone_crusher" + ("_lit" if lit else ""), **({"y": turn} if turn else {}))
     write_json(f"{OUT}/blockstates/bone_crusher.json", {"variants": variants})
-    write_json(f"{OUT}/models/item/bone_crusher.json", {"parent": "tinyrelics:block/bone_crusher"})
+    write_json(f"{OUT}/models/item/bone_crusher.json", {"parent": "tinyrelics:block/bone_crusher_inventory"})
 
 def press_block():
     top, front = tiles("press_block", ((56, 57, 687, 666), (777, 25, 1395, 683)))

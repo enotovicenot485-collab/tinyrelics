@@ -122,5 +122,6 @@ public final class ClientSetup {
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(TinyRelics.THROWN_RELIC.get(), ThrownRelicRenderer::new);
+        event.registerBlockEntityRenderer(TinyRelics.BONE_MACHINE_ENTITY.get(), BoneMachineRenderer::new);
     }
 }
