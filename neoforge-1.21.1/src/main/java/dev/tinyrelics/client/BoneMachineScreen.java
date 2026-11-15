@@ -54,31 +54,48 @@ public class BoneMachineScreen extends AbstractContainerScreen<BoneMachineMenu> 
         }
     }
 
+    /** A little sprite drawn smaller than it is on the sheet. */
+    private void chip(GuiGraphics graphics, float x, float y, int size, int u, int v) {
+        graphics.blit(this.texture, this.leftPos + Math.round(x), this.topPos + Math.round(y), size, size, (float) u, (float) v, 28, 28, SHEET, SHEET);
+    }
+
     private void crusher(GuiGraphics graphics, long now, float t, boolean working) {
         gauge(graphics, 21, 31, 14, 35);
         int mode = this.menu.mode();
         // bones are the first row of little sprites, lumps of soul sand the second
         int row = mode == BoneMachineBlockEntity.MODE_PLAIN ? 0 : 36;
-        if (working && t < 0.4F) {
-            part(graphics, 86, 28 + (int) (t / 0.4F * 30.0F), 14, 14, 400, row);
+        if (working) {
+            // the piece drops onto the rollers and is dragged down between them, shaking; the rollers hide what they have eaten
+            float y = t < 0.3F ? 26.0F + t / 0.3F * 24.0F : 50.0F + (t - 0.3F) / 0.7F * 16.0F;
+            int shake = t < 0.3F ? 0 : (int) (now / 45L % 3L) - 1;
+            part(graphics, 86 + shake, Math.round(y), 14, 14, 400, row);
         }
         // the rollers turn towards each other
-        int frame = working ? (int) (now / 60L % 6L) : 0;
+        int frame = working ? (int) (now / 45L % 6L) : 0;
         part(graphics, 60, 49, 34, 34, frame * 72, 440);
         part(graphics, 91, 49, 34, 34, ((6 - frame) % 6) * 72, 440);
         if (!working) {
             return;
         }
-        if (t >= 0.3F) {
-            int shake = (int) (now / 70L % 3L) - 1;
-            part(graphics, 79 + shake, 55 - shake, 14, 14, 436, row);
-            part(graphics, 93 - shake, 58 + shake, 14, 14, 472, row);
+        if (t >= 0.25F) {
+            // splinters fly up out of the gap in arcs, left and right, one after another
+            for (int i = 0; i < 8; i++) {
+                float p = ((now % 800L) / 800.0F + i / 8.0F) % 1.0F;
+                float side = (i % 2 == 0 ? 1.0F : -1.0F) * (7.0F + (i * 5) % 11);
+                float height = 12.0F + (i * 7) % 10;
+                float x = 92.5F + side * p * 1.5F;
+                float y = 60.0F - (float) Math.sin(p * Math.PI) * height + p * 8.0F;
+                int size = 4 + i % 3;
+                chip(graphics, x - size / 2.0F, y - size / 2.0F, size, 436 + (i % 2) * 36, row);
+            }
         }
-        if (mode == BoneMachineBlockEntity.MODE_PLAIN && t >= 0.45F) {
-            part(graphics, 85, 77, 16, 24, 360 + (int) (now / 120L % 4L) * 36, 80);
+        if (mode == BoneMachineBlockEntity.MODE_PLAIN && t >= 0.4F) {
+            part(graphics, 85, 77, 16, 24, 360 + (int) (now / 100L % 4L) * 36, 80);
         }
         if (mode == BoneMachineBlockEntity.MODE_SAND_SOUL && t >= 0.5F) {
-            part(graphics, 85, 64 + (int) ((t - 0.5F) / 0.5F * 22.0F), 16, 28, 360 + (int) (now / 150L % 4L) * 36, 140);
+            // the soul drifts down into the slot, swaying
+            int sway = Math.round((float) Math.sin(now / 180.0D) * 2.0F);
+            part(graphics, 85 + sway, 64 + (int) ((t - 0.5F) / 0.5F * 22.0F), 16, 28, 360 + (int) (now / 150L % 4L) * 36, 140);
         }
     }
 

@@ -213,6 +213,9 @@ public class TinyRelics {
     // ---- Bone: the necromancer's two machines, what they make, and the souls ground out of soul sand.
     public static final DeferredHolder<Block, BoneMachineBlock> BONE_CRUSHER = BLOCKS.register("bone_crusher", TinyRelics::machine);
     public static final DeferredHolder<Block, BoneMachineBlock> SOUL_PRESS = BLOCKS.register("soul_press", TinyRelics::machine);
+    /** Never placed: BoneMachineRenderer draws its model, turning, inside the crusher. */
+    public static final DeferredHolder<Block, Block> CRUSHER_ROLLER = BLOCKS.register("crusher_roller",
+            () -> new Block(BlockBehaviour.Properties.of().noOcclusion().noLootTable()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BoneMachineBlockEntity>> BONE_MACHINE_ENTITY = BLOCK_ENTITIES.register("bone_machine",
             () -> BlockEntityType.Builder.of(BoneMachineBlockEntity::new, BONE_CRUSHER.get(), SOUL_PRESS.get()).build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<BoneMachineMenu>> BONE_CRUSHER_MENU = MENUS.register("bone_crusher",

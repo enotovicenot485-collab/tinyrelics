@@ -2,9 +2,11 @@
  "parent": "minecraft:block/block",
  "render_type": "minecraft:cutout",
  "textures": {
-  "top": "tinyrelics:block/bone_crusher_top_lit",
+  "top": "tinyrelics:block/bone_crusher_top",
   "front": "tinyrelics:block/bone_crusher_front_lit",
   "side": "tinyrelics:block/bone_crusher_side",
+  "back": "tinyrelics:block/bone_crusher_back",
+  "floor": "tinyrelics:block/bone_crusher_floor_lit",
   "cog": "tinyrelics:block/bone_crusher_cog",
   "skull": "tinyrelics:block/bone_crusher_skull",
   "iron": "tinyrelics:block/machine_iron",
@@ -19,7 +21,7 @@
    ],
    "to": [
     15.5,
-    12,
+    10,
     15.5
    ],
    "faces": {
@@ -27,7 +29,7 @@
      "texture": "#front"
     },
     "south": {
-     "texture": "#side"
+     "texture": "#back"
     },
     "west": {
      "texture": "#side"
@@ -39,14 +41,14 @@
      "texture": "#iron"
     },
     "up": {
-     "texture": "#top"
+     "texture": "#floor"
     }
    }
   },
   {
    "from": [
     0.5,
-    12,
+    10,
     0.5
    ],
    "to": [
@@ -75,7 +77,7 @@
   {
    "from": [
     0.5,
-    12,
+    10,
     13.5
    ],
    "to": [
@@ -85,7 +87,7 @@
    ],
    "faces": {
     "south": {
-     "texture": "#side"
+     "texture": "#back"
     },
     "north": {
      "texture": "#iron"
@@ -104,7 +106,7 @@
   {
    "from": [
     0.5,
-    12,
+    10,
     2.5
    ],
    "to": [
@@ -127,7 +129,7 @@
   {
    "from": [
     13.5,
-    12,
+    10,
     2.5
    ],
    "to": [
@@ -149,92 +151,6 @@
   },
   {
    "from": [
-    3.5,
-    12,
-    3
-   ],
-   "to": [
-    7.5,
-    15,
-    13.5
-   ],
-   "faces": {
-    "up": {
-     "texture": "#top"
-    },
-    "north": {
-     "texture": "#iron"
-    },
-    "south": {
-     "texture": "#iron"
-    },
-    "west": {
-     "texture": "#top",
-     "uv": [
-      3.5,
-      3,
-      6.5,
-      13.5
-     ],
-     "rotation": 90
-    },
-    "east": {
-     "texture": "#top",
-     "uv": [
-      4.5,
-      3,
-      7.5,
-      13.5
-     ],
-     "rotation": 90
-    }
-   }
-  },
-  {
-   "from": [
-    9,
-    12,
-    3
-   ],
-   "to": [
-    13,
-    15,
-    13.5
-   ],
-   "faces": {
-    "up": {
-     "texture": "#top"
-    },
-    "north": {
-     "texture": "#iron"
-    },
-    "south": {
-     "texture": "#iron"
-    },
-    "west": {
-     "texture": "#top",
-     "uv": [
-      9,
-      3,
-      12,
-      13.5
-     ],
-     "rotation": 90
-    },
-    "east": {
-     "texture": "#top",
-     "uv": [
-      10,
-      3,
-      13,
-      13.5
-     ],
-     "rotation": 90
-    }
-   }
-  },
-  {
-   "from": [
     0,
     0,
     0
@@ -281,7 +197,7 @@
      "texture": "#iron"
     },
     "south": {
-     "texture": "#side"
+     "texture": "#back"
     },
     "west": {
      "texture": "#side"
@@ -345,7 +261,7 @@
      "texture": "#iron"
     },
     "south": {
-     "texture": "#side"
+     "texture": "#back"
     },
     "west": {
      "texture": "#iron"
@@ -416,23 +332,6 @@
     },
     "east": {
      "texture": "#iron"
-    }
-   }
-  },
-  {
-   "from": [
-    1.75,
-    6,
-    15.5
-   ],
-   "to": [
-    10.25,
-    14.5,
-    16
-   ],
-   "faces": {
-    "south": {
-     "texture": "#cog"
     }
    }
   },

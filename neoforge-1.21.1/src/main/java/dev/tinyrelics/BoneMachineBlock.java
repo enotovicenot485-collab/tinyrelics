@@ -78,6 +78,7 @@ public class BoneMachineBlock extends BaseEntityBlock {
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof BoneMachineBlockEntity machine) {
             Containers.dropContents(level, pos, machine);
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), machine.onTheBelt());
         }
         super.onRemove(state, level, pos, newState, moved);
     }
