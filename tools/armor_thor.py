@@ -221,11 +221,10 @@ def cloak_texture(side=-1):
     fur_end = 100                                                       # rows of the drawing hidden under the fur
     for j in range(CLOAK_ROWS * K):
         y = (j + 0.5) / (CLOAK_ROWS * K) * (bottom - top)
-        # every unit row is as wide as its cloth, rounded to whole units; the last texels repeat the edge
-        unit = slice(int(j // K * K / (CLOAK_ROWS * K) * len(reach)), int((j // K + 1) * K / (CLOAK_ROWS * K) * len(reach)))
-        half = int(np.ceil(reach[unit].mean() / scale / K - 0.3)) * K
+        # every texel row is exactly as wide as the cloth is there: the edge goes in the drawing's own small steps
+        half = int(round(reach[int(y)] / scale))
         for i in range(half):
-            dx = min((i + 0.5) * scale, reach[int(y)] - 1)
+            dx = (i + 0.5) * scale
             sy = y
             if y < fur_end:                  # under the fur: plain cloth from just below it, without the rune
                 sy = fur_end + y % 16
@@ -234,6 +233,9 @@ def cloak_texture(side=-1):
             if cloth[py, px] or j < (CLOAK_ROWS - 2) * K:
                 c = im[py, px] if lum[py, px] > 18 else np.array((22.0, 38.0, 72.0))
                 tex[j, 8 * K + i] = tex[j, 8 * K - 1 - i] = (*c, 255)
+    # the hem: the drawing's darkest shadow texels there read as black dots in game
+    hem = tex[(CLOAK_ROWS - 2) * K:]
+    hem[hem[..., :3].mean(-1) < 30] = 0
     # scraps of the hem that hang in the air on their own are dropped
     labels, count = ndi.label(tex[..., 3] > 0)
     if count > 1:
@@ -244,25 +246,33 @@ def cloak_texture(side=-1):
 CLOAK_TEX = cloak_texture()
 
 def cloak_piece(part, from_row, rows):
-    """One hinged half of the cloak, a box for every unit of its length exactly as wide as the cloth of that
-    row (several boxes where the torn hem splits into tongues), so the cloth has solid edges from the side."""
-    boxes = []
-    for r in range(rows):
-        row = from_row + r
-        strip = CLOAK_TEX[row * K:(row + 1) * K]
-        filled = [strip[:, c * K:(c + 1) * K, 3].mean() > 0.4 * 255 for c in range(16)]
-        c = 0
-        while c < 16:
-            if not filled[c]:
+    """One hinged half of the cloak. Rows of texels with the same outline are joined into one box that is
+    exactly as wide as the cloth (several boxes side by side where the hem is cut into tongues). The boxes
+    are measured in quarters of a unit, so the edge steps as finely as the drawing and still has solid sides."""
+    def runs(j):
+        solid = CLOAK_TEX[j, :, 3] > 0
+        out, c = [], 0
+        while c < len(solid):
+            if not solid[c]:
                 c += 1; continue
             e = c
-            while e < 16 and filled[e]:
+            while e < len(solid) and solid[e]:
                 e += 1
-            b = box(part, None, (c - 8, r, 0), (e - c, 1, 1), None)
+            out.append((c, e)); c = e
+        return out
+    boxes = []
+    first, last = from_row * K, (from_row + rows) * K
+    j = first
+    while j < last:
+        e = j
+        while e < last and runs(e) == runs(j):
+            e += 1
+        for c0, c1 in runs(j):
+            b = box(part, None, (c0 / K - 8, (j - first) / K, 0), ((c1 - c0) / K, (e - j) / K, 1), None)
             b["relief"] = "S"; b["ragged"] = True
-            b["image"] = strip[:, c * K:e * K].copy()
+            b["image"] = CLOAK_TEX[j:e, c0:c1].copy()
             boxes.append(b)
-            c = e
+        j = e
     return boxes
 
 # rows = the part of the box height (0 = top, 1 = bottom) that is painted; the rest stays see-through.
@@ -307,7 +317,7 @@ def place_boxes(boxes):
     used = np.zeros((SHEET, SHEET), bool)
     def footprint(b):
         w, h, d = b["size"]
-        return 2 * (w + d), d + h
+        return int(np.ceil(2 * (w + d))), int(np.ceil(d + h))          # the cloak's boxes are not whole units
     for b in boxes:
         if b["uv"] is not None:
             fw, fh = footprint(b); u, v = b["uv"]
@@ -411,7 +421,7 @@ def paint_relief(sheet, b):
     and the colours of the picture's edges carried round the remaining thin sides."""
     w, h, d = b["size"]; u, v = b["uv"]; main_face = b["relief"]
     across = w if main_face in ("N", "S") else d          # width of the main face in model units
-    main = np.zeros((h * K, across * K, 4))
+    main = np.zeros((int(round(h * K)), int(round(across * K)), 4))
     if "image" in b:
         main = b["image"].copy()             # a picture prepared beforehand (the cloak)
     else:
@@ -433,12 +443,13 @@ def paint_relief(sheet, b):
         r_, g_, b_ = main[:rows, :, 0], main[:rows, :, 1], main[:rows, :, 2]
         main[:rows][~((r_ > 105) & (r_ - b_ > 40))] = 0
     def put(block, fx, fy):
-        sheet[fy * K:fy * K + block.shape[0], fx * K:fx * K + block.shape[1]] = block
+        fx, fy = int(round(fx * K)), int(round(fy * K))
+        sheet[fy:fy + block.shape[0], fx:fx + block.shape[1]] = block
     def strip(column, width):     # a thin side: every row takes the colour of the picture's edge, a little darker
-        block = np.repeat(column[:, None, :], width * K, axis=1).copy(); block[..., :3] *= 0.78
+        block = np.repeat(column[:, None, :], int(round(width * K)), axis=1).copy(); block[..., :3] *= 0.78
         return block
     mirrored = main[:, ::-1]
-    top = np.zeros((d * K, w * K, 4)); bottom = np.zeros((d * K, w * K, 4))
+    top = np.zeros((int(round(d * K)), int(round(w * K)), 4)); bottom = top.copy()
     if main_face in ("N", "S"):
         if main_face == "N":
             north, south, left_edge, right_edge, top_row, bottom_row = main, mirrored, main[:, 0], main[:, -1], main[0], main[-1]
@@ -603,7 +614,7 @@ for slot, boxes in SLOTS.items():
     for b in boxes:
         w, h, d = b["size"]; u, v = b["uv"]
         fx = b.get("fx") or ("bracer" if "arm" in b["part"] else "other")
-        area = (slice(v * K, (v + d + h) * K), slice(u * K, (u + 2 * (w + d)) * K))
+        area = (slice(v * K, int(round((v + d + h) * K))), slice(u * K, int(round((u + 2 * (w + d)) * K))))
         kind[area] = KINDS.index(fx)
         relx[area] = np.clip((xx[area] - (u + d) * K) / (w * K), 0, 1)
         rely[area] = np.clip((yy[area] - (v + d) * K) / (h * K), 0, 1)
