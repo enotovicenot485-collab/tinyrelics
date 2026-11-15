@@ -114,5 +114,13 @@
   "item.tinyrelics.thor_armor.tooltip2": "Полный комплект: ударившего бьёт молния",
   "screen.tinyrelics.name.thor_armor": "Броня Тора",
   "screen.tinyrelics.stats.thor_armor": "1000 брони · неразрушаемая",
-  "screen.tinyrelics.desc.thor_armor": "Мантия 400, поножи 350, сапоги 250, шлема нет. Не крафтится и не ломается. Когда надеты все три части, любого, кто ранит владельца, в ответ бьёт молния, не чаще раза в полсекунды. Настроек у брони нет."
+  "screen.tinyrelics.desc.thor_armor": "Мантия 400, поножи 350, сапоги 250, шлема нет. Не крафтится и не ломается. Когда надеты все три части, любого, кто ранит владельца, в ответ бьёт молния, не чаще раза в полсекунды. Настроек у брони нет.",
+  "item.tinyrelics.bone_powder": "Костяной порошок",
+  "item.tinyrelics.bone_ingot": "Костяной слиток",
+  "item.tinyrelics.soul": "Душа",
+  "block.tinyrelics.bone_crusher": "Дробилка",
+  "block.tinyrelics.soul_press": "Пресс",
+  "container.tinyrelics.bone_crusher": "Дробилка",
+  "container.tinyrelics.soul_press": "Пресс",
+  "container.tinyrelics.machine.fuel": "Порох: хватит ещё на %s из %s работ"
 }

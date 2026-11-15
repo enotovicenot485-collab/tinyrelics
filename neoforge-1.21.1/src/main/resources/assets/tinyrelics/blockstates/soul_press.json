@@ -1,0 +1,64 @@
+{
+ "variants": {
+  "facing=north,lit=false,pressed=false": {
+   "model": "tinyrelics:block/soul_press"
+  },
+  "facing=north,lit=false,pressed=true": {
+   "model": "tinyrelics:block/soul_press_down"
+  },
+  "facing=north,lit=true,pressed=false": {
+   "model": "tinyrelics:block/soul_press_lit"
+  },
+  "facing=north,lit=true,pressed=true": {
+   "model": "tinyrelics:block/soul_press_down_lit"
+  },
+  "facing=east,lit=false,pressed=false": {
+   "model": "tinyrelics:block/soul_press",
+   "y": 90
+  },
+  "facing=east,lit=false,pressed=true": {
+   "model": "tinyrelics:block/soul_press_down",
+   "y": 90
+  },
+  "facing=east,lit=true,pressed=false": {
+   "model": "tinyrelics:block/soul_press_lit",
+   "y": 90
+  },
+  "facing=east,lit=true,pressed=true": {
+   "model": "tinyrelics:block/soul_press_down_lit",
+   "y": 90
+  },
+  "facing=south,lit=false,pressed=false": {
+   "model": "tinyrelics:block/soul_press",
+   "y": 180
+  },
+  "facing=south,lit=false,pressed=true": {
+   "model": "tinyrelics:block/soul_press_down",
+   "y": 180
+  },
+  "facing=south,lit=true,pressed=false": {
+   "model": "tinyrelics:block/soul_press_lit",
+   "y": 180
+  },
+  "facing=south,lit=true,pressed=true": {
+   "model": "tinyrelics:block/soul_press_down_lit",
+   "y": 180
+  },
+  "facing=west,lit=false,pressed=false": {
+   "model": "tinyrelics:block/soul_press",
+   "y": 270
+  },
+  "facing=west,lit=false,pressed=true": {
+   "model": "tinyrelics:block/soul_press_down",
+   "y": 270
+  },
+  "facing=west,lit=true,pressed=false": {
+   "model": "tinyrelics:block/soul_press_lit",
+   "y": 270
+  },
+  "facing=west,lit=true,pressed=true": {
+   "model": "tinyrelics:block/soul_press_down_lit",
+   "y": 270
+  }
+ }
+}

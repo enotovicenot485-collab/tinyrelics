@@ -114,5 +114,13 @@
   "item.tinyrelics.thor_armor.tooltip2": "Full set: lightning strikes whoever hits you",
   "screen.tinyrelics.name.thor_armor": "Armor of Thor",
   "screen.tinyrelics.stats.thor_armor": "1000 armor · unbreakable",
-  "screen.tinyrelics.desc.thor_armor": "Mantle 400, leggings 350, boots 250, no helmet. Cannot be crafted and never breaks. With all three pieces on, whoever hurts the wearer is struck by lightning in return, at most twice a second. The armor has no settings."
+  "screen.tinyrelics.desc.thor_armor": "Mantle 400, leggings 350, boots 250, no helmet. Cannot be crafted and never breaks. With all three pieces on, whoever hurts the wearer is struck by lightning in return, at most twice a second. The armor has no settings.",
+  "item.tinyrelics.bone_powder": "Bone Powder",
+  "item.tinyrelics.bone_ingot": "Bone Ingot",
+  "item.tinyrelics.soul": "Soul",
+  "block.tinyrelics.bone_crusher": "Bone Crusher",
+  "block.tinyrelics.soul_press": "Soul Press",
+  "container.tinyrelics.bone_crusher": "Bone Crusher",
+  "container.tinyrelics.soul_press": "Soul Press",
+  "container.tinyrelics.machine.fuel": "Gunpowder: enough for %s of %s more jobs"
 }

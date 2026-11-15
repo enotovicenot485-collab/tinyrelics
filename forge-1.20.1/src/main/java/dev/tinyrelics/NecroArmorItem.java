@@ -93,7 +93,7 @@ public class NecroArmorItem extends ArmorItem {
 
         @Override
         public Ingredient getRepairIngredient() {
-            return Ingredient.of(Items.BONE_BLOCK);
+            return Ingredient.of(TinyRelics.BONE_INGOT.get());
         }
 
         @Override

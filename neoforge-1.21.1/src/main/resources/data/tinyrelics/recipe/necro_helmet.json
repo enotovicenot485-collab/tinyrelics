@@ -2,15 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    "BWB",
-    "B B"
+    "III",
+    "ISI",
+    " S "
   ],
   "key": {
-    "B": {
-      "item": "minecraft:bone_block"
+    "I": {
+      "item": "tinyrelics:bone_ingot"
     },
-    "W": {
-      "item": "minecraft:wither_skeleton_skull"
+    "S": {
+      "item": "tinyrelics:soul"
     }
   },
   "result": {

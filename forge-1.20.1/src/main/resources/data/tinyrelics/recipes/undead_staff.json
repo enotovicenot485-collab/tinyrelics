@@ -2,25 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    "WNW",
-    "SBS",
-    " T "
+    "SIS",
+    "SIS",
+    " I "
   ],
   "key": {
-    "W": {
-      "item": "minecraft:wither_skeleton_skull"
-    },
-    "N": {
-      "item": "minecraft:nether_star"
+    "I": {
+      "item": "tinyrelics:bone_ingot"
     },
     "S": {
-      "item": "minecraft:soul_lantern"
-    },
-    "B": {
-      "item": "minecraft:bone_block"
-    },
-    "T": {
-      "item": "minecraft:netherite_ingot"
+      "item": "tinyrelics:soul"
     }
   },
   "result": {

@@ -45,7 +45,8 @@ public final class RelicTab {
         row(output, nextGap,
                 TinyRelics.NECRO_HELMET.get(), TinyRelics.NECRO_CHESTPLATE.get(),
                 TinyRelics.NECRO_LEGGINGS.get(), TinyRelics.NECRO_BOOTS.get(),
-                TinyRelics.UNDEAD_STAFF.get());
+                TinyRelics.UNDEAD_STAFF.get(), TinyRelics.BONE_INGOT.get(), TinyRelics.SOUL.get(),
+                TinyRelics.BONE_CRUSHER_ITEM.get(), TinyRelics.SOUL_PRESS_ITEM.get());
 
         banner(output, THOR);
         row(output, nextGap, TinyRelics.THOR_HAMMER.get(), TinyRelics.THOR_CHESTPLATE.get(),

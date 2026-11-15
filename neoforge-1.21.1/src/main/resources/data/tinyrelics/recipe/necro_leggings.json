@@ -2,16 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    "BLB",
-    "B B",
-    "B B"
+    "III",
+    "ISI",
+    "ISI"
   ],
   "key": {
-    "B": {
-      "item": "minecraft:bone_block"
+    "I": {
+      "item": "tinyrelics:bone_ingot"
     },
-    "L": {
-      "item": "minecraft:soul_lantern"
+    "S": {
+      "item": "tinyrelics:soul"
     }
   },
   "result": {

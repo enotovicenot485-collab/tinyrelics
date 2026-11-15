@@ -100,7 +100,7 @@ public class TinyRelics {
                     }),
                     15,
                     SoundEvents.ARMOR_EQUIP_NETHERITE,
-                    () -> Ingredient.of(Items.BONE_BLOCK),
+                    () -> Ingredient.of(TinyRelics.BONE_INGOT.get()),
                     List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(MODID, "necromancer"))),
                     1.0F,
                     0.0F));
@@ -209,6 +209,29 @@ public class TinyRelics {
     public static final DeferredItem<Item> BLOOD_INGOT = ITEMS.register("blood_ingot", () -> new Item(new Item.Properties()));
     public static final DeferredItem<BlockItem> BLOOD_ALTAR_ITEM = ITEMS.register("blood_altar",
             () -> new BlockItem(BLOOD_ALTAR.get(), new Item.Properties()));
+
+    // ---- Bone: the necromancer's two machines, what they make, and the souls ground out of soul sand.
+    public static final DeferredHolder<Block, BoneMachineBlock> BONE_CRUSHER = BLOCKS.register("bone_crusher", TinyRelics::machine);
+    public static final DeferredHolder<Block, BoneMachineBlock> SOUL_PRESS = BLOCKS.register("soul_press", TinyRelics::machine);
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BoneMachineBlockEntity>> BONE_MACHINE_ENTITY = BLOCK_ENTITIES.register("bone_machine",
+            () -> BlockEntityType.Builder.of(BoneMachineBlockEntity::new, BONE_CRUSHER.get(), SOUL_PRESS.get()).build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<BoneMachineMenu>> BONE_CRUSHER_MENU = MENUS.register("bone_crusher",
+            () -> IMenuTypeExtension.create((id, inventory, extra) -> new BoneMachineMenu(id, inventory, false)));
+    public static final DeferredHolder<MenuType<?>, MenuType<BoneMachineMenu>> SOUL_PRESS_MENU = MENUS.register("soul_press",
+            () -> IMenuTypeExtension.create((id, inventory, extra) -> new BoneMachineMenu(id, inventory, true)));
+    public static final DeferredItem<Item> BONE_POWDER = ITEMS.register("bone_powder", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> BONE_INGOT = ITEMS.register("bone_ingot", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> SOUL = ITEMS.register("soul", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<BlockItem> BONE_CRUSHER_ITEM = ITEMS.register("bone_crusher",
+            () -> new BlockItem(BONE_CRUSHER.get(), new Item.Properties()));
+    public static final DeferredItem<BlockItem> SOUL_PRESS_ITEM = ITEMS.register("soul_press",
+            () -> new BlockItem(SOUL_PRESS.get(), new Item.Properties()));
+
+    /** Not a full cube, and it glows while its fire burns. */
+    private static BoneMachineBlock machine() {
+        return new BoneMachineBlock(BlockBehaviour.Properties.of().strength(3.5F).sound(SoundType.STONE).noOcclusion()
+                .lightLevel(state -> state.getValue(BoneMachineBlock.LIT) ? 10 : 0));
+    }
 
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 

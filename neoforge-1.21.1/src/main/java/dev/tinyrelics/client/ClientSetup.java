@@ -37,6 +37,8 @@ public final class ClientSetup {
 
     private static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(TinyRelics.BLOOD_ALTAR_MENU.get(), BloodAltarScreen::new);
+        event.register(TinyRelics.BONE_CRUSHER_MENU.get(), BoneMachineScreen::new);
+        event.register(TinyRelics.SOUL_PRESS_MENU.get(), BoneMachineScreen::new);
     }
 
     public static void init(IEventBus modBus) {
