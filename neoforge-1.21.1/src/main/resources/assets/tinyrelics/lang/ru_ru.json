@@ -154,5 +154,13 @@
   "guide.tinyrelics.thor.armor": "# Броня Тора\nМантия, поножи и сапоги, шлема нет. Не ломается.\nВ полном комплекте каждого, кто тебя ранит, в ответ бьёт молния.\n# Легенда\nМолот и броня Тора не крафтятся: их дают только в творческом режиме.",
   "guide.tinyrelics.shop.title": "Лавка",
   "guide.tinyrelics.shop.charm": "# Амулет сохранения\nПока амулет лежит в инвентаре, после смерти все вещи остаются при тебе. Опыт не сохраняется.\nНа каждую смерть уходит один амулет.",
-  "guide.tinyrelics.shop.more": "# Что дальше\nТорговец обещает новые диковинки. Загляни сюда, когда мод обновится."
+  "guide.tinyrelics.shop.more": "# Что дальше\nТорговец обещает новые диковинки. Загляни сюда, когда мод обновится.",
+  "guide.tinyrelics.roadmap.title": "Дорожная карта",
+  "guide.tinyrelics.roadmap.archer": "Небесный\nЛучник",
+  "guide.tinyrelics.roadmap.pirate": "Капитан\nПиратов",
+  "guide.tinyrelics.roadmap.shogun": "Верховный\nСёгун",
+  "guide.tinyrelics.roadmap.archer.about": "Белые крылья, нимб и лук из света.\nСтрелы, что падают с самих небес.",
+  "guide.tinyrelics.roadmap.pirate.about": "Мушкет, абордажная сабля\nи верный зелёный попугай.\nСвой корабль и свои сокровища.",
+  "guide.tinyrelics.roadmap.shogun.about": "Маска они и длинная катана.\nУдар, который не успеваешь увидеть.",
+  "guide.tinyrelics.roadmap.soon": "В следующих обновлениях"
 }

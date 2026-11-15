@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -54,6 +55,8 @@ public class GuideScreen extends Screen {
     private static final int TEXT_BLOCK = 2;
     private static final int RECIPE = 3;
     private static final int DIVIDER = 4;
+    /** The roadmap: a picture over the whole spread. */
+    private static final int ROADMAP = 5;
 
     private record Block(int kind, String value, int number) {
     }
@@ -88,6 +91,7 @@ public class GuideScreen extends Screen {
                 recipe("blood_boots"), recipe("blood_blade"));
         chapter("thor", 0x7A5A00, TinyRelics.THOR_HAMMER.get(), 2, text("thor.hammer"), text("thor.armor"));
         chapter("shop", 0x5A3A1A, TinyRelics.KEEPING_CHARM.get(), 5, text("shop.charm"), recipe("keeping_charm"), text("shop.more"));
+        chapter("roadmap", 0x1E6B6B, Items.FILLED_MAP, -1, new Block(ROADMAP, "", 0));
     }
 
     private static ResourceLocation rl(String path) {
@@ -104,6 +108,11 @@ public class GuideScreen extends Screen {
 
     private void chapter(String id, int colour, ItemLike icon, int banner, Block... blocks) {
         List<Block> all = new ArrayList<>();
+        if (banner < 0) {
+            all.addAll(List.of(blocks));                    // a chapter that is one picture: no title
+            this.chapters.add(new Chapter(id, colour, icon, banner, all));
+            return;
+        }
         all.add(new Block(TITLE, "guide.tinyrelics." + id + ".title", 0));
         if (banner > 0) {
             all.add(new Block(BANNER, "", banner));
@@ -180,6 +189,11 @@ public class GuideScreen extends Screen {
                     this.y += 22;
                 }
                 case TEXT_BLOCK -> pourText(Component.translatable(block.value()).getString(), chapter.colour());
+                case ROADMAP -> {
+                    page().add(new Placed(ROADMAP, 0, null, 0, 0, null));
+                    this.pages.add(new ArrayList<>());          // the right page is under the picture too
+                    this.y = 0;
+                }
                 default -> {
                     room(78);
                     page().add(new Placed(RECIPE, this.y, null, 0, 0, block.value()));
@@ -216,6 +230,7 @@ public class GuideScreen extends Screen {
 
     private ItemStack hovered = ItemStack.EMPTY;
     private Component hoveredText;
+    private List<Component> hoveredLines;
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
@@ -224,12 +239,17 @@ public class GuideScreen extends Screen {
         int my = (int) (mouseY / this.scale);
         this.hovered = ItemStack.EMPTY;
         this.hoveredText = null;
+        this.hoveredLines = null;
         graphics.pose().pushPose();
         graphics.pose().scale(this.scale, this.scale, 1.0F);
         tabs(graphics, mx, my, false);
         graphics.blit(BOOK, this.left, this.top, W, H, 0.0F, 0.0F, W * 2, H * 2, W * 2, H * 2);
         tabs(graphics, mx, my, true);
-        for (int side = 0; side < 2; side++) {
+        boolean roadmap = this.pages.get(this.spread).stream().anyMatch(placed -> placed.kind() == ROADMAP);
+        if (roadmap) {
+            this.hoveredLines = RoadmapMap.draw(graphics, this.font, this.left + 34, this.top + 24, mx, my, this.scale);
+        }
+        for (int side = 0; side < 2 && !roadmap; side++) {
             int index = this.spread + side;
             if (index < this.pages.size()) {
                 drawPage(graphics, this.pages.get(index), this.left + PAGE_X[side], this.top + PAGE_TOP, mx, my);
@@ -246,7 +266,9 @@ public class GuideScreen extends Screen {
         }
         graphics.pose().popPose();
        super.render(graphics, mouseX, mouseY, partialTick);
-        if (!this.hovered.isEmpty()) {
+        if (this.hoveredLines != null) {
+            graphics.renderComponentTooltip(this.font, this.hoveredLines, mouseX, mouseY);
+        } else if (!this.hovered.isEmpty()) {
             graphics.renderTooltip(this.font, this.hovered, mouseX, mouseY);
         } else if (this.hoveredText != null) {
             graphics.renderTooltip(this.font, this.hoveredText, mouseX, mouseY);

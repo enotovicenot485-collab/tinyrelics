@@ -72,7 +72,7 @@ def recolour(tab, hue):
 
 TABS = ((69, 261, 277, 417), (315, 261, 518, 417), (553, 261, 758, 417), (794, 261, 1000, 417), (1039, 261, 1243, 417))
 tabs = [size(cut(parts, *box, purple=True), 60, 44) for box in TABS]
-tabs = [recolour(tabs[0], 0.30)] + tabs                                 # contents, necromancer, assassin, blood, thor, shop
+tabs = [recolour(tabs[0], 0.30)] + tabs + [recolour(tabs[0], 0.47)]   # contents, necromancer, assassin, blood, thor, shop, roadmap
 for i, tab in enumerate(tabs):
     put(tab, i * 64, 40)
     lit = tab.astype(float)

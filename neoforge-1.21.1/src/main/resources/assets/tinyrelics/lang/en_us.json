@@ -154,5 +154,13 @@
   "guide.tinyrelics.thor.armor": "# Armor of Thor\nMantle, leggings and boots, no helmet. Never breaks.\nWith the full set, whoever hurts you is struck by lightning.\n# Legend\nThe hammer and the armor of Thor cannot be crafted: they come only from creative mode.",
   "guide.tinyrelics.shop.title": "Curio Shop",
   "guide.tinyrelics.shop.charm": "# Charm of Keeping\nWhile the charm is in your inventory, you keep all your things when you die. Experience is not kept.\nEach death uses up one charm.",
-  "guide.tinyrelics.shop.more": "# What next\nThe merchant promises new curiosities. Look here again when the mod is updated."
+  "guide.tinyrelics.shop.more": "# What next\nThe merchant promises new curiosities. Look here again when the mod is updated.",
+  "guide.tinyrelics.roadmap.title": "Roadmap",
+  "guide.tinyrelics.roadmap.archer": "Sky\nArcher",
+  "guide.tinyrelics.roadmap.pirate": "Pirate\nCaptain",
+  "guide.tinyrelics.roadmap.shogun": "Grand\nShogun",
+  "guide.tinyrelics.roadmap.archer.about": "White wings, a halo and a bow of light.\nArrows that fall from the sky itself.",
+  "guide.tinyrelics.roadmap.pirate.about": "A musket, a cutlass\nand a faithful green parrot.\nHis own ship and his own treasure.",
+  "guide.tinyrelics.roadmap.shogun.about": "An oni mask and a long katana.\nA strike too fast to see.",
+  "guide.tinyrelics.roadmap.soon": "In the coming updates"
 }
