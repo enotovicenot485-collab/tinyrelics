@@ -128,7 +128,11 @@ def loom_block():
     save(top, f"{OUT}/textures/block/shadow_loom_top.png")
     save(front, f"{OUT}/textures/block/shadow_loom_front.png")
     # the drawing's sides show a painted spool; the real spools sit in niches, so the sides are plain boards
-    save(boards(side, (12, 12, 52, 52), (2, 14, 10, 50)), f"{OUT}/textures/block/shadow_loom_side.png")
+    # (only its left edge - the post with its two corner plates - is free of that picture: it is used for both edges)
+    clean = boards(side, (0, 0, 64, 64), (2, 20, 10, 44))
+    clean[:, :18] = side[:, :18]
+    clean[:, 46:] = side[:, :18][:, ::-1]
+    save(clean, f"{OUT}/textures/block/shadow_loom_side.png")
     save(plain((44, 37, 34), 5, 11), f"{OUT}/textures/block/shadow_wood.png")
     save(plain((118, 84, 52), 8, 12), f"{OUT}/textures/block/shuttle_wood.png")
     save(wound((138, 62, 214), 13), f"{OUT}/textures/block/shuttle_thread.png")
@@ -199,6 +203,8 @@ def spooler_block():
     save(front, f"{OUT}/textures/block/phantom_spooler_front.png")
     # the crank wheel is a real part that turns, so the sides themselves are plain boards
     save(boards(side, (12, 12, 52, 52), (14, 4, 50, 10)), f"{OUT}/textures/block/phantom_spooler_side.png")
+    # the front and the back are boarded up as well: the reel shows only through the top
+    save(boards(front, (12, 15, 52, 52), (14, 54, 50, 60)), f"{OUT}/textures/block/phantom_spooler_panel.png")
     # the reel seen from above, full of thread: the drawing's own round reel, on a flat disc that turns with it
     a = m.load("spooler_gui")
     save(fit(cut(a, 1073, 223, 1330, 484), 64, 64, keep_shape=False), f"{OUT}/textures/block/spooler_reel_top.png")
@@ -212,7 +218,8 @@ def spooler_block():
         element((0, 13, 13), (16, 16, 16), {"south": "front", "north": W, "west": "side", "east": "side", "up": "top", "down": W}),
         element((0, 13, 3), (3, 16, 13), {"west": "side", "east": W, "up": "top", "down": W}),
         element((13, 13, 3), (16, 16, 13), {"east": "side", "west": W, "up": "top", "down": W}),
-        # boarded sides; the front and the back stay open, the reel shows through
+        element((3, 3, 0.5), (13, 13, 1.5), {"north": "panel", "south": W}),
+        element((3, 3, 14.5), (13, 13, 15.5), {"south": "panel", "north": W}),
         element((0.5, 3, 3), (1.5, 13, 13), {"west": "side", "east": "side"}),
         element((14.5, 3, 3), (15.5, 13, 13), {"west": "side", "east": "side"}),
     ]
@@ -220,7 +227,7 @@ def spooler_block():
         for z in (0, 13):
             elements.append(element((x, 3, z), (x + 3, 13, z + 3), {"north": "front" if z == 0 else W, "south": "front" if z == 13 else W,
                                                                      "west": "side" if x == 0 else W, "east": "side" if x == 13 else W}))
-    textures = dict(top="phantom_spooler_top", front="phantom_spooler_front", side="phantom_spooler_side", wood="shadow_wood")
+    textures = dict(top="phantom_spooler_top", front="phantom_spooler_front", side="phantom_spooler_side", panel="phantom_spooler_panel", wood="shadow_wood")
     write_model("phantom_spooler", textures, elements)
     # The reel stands upright in the middle of a block of its own; ShadowMachineRenderer turns it about its axle.
     reel = (eight((4.5, 3.2, 4.5), (11.5, 4, 11.5), "steel", "y") + eight((5.75, 4, 5.75), (10.25, 13.4, 10.25), "thread", "y")
