@@ -7,6 +7,7 @@ Writes banner_shop.png: FRAMES frames of 648x144 one under another (TabBanners m
 import sys
 import numpy as np
 from PIL import Image
+from scipy import ndimage as ndi
 
 SRC, OUT = sys.argv[1], sys.argv[2]
 GW, GH, SCALE = 162, 36, 4
@@ -31,15 +32,28 @@ def glow(frame, x, y, radius, colour, power):
 # ---- the merchant: mirrored so his boots lie on the counter to the left of him, cut out of his magenta sheet
 sheet = np.array(Image.open(f"{SRC}/shop_merchant.png").convert("RGB")).astype(int)
 solid = ~((sheet[..., 0] - sheet[..., 1] > 90) & (sheet[..., 2] - sheet[..., 1] > 90))
-merchant = Image.fromarray(np.dstack([sheet, np.where(solid, 255, 0)]).astype(np.uint8)[:, ::-1].copy(), "RGBA")
+merchant = np.dstack([sheet, np.where(solid, 255, 0)]).astype(np.float64)[:, ::-1].copy()
 M = 0.118                                   # his size on the banner
-HEEL = (merchant.width - 1095, 992)         # where his boots rest, on the mirrored sheet: he rocks about this point
+HEEL = (merchant.shape[1] - 1095, 992)        # where his boots rest, on the mirrored sheet
+# He rocks on the chair's back legs: the chair and his body turn about the spot where those legs stand,
+# so his head goes back and forth. His boots stay on the counter, and his legs bend between the two.
+CHAIR_FOOT = (merchant.shape[1] - 560, 1180)
+STILL_UNTIL, MOVING_FROM = 330.0, 620.0     # columns of the mirrored sheet: boots / body
+my, mx = np.indices(merchant.shape[:2]).astype(np.float64)
+weight = np.clip((mx - STILL_UNTIL) / (MOVING_FROM - STILL_UNTIL), 0, 1)
+weight = weight * weight * (3 - 2 * weight)
 HEEL_AT = (438.0, at(0, 577)[1])            # and where that point is on the banner
 COUNTER = at(0, 560)[1]                     # the counter's top edge
 
 def with_merchant(frame, angle):
-    turned = merchant.rotate(angle, resample=Image.BICUBIC, center=HEEL)
-    small = turned.resize((round(merchant.width * M), round(merchant.height * M)), Image.LANCZOS)
+    # every pixel looks back along its own share of the turn (the turn is small, so this is close enough)
+    a = np.radians(angle)
+    dx, dy = mx - CHAIR_FOOT[0], my - CHAIR_FOOT[1]
+    sx = mx + weight * (dx * np.cos(a) + dy * np.sin(a) - dx)
+    sy = my + weight * (-dx * np.sin(a) + dy * np.cos(a) - dy)
+    turned = np.dstack([ndi.map_coordinates(merchant[..., c], [sy, sx], order=1, mode="constant") for c in range(4)])
+    turned = Image.fromarray(turned.clip(0, 255).astype(np.uint8), "RGBA")
+    small = turned.resize((round(merchant.shape[1] * M), round(merchant.shape[0] * M)), Image.LANCZOS)
     x0, y0 = int(round(HEEL_AT[0] - HEEL[0] * M)), int(round(HEEL_AT[1] - HEEL[1] * M))
     layer = np.zeros((H, W, 4))
     part = np.array(small).astype(np.float64)
@@ -82,7 +96,7 @@ for f in range(FRAMES):
     frame = base.copy()
     for i, (x, y) in enumerate(LANTERNS):           # the lanterns breathe, each on its own beat
         glow(frame, x, y, 16, (60, 34, 8), 0.5 * np.sin(2 * np.pi * (2 * t + i * 0.3)) + 0.3 * np.sin(2 * np.pi * (5 * t + i * 0.7)))
-    frame = with_merchant(frame, 3.2 * np.sin(2 * np.pi * t))
+    frame = with_merchant(frame, 2.0 + 5.0 * np.sin(2 * np.pi * t))
     # fireflies wander in the first jar and blink
     (x0, y0), (x1, y1) = JAR_FLIES
     for fly in flies:
@@ -123,5 +137,5 @@ for f in range(FRAMES):
                 frame[int(round(py)), int(round(px))] = frame[int(round(py)), int(round(px))] * (1 - w) + np.array((255, 250, 210)) * w
     frames.append(frame.clip(0, 255).astype(np.uint8))
 Image.fromarray(np.concatenate(frames, 0), "RGB").save(f"{OUT}/banner_shop.png")
-Image.fromarray(np.concatenate([frames[k] for k in (0, 6, 10, 17, 24, 31)], 0), "RGB").save(f"{OUT}/banner_shop_preview.png")
+Image.fromarray(np.concatenate([frames[k] for k in (0, 10, 20, 30)], 0), "RGB").save(f"{OUT}/banner_shop_preview.png")
 print("frames", FRAMES)
