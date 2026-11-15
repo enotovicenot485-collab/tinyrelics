@@ -162,5 +162,6 @@
   "guide.tinyrelics.roadmap.archer.about": "White wings, a halo and a bow of light.\nArrows that fall from the sky itself.",
   "guide.tinyrelics.roadmap.pirate.about": "A musket, a cutlass\nand a faithful green parrot.\nHis own ship and his own treasure.",
   "guide.tinyrelics.roadmap.shogun.about": "An oni mask and a long katana.\nA strike too fast to see.",
-  "guide.tinyrelics.roadmap.soon": "In the coming updates"
+  "guide.tinyrelics.roadmap.soon": "In the coming updates",
+  "message.tinyrelics.shield_wait": "Shield recharging: %s s more"
 }

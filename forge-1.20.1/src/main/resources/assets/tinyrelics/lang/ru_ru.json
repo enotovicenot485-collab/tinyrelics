@@ -162,5 +162,6 @@
   "guide.tinyrelics.roadmap.archer.about": "Белые крылья, нимб и лук из света.\nСтрелы, что падают с самих небес.",
   "guide.tinyrelics.roadmap.pirate.about": "Мушкет, абордажная сабля\nи верный зелёный попугай.\nСвой корабль и свои сокровища.",
   "guide.tinyrelics.roadmap.shogun.about": "Маска они и длинная катана.\nУдар, который не успеваешь увидеть.",
-  "guide.tinyrelics.roadmap.soon": "В следующих обновлениях"
+  "guide.tinyrelics.roadmap.soon": "В следующих обновлениях",
+  "message.tinyrelics.shield_wait": "Щит перезаряжается: ещё %s с"
 }

@@ -21,8 +21,10 @@ public class ChaosBoomerangItem extends RelicWeaponItem {
     public static final String SHIELD_UNTIL = "tinyrelics_shield_until";
     /** The shield lasts 20 seconds. */
     public static final int SHIELD_TICKS = 400;
-    /** After the shield is over: 30 seconds. */
+    /** After the shield is over: 30 seconds. Kept apart from the item's own cooldown, so throws are not held up by it. */
     public static final int SHIELD_COOLDOWN = 600;
+    /** Player data key: game time from which the shield can be called again. */
+    public static final String SHIELD_READY = "tinyrelics_shield_ready";
     /** Cooldown after either ability: 10 seconds. */
     public static final int COOLDOWN = 200;
     /** After a throw, once the boomerang is back in the hand: half a second. It is the assassin's main weapon. */
@@ -41,9 +43,17 @@ public class ChaosBoomerangItem extends RelicWeaponItem {
         ItemStack stack = player.getItemInHand(hand);
         if (level instanceof ServerLevel server && player instanceof ServerPlayer serverPlayer) {
             if (player.isShiftKeyDown()) {
+                long now = server.getGameTime();
+                long ready = serverPlayer.getPersistentData().getLong(SHIELD_READY);
+                if (now < ready) {
+                    serverPlayer.displayClientMessage(Component.translatable("message.tinyrelics.shield_wait", (ready - now + 19) / 20), true);
+                    return InteractionResultHolder.fail(stack);
+                }
                 ThrownRelic.launch(server, serverPlayer, stack, ThrownRelic.ORBIT);
-                serverPlayer.getPersistentData().putLong(SHIELD_UNTIL, server.getGameTime() + SHIELD_TICKS);
-                player.getCooldowns().addCooldown(this, SHIELD_TICKS + SHIELD_COOLDOWN);
+                serverPlayer.getPersistentData().putLong(SHIELD_UNTIL, now + SHIELD_TICKS);
+                serverPlayer.getPersistentData().putLong(SHIELD_READY, now + SHIELD_TICKS + SHIELD_COOLDOWN);
+                // only while it circles: the moment the shield is over it can be thrown again
+                player.getCooldowns().addCooldown(this, SHIELD_TICKS);
                 wear(stack, player);
                 server.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.6F);
