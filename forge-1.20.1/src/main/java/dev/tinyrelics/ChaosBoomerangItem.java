@@ -23,7 +23,9 @@ public class ChaosBoomerangItem extends RelicWeaponItem {
     public static final int SHIELD_TICKS = 400;
     /** Cooldown after either ability: 10 seconds. */
     public static final int COOLDOWN = 200;
-    /** Safety cooldown while the boomerang is in the air. */
+    /** After a throw, once the boomerang is back in the hand: half a second. It is the assassin's main weapon. */
+    public static final int THROW_COOLDOWN = 10;
+    /** While the boomerang is in the air it can not be thrown again: this cooldown lasts until it comes back. */
     private static final int FLIGHT_COOLDOWN = 400;
     /** Damage of a thrown hit, the same as a melee hit. */
     public static final float THROW_DAMAGE = 8.0F;
@@ -45,7 +47,7 @@ public class ChaosBoomerangItem extends RelicWeaponItem {
                         SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.6F);
             } else {
                 ThrownRelic.launch(server, serverPlayer, stack, ThrownRelic.CHAIN);
-                // Replaced by the real 10 second cooldown when the boomerang comes back.
+                // Lasts until the boomerang comes back, then becomes half a second (ThrownRelic.finish).
                 player.getCooldowns().addCooldown(this, FLIGHT_COOLDOWN);
                 wear(stack, player);
                 server.playSound(null, player.getX(), player.getY(), player.getZ(),

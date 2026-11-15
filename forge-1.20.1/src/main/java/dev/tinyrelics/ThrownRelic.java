@@ -258,7 +258,7 @@ public class ThrownRelic extends Entity {
             if (isHammer()) {
                 this.owner.getCooldowns().removeCooldown(stack.getItem());
             } else {
-                this.owner.getCooldowns().addCooldown(stack.getItem(), ChaosBoomerangItem.COOLDOWN);
+                this.owner.getCooldowns().addCooldown(stack.getItem(), ChaosBoomerangItem.THROW_COOLDOWN);
             }
             if (caught) {
                 this.owner.level().playSound(null, this.owner.getX(), this.owner.getY(), this.owner.getZ(),
