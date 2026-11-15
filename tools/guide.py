@@ -90,7 +90,17 @@ c = frame[..., :3].astype(int)
 paper = (c[..., 0] > 200) & (c[..., 1] > 165) & (c[..., 2] > 110)
 labels, _ = ndi.label(paper)
 frame[labels == labels[frame.shape[0] // 2, frame.shape[1] // 2], 3] = 0
-put(size(frame, 272, 72), 0, 320)
+# 136 x 40 GUI pixels: the opening then has the banners' own shape (162 x 36), so they fill it without squashing.
+# What is left of the parchment inside the frame's dark inner line is cleared, so the banner reaches the line.
+frame = size(frame, 272, 80)
+dark = (frame[..., :3].astype(int).mean(-1) < 60) & (frame[..., 3] > 0)
+row, col = dark[40], dark[:, 136]
+inner_x = max(i for i in range(60) if row[i]) + 1
+inner_y = max(i for i in range(30) if col[i]) + 1
+inner_y2 = min(i for i in range(50, 80) if col[i])
+frame[inner_y:inner_y2, inner_x:272 - inner_x] = 0
+print("banner opening, in texels:", inner_x, inner_y, 272 - inner_x, inner_y2)
+put(frame, 0, 320)
 save(sheet, f"{OUT}/textures/gui/guide_parts.png")
 
 # ---- the item

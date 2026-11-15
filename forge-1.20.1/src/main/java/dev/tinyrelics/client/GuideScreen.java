@@ -170,9 +170,9 @@ public class GuideScreen extends Screen {
                     this.y += 13;
                 }
                 case BANNER -> {
-                    room(40);
+                    room(42);
                     page().add(new Placed(BANNER, this.y, null, 0, block.number(), null));
-                    this.y += 41;
+                    this.y += 45;
                 }
                 case DIVIDER -> {
                     room(20);
@@ -304,8 +304,9 @@ public class GuideScreen extends Screen {
                 case TEXT_BLOCK -> graphics.drawString(this.font, placed.line(), x, at, 0xFF000000 | placed.colour(), false);
                 case DIVIDER -> graphics.blit(PARTS, x, at + 2, PAGE_W, 16, 0.0F, 280.0F, 272, 32, 512, 512);
                 case BANNER -> {
-                    TabBanners.draw(graphics, placed.number(), x + 4, at + 4, PAGE_W - 8, 28);
-                    graphics.blit(PARTS, x, at, PAGE_W, 36, 0.0F, 320.0F, 272, 72, 512, 512);
+                    // the banner reaches under the frame's inner line on every side, so no gap shows
+                    TabBanners.draw(graphics, placed.number(), x + 6, at + 7, PAGE_W - 12, 27);
+                    graphics.blit(PARTS, x, at, PAGE_W, 40, 0.0F, 320.0F, 272, 80, 512, 512);
                 }
                 default -> drawRecipe(graphics, placed.recipe(), x, at, mx, my);
             }
