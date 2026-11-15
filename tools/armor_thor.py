@@ -193,31 +193,35 @@ BODY_BOX = ((-4, 0, -2), (8, 12, 4))
 # The cloak is its own part hanging from the back of the neck, in two pieces so that it can bend:
 # ThorCloak turns them every frame. Their boxes are measured from their own hinges.
 CLOAK_REF = ((-7, 0, 0), (14, 23, 1))
-CLOAK_EDGE = (22, 34, 76)
 
 def cloak_piece(part, from_row, rows):
-    """One hinged half of the cloak, a box for every unit of its length, each as wide as the cloth is in
-    that row of the drawing. One big plate cut to shape looked right from behind but had no edges: from
-    the side there was nothing where the cloth is narrower than the plate, and the sky showed through."""
+    """One hinged half of the cloak, built row by row: every unit of its length gets a box exactly over
+    the cloth of that row (several boxes where the torn hem splits into tongues). One big plate cut to
+    shape had no edges, and the sky showed through it from the side. Boxes wider than the cloth were no
+    better: their spare width turned into dark bars beside the cloak and empty frames under the hem."""
     x0, y0, x1, y1 = CLOAK["S"]
     total_w, total_h = CLOAK_REF[1][0], CLOAK_REF[1][1]
     boxes = []
     for r in range(rows):
         row = from_row + r
         ya, yb = int(y0 + (y1 - y0) * row / total_h), int(y0 + (y1 - y0) * (row + 1) / total_h)
-        cloth = (~BG[ya:yb, x0:x1]).mean(axis=0) > 0.5
-        cols = np.where(cloth)[0]
-        if len(cols) == 0:
-            continue
-        # how far the cloth reaches from the middle, in units, the same on both sides
-        middle = (x1 - x0) / 2.0
-        reach = max(middle - cols[0], cols[-1] + 1 - middle) / (x1 - x0) * total_w
-        half = int(min(total_w // 2, max(1, round(reach))))
-        b = relief(part, CLOAK, *CLOAK_REF, (-half, row, 0), (2 * half, 1, 1), "S", ragged=True)
-        b["xyz"] = (-half, r, 0)
-        b["edge_fill"] = CLOAK_EDGE
-        b["fill_across"] = row < total_h - 2          # the torn hem keeps its gaps
-        boxes.append(b)
+        cloth = ~BG[ya:yb, x0:x1]
+        # the back view is mirrored on the model: unit column c of the box shows the picture from its far end
+        share = [cloth[:, int((x1 - x0) * (total_w - c - 1) / total_w):int((x1 - x0) * (total_w - c) / total_w)].mean()
+                 for c in range(total_w)]
+        filled = [v > 0.4 for v in share]
+        c = 0
+        while c < total_w:
+            if not filled[c]:
+                c += 1; continue
+            e = c
+            while e < total_w and filled[e]:
+                e += 1
+            b = relief(part, CLOAK, *CLOAK_REF, (c - total_w // 2, row, 0), (e - c, 1, 1), "S", ragged=True)
+            b["xyz"] = (c - total_w // 2, r, 0)
+            b["fit"] = True
+            boxes.append(b)
+            c = e
     return boxes
 
 # rows = the part of the box height (0 = top, 1 = bottom) that is painted; the rest stays see-through.
@@ -374,14 +378,15 @@ def paint_relief(sheet, b):
                 main[j, i] = (*c, 255)
     if not b["ragged"]:
         fill_holes(main, BONE)
-    if b.get("fill_across"):
-        # the cloth reaches the edges of its box in every row, so the thin sides have something to show
+    if b.get("fit"):
+        # Cloth: a row that nearly fills its box is stretched to fill it exactly, so the trim sits on the
+        # very edge and the thin sides are solid. Rows of a torn tongue keep their own shape.
+        n = main.shape[1]
         for j in range(main.shape[0]):
             solid = np.where(main[j, :, 3] > 0)[0]
-            if len(solid):
-                main[j, :solid[0]] = main[j, solid[0]]; main[j, solid[-1] + 1:] = main[j, solid[-1]]
-            else:
-                main[j] = (*b["edge_fill"], 255)
+            if len(solid) and 0.7 * n <= solid[-1] - solid[0] + 1 < n:
+                idx = (solid[0] + (np.arange(n) + 0.5) / n * (solid[-1] - solid[0] + 1)).astype(int)
+                main[j] = main[j, idx]
     if b.get("no_outline"):
         # fur and other soft edges: the drawing's black outline would hang in the air as a wire frame
         dark = main[..., :3].mean(-1) < 46
@@ -415,11 +420,6 @@ def paint_relief(sheet, b):
         north, south = strip(front_edge, w), strip(back_edge, w)
         top[:] = top_row[:, None, :]; bottom[:] = bottom_row[:, None, :]      # rows of the top run back to front
     top[..., :3] *= 0.9; bottom[..., :3] *= 0.7
-    if b.get("edge_fill"):
-        # no thin side is ever see-through
-        for face in (west, east, north, south, top, bottom):
-            if face is not main and face is not mirrored:
-                face[face[..., 3] == 0] = (*b["edge_fill"], 255)
     put(west, u, v + d); put(north, u + d, v + d); put(east, u + d + w, v + d); put(south, u + d + w + d, v + d)
     put(top, u + d, v); put(bottom, u + d + w, v)
 
