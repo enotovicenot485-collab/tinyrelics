@@ -45,7 +45,7 @@ os.makedirs(f"{OUT}/textures/gui", exist_ok=True)
 Image.open(f"{SRC}/roadmap_map.png").convert("RGB").resize((MAP_W * K, MAP_H * K), Image.BOX).save(f"{OUT}/textures/gui/roadmap_map.png")
 
 # ---- the sprites: name, sheet, box, GUI pixels per pixel of the sheet, mirrored, only the biggest piece, points
-P = 20.0 / 983          # the pirate
+P = 24.0 / 983          # the pirate
 A = 29.0 / 850          # the archer
 S = 26.0 / 865          # the shogun
 SPRITES = [
@@ -71,17 +71,45 @@ SPRITES = [
     ("SLASH0", "hero_shogun", (909, 559, 1141, 935), S * 1.1, True, False, {}),
     ("SLASH1", "hero_shogun", (1110, 583, 1338, 929), S * 1.1, True, False, {}),
     ("SLASH2", "hero_shogun", (1314, 597, 1507, 906), S * 1.1, True, False, {}),
-    ("SHIP", "roadmap_parts", (49, 86, 489, 534), 48.0 / 440, False, False, {"WATER": (268, 512), "DECK": (290, 448)}),
+    ("SHIP", "roadmap_parts", (49, 86, 489, 534), 58.0 / 440, False, False, {"WATER": (268, 512), "DECK": (290, 448)}),
     ("CLOUD0", "roadmap_parts", (482, 135, 829, 321), 0.1, False, False, {}),
     ("CLOUD1", "roadmap_parts", (502, 351, 887, 513), 0.1, False, False, {}),
-    ("MARKER", "roadmap_parts", (922, 159, 1165, 410), 0.042, False, False, {"TIP": (1043, 410)}),
     ("PETAL0", "roadmap_parts", (1395, 178, 1497, 290), 0.035, False, False, {}),
     ("PETAL1", "roadmap_parts", (1229, 188, 1317, 280), 0.035, False, False, {}),
     ("PETAL2", "roadmap_parts", (1261, 301, 1369, 393), 0.035, False, False, {}),
     ("PETAL3", "roadmap_parts", (1383, 377, 1497, 456), 0.035, False, False, {}),
-    ("GULL0", "roadmap_parts", (35, 625, 271, 836), 0.045, False, False, {}),
-    ("GULL1", "roadmap_parts", (304, 686, 553, 836), 0.045, False, False, {}),
-    ("GULL2", "roadmap_parts", (589, 701, 817, 844), 0.045, False, False, {}),
+    ("GULL0", "roadmap_gull", (87, 17, 369, 231), 0.032, False, False, {}),
+    ("GULL1", "roadmap_gull", (469, 78, 748, 225), 0.032, False, False, {}),
+    ("GULL2", "roadmap_gull", (809, 115, 1120, 225), 0.032, False, False, {}),
+    ("GULL3", "roadmap_gull", (1188, 127, 1463, 345), 0.032, False, False, {}),
+    ("GLIDE", "roadmap_gull", (99, 385, 672, 472), 0.032, False, False, {}),
+    ("GULL_HIT", "roadmap_gull", (730, 300, 1205, 535), 0.032, False, False, {}),
+    ("BURST0", "roadmap_gull", (70, 600, 270, 780), 0.032, False, False, {}),
+    ("BURST1", "roadmap_gull", (360, 570, 700, 812), 0.032, False, False, {}),
+    ("BURST2", "roadmap_gull", (750, 565, 1165, 825), 0.032, False, False, {}),
+    ("BURST3", "roadmap_gull", (1235, 590, 1495, 775), 0.032, False, False, {}),
+    ("FEATHER0", "roadmap_gull", (148, 868, 249, 955), 0.032, False, False, {}),
+    ("FEATHER1", "roadmap_gull", (447, 858, 508, 972), 0.032, False, False, {}),
+    ("FEATHER2", "roadmap_gull", (694, 880, 798, 950), 0.032, False, False, {}),
+    ("FEATHER3", "roadmap_gull", (977, 868, 1074, 955), 0.032, False, False, {}),
+    ("FEATHER4", "roadmap_gull", (1282, 874, 1385, 966), 0.032, False, False, {}),
+    ("COON_FALL", "roadmap_raccoon", (142, 24, 437, 262), 0.052, False, False, {}),
+    ("COON_LAND", "roadmap_raccoon", (588, 78, 891, 295), 0.052, False, False, {}),
+    ("COON_DAZED", "roadmap_raccoon", (991, 23, 1236, 301), 0.052, False, False, {}),
+    ("COON_UP", "roadmap_raccoon", (37, 356, 327, 524), 0.052, False, False, {}),
+    ("COON_RUN0", "roadmap_raccoon", (385, 367, 645, 520), 0.052, False, False, {}),
+    ("COON_RUN1", "roadmap_raccoon", (681, 373, 945, 524), 0.052, False, False, {}),
+    ("COON_RUN2", "roadmap_raccoon", (992, 376, 1232, 524), 0.052, False, False, {}),
+    ("COON_RUN3", "roadmap_raccoon", (1252, 363, 1502, 523), 0.052, False, False, {}),
+    ("COON_SLIP", "roadmap_raccoon", (73, 571, 380, 800), 0.052, False, False, {}),
+    ("COON_DIVE", "roadmap_raccoon", (506, 570, 821, 794), 0.052, False, False, {}),
+    ("SPLASH0", "roadmap_raccoon", (37, 873, 190, 965), 0.052, False, False, {}),
+    ("SPLASH1", "roadmap_raccoon", (241, 861, 414, 971), 0.052, False, False, {}),
+    ("SPLASH2", "roadmap_raccoon", (475, 855, 595, 968), 0.052, False, False, {}),
+    ("DUST0", "roadmap_raccoon", (665, 880, 815, 975), 0.052, False, False, {}),
+    ("DUST1", "roadmap_raccoon", (873, 866, 1033, 977), 0.052, False, False, {}),
+    ("DUST2", "roadmap_raccoon", (1085, 873, 1231, 977), 0.052, False, False, {}),
+    ("COON_CLOUD", "roadmap_raccoon", (1306, 832, 1499, 977), 0.09, False, False, {}),
     ("WAVE0", "roadmap_parts", (858, 700, 1032, 844), 0.05, False, False, {}),
     ("WAVE1", "roadmap_parts", (1056, 672, 1262, 844), 0.05, False, False, {}),
     ("WAVE2", "roadmap_parts", (1285, 663, 1498, 845), 0.05, False, False, {}),
@@ -129,6 +157,18 @@ for name, sheet, box, scale, largest, mirror, points in SPRITES:
         img = img[:, ::-1].copy()
     images.append((name, img, pts))
 
+# the treasure island cut from the map as drawn: drawn again over the gull, it hides her until she rises above it
+drawn = np.array(Image.open(f"{OUT}/textures/gui/roadmap_map.png").convert("RGB")).astype(int)
+ix0, iy0 = int(590 * MAP_SCALE * K), int(290 * MAP_SCALE * K)
+ix1, iy1 = int(935 * MAP_SCALE * K), int(560 * MAP_SCALE * K)
+island = drawn[iy0:iy1, ix0:ix1]
+land = ~((island[..., 2] > island[..., 0] + 22) & (island[..., 2] >= island[..., 1]))
+labels, n = ndi.label(land)
+sizes = ndi.sum(land, labels, range(1, n + 1))
+land = ndi.binary_fill_holes(labels == 1 + int(np.argmax(sizes)))
+images.append(("ISLAND", np.dstack([island, np.where(land, 255, 0)]).astype(np.uint8), {}))
+ISLAND_AT = (ix0 / K, iy0 / K)
+
 # ---- shelf packing into one atlas
 ATLAS = 1024
 atlas = np.zeros((ATLAS, ATLAS, 4), np.uint8)
@@ -172,6 +212,8 @@ with open(JAVA, "w") as f:
         f.write(f"    static final int[] {name} = {{{x}, {y}, {w}, {h}}};\n")
         for key, (px, py) in pts.items():
             f.write(f"    static final float[] {name}_{key} = {{{px:.2f}F, {py:.2f}F}};\n")
+    f.write(f"    /** Where the island cut-out goes, in GUI pixels from the map's corner. */\n")
+    f.write(f"    static final float[] ISLAND_AT = {{{ISLAND_AT[0]:.2f}F, {ISLAND_AT[1]:.2f}F}};\n")
     f.write("\n    /** The marker's path, in picture pixels of the map. */\n")
     f.write("    static final float[][] PATH = {" + ", ".join(f"{{{px:.0f}F, {py:.0f}F}}" for px, py in path) + "};\n\n")
     f.write("    private RoadmapArt() {\n    }\n}\n")
