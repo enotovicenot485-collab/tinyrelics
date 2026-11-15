@@ -194,32 +194,73 @@ BODY_BOX = ((-4, 0, -2), (8, 12, 4))
 # ThorCloak turns them every frame. Their boxes are measured from their own hinges.
 CLOAK_REF = ((-7, 0, 0), (14, 23, 1))
 
+CLOAK_ROWS = 23
+
+def cloak_texture(side=-1):
+    """The cloak cut out of the back view as a clean picture of its own, K texels per unit, 16 units wide.
+    The drawing can not be used as it is: the arms stand in front of the cloth, fur covers its top, and a
+    black outline runs round it. So only one half of the cloth is read, from the middle out to just inside
+    the outline, at one scale for the whole cloth (so the trim runs on unbroken), and mirrored. Both sides are then the same by construction."""
+    cx, top, bottom = 653, 360, 820          # the middle of the cloak and its length in the drawing
+    lum = im.mean(-1)
+    cloth = (lum > 18) & ~BG & ~((im[..., 0] > im[..., 2] + 5) & (lum < 110))      # not outline, not the boots
+    reach = []
+    for y in range(top, bottom):
+        x, miss, last = cx, 0, cx
+        while miss < 3 and 0 < x < W - 1:
+            x += side
+            if lum[y, x] > 14 and not BG[y, x]: miss, last = 0, x
+            else: miss += 1
+        reach.append(abs(last - cx))
+    reach = np.array(reach, dtype=np.float64)
+    solid_rows = int((CLOAK_ROWS - 2) / CLOAK_ROWS * len(reach))        # above the torn hem
+    reach[solid_rows:] = np.median(reach[solid_rows - 30:solid_rows])
+    reach = ndi.median_filter(reach, 41, mode="nearest") - 3            # smooth, and stay inside the outline
+    tex = np.zeros((CLOAK_ROWS * K, 16 * K, 4))
+    scale = reach.max() / (7 * K)                                       # pixels of the drawing per texel
+    fur_end = 100                                                       # rows of the drawing hidden under the fur
+    for j in range(CLOAK_ROWS * K):
+        y = (j + 0.5) / (CLOAK_ROWS * K) * (bottom - top)
+        # every unit row is as wide as its cloth, rounded to whole units; the last texels repeat the edge
+        unit = slice(int(j // K * K / (CLOAK_ROWS * K) * len(reach)), int((j // K + 1) * K / (CLOAK_ROWS * K) * len(reach)))
+        half = int(np.ceil(reach[unit].mean() / scale / K - 0.3)) * K
+        for i in range(half):
+            dx = min((i + 0.5) * scale, reach[int(y)] - 1)
+            sy = y
+            if y < fur_end:                  # under the fur: plain cloth from just below it, without the rune
+                sy = fur_end + y % 16
+                if dx < 30: dx += 45
+            px, py = int(cx + side * dx), int(top + sy)
+            if cloth[py, px] or j < (CLOAK_ROWS - 2) * K:
+                c = im[py, px] if lum[py, px] > 18 else np.array((22.0, 38.0, 72.0))
+                tex[j, 8 * K + i] = tex[j, 8 * K - 1 - i] = (*c, 255)
+    # scraps of the hem that hang in the air on their own are dropped
+    labels, count = ndi.label(tex[..., 3] > 0)
+    if count > 1:
+        sizes = ndi.sum(tex[..., 3] > 0, labels, range(1, count + 1))
+        tex[labels != 1 + int(np.argmax(sizes))] = 0
+    return tex
+
+CLOAK_TEX = cloak_texture()
+
 def cloak_piece(part, from_row, rows):
-    """One hinged half of the cloak, built row by row: every unit of its length gets a box exactly over
-    the cloth of that row (several boxes where the torn hem splits into tongues). One big plate cut to
-    shape had no edges, and the sky showed through it from the side. Boxes wider than the cloth were no
-    better: their spare width turned into dark bars beside the cloak and empty frames under the hem."""
-    x0, y0, x1, y1 = CLOAK["S"]
-    total_w, total_h = CLOAK_REF[1][0], CLOAK_REF[1][1]
+    """One hinged half of the cloak, a box for every unit of its length exactly as wide as the cloth of that
+    row (several boxes where the torn hem splits into tongues), so the cloth has solid edges from the side."""
     boxes = []
     for r in range(rows):
         row = from_row + r
-        ya, yb = int(y0 + (y1 - y0) * row / total_h), int(y0 + (y1 - y0) * (row + 1) / total_h)
-        cloth = ~BG[ya:yb, x0:x1]
-        # the back view is mirrored on the model: unit column c of the box shows the picture from its far end
-        share = [cloth[:, int((x1 - x0) * (total_w - c - 1) / total_w):int((x1 - x0) * (total_w - c) / total_w)].mean()
-                 for c in range(total_w)]
-        filled = [v > 0.4 for v in share]
+        strip = CLOAK_TEX[row * K:(row + 1) * K]
+        filled = [strip[:, c * K:(c + 1) * K, 3].mean() > 0.4 * 255 for c in range(16)]
         c = 0
-        while c < total_w:
+        while c < 16:
             if not filled[c]:
                 c += 1; continue
             e = c
-            while e < total_w and filled[e]:
+            while e < 16 and filled[e]:
                 e += 1
-            b = relief(part, CLOAK, *CLOAK_REF, (c - total_w // 2, row, 0), (e - c, 1, 1), "S", ragged=True)
-            b["xyz"] = (c - total_w // 2, r, 0)
-            b["fit"] = True
+            b = box(part, None, (c - 8, r, 0), (e - c, 1, 1), None)
+            b["relief"] = "S"; b["ragged"] = True
+            b["image"] = strip[:, c * K:e * K].copy()
             boxes.append(b)
             c = e
     return boxes
@@ -371,22 +412,16 @@ def paint_relief(sheet, b):
     w, h, d = b["size"]; u, v = b["uv"]; main_face = b["relief"]
     across = w if main_face in ("N", "S") else d          # width of the main face in model units
     main = np.zeros((h * K, across * K, 4))
-    for j in range(h * K):
-        for i in range(across * K):
-            c = sample(b["src"][main_face], (i + 0.5) / (across * K), (j + 0.5) / (h * K))
-            if c is not None:
-                main[j, i] = (*c, 255)
+    if "image" in b:
+        main = b["image"].copy()             # a picture prepared beforehand (the cloak)
+    else:
+        for j in range(h * K):
+            for i in range(across * K):
+                c = sample(b["src"][main_face], (i + 0.5) / (across * K), (j + 0.5) / (h * K))
+                if c is not None:
+                    main[j, i] = (*c, 255)
     if not b["ragged"]:
         fill_holes(main, BONE)
-    if b.get("fit"):
-        # Cloth: a row that nearly fills its box is stretched to fill it exactly, so the trim sits on the
-        # very edge and the thin sides are solid. Rows of a torn tongue keep their own shape.
-        n = main.shape[1]
-        for j in range(main.shape[0]):
-            solid = np.where(main[j, :, 3] > 0)[0]
-            if len(solid) and 0.7 * n <= solid[-1] - solid[0] + 1 < n:
-                idx = (solid[0] + (np.arange(n) + 0.5) / n * (solid[-1] - solid[0] + 1)).astype(int)
-                main[j] = main[j, idx]
     if b.get("no_outline"):
         # fur and other soft edges: the drawing's black outline would hang in the air as a wire frame
         dark = main[..., :3].mean(-1) < 46
