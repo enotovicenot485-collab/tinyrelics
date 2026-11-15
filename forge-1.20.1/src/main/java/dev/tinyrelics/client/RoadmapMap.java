@@ -27,6 +27,8 @@ final class RoadmapMap {
     /** Where things stand on the map, in pixels of the map picture. */
     private static final float[] ARCHER_AT = {288, 572};
     private static final float[] SHIP_AT = {1045, 562};
+    /** Where the ship's rail is, as a fraction of the ship's height. */
+    private static final float HULL_FROM = 0.69F;
     private static final float[] SHOGUN_AT = {1495, 650};
     private static final float[] PLAQUE_X = {300, 885, 1485};
     private static final int[][] PLAQUES = {PLAQUE0, PLAQUE1, PLAQUE2};
@@ -96,6 +98,17 @@ final class RoadmapMap {
 
     private static float h(int[] s) {
         return s[3] / (float) K;
+    }
+
+    /** Only the rows of a sprite from a fraction of its height down. */
+    private static void rows(int[] s, float x, float y, float from) {
+        PoseStack pose = g.pose();
+        pose.pushPose();
+        pose.translate(x, y, 0.0F);
+        pose.scale(1.0F / K, 1.0F / K, 1.0F);
+        int v0 = Math.round(s[3] * from);
+        g.blit(SPRITES, 0, v0, s[2], s[3] - v0, (float) s[0], (float) (s[1] + v0), s[2], s[3] - v0, ATLAS, ATLAS);
+        pose.popPose();
     }
 
     /** A sprite turned about one of its points, that point put at (x, y). */
@@ -223,6 +236,8 @@ final class RoadmapMap {
         pose.mulPose(Axis.ZP.rotationDegrees(rock));
         sprite(SHIP, -SHIP_WATER[0], -SHIP_WATER[1]);
         pirate(t, SHIP_DECK[0] - SHIP_WATER[0], SHIP_DECK[1] - SHIP_WATER[1]);
+        // the hull below the rail once more, over his boots: he stands on the deck, behind the rail
+        rows(SHIP, -SHIP_WATER[0], -SHIP_WATER[1], HULL_FROM);
         pose.popPose();
         pirateBox = new float[] {sx + SHIP_DECK[0] - SHIP_WATER[0] - PIRATE_FEET[0], sy + SHIP_DECK[1] - SHIP_WATER[1] - PIRATE_FEET[1],
                 w(PIRATE), h(PIRATE)};

@@ -45,9 +45,9 @@ os.makedirs(f"{OUT}/textures/gui", exist_ok=True)
 Image.open(f"{SRC}/roadmap_map.png").convert("RGB").resize((MAP_W * K, MAP_H * K), Image.BOX).save(f"{OUT}/textures/gui/roadmap_map.png")
 
 # ---- the sprites: name, sheet, box, GUI pixels per pixel of the sheet, mirrored, only the biggest piece, points
-P = 26.0 / 983          # the pirate
-A = 36.0 / 850          # the archer
-S = 32.0 / 865          # the shogun
+P = 20.0 / 983          # the pirate
+A = 29.0 / 850          # the archer
+S = 26.0 / 865          # the shogun
 SPRITES = [
     ("ARCHER", "hero_archer", (121, 12, 625, 862), A, False, False, {"FEET": (373, 860), "WING_L": (350, 365), "WING_R": (515, 365)}),
     ("WING_L", "hero_archer", (736, 144, 1228, 787), A * 0.8, False, False, {"ROOT": (1205, 405)}),
@@ -71,7 +71,7 @@ SPRITES = [
     ("SLASH0", "hero_shogun", (909, 559, 1141, 935), S * 1.1, True, False, {}),
     ("SLASH1", "hero_shogun", (1110, 583, 1338, 929), S * 1.1, True, False, {}),
     ("SLASH2", "hero_shogun", (1314, 597, 1507, 906), S * 1.1, True, False, {}),
-    ("SHIP", "roadmap_parts", (49, 86, 489, 534), 48.0 / 440, False, False, {"WATER": (268, 512), "DECK": (300, 405)}),
+    ("SHIP", "roadmap_parts", (49, 86, 489, 534), 48.0 / 440, False, False, {"WATER": (268, 512), "DECK": (290, 448)}),
     ("CLOUD0", "roadmap_parts", (482, 135, 829, 321), 0.1, False, False, {}),
     ("CLOUD1", "roadmap_parts", (502, 351, 887, 513), 0.1, False, False, {}),
     ("MARKER", "roadmap_parts", (922, 159, 1165, 410), 0.042, False, False, {"TIP": (1043, 410)}),
@@ -157,7 +157,7 @@ for i in range(1, n + 1):
         cy, cx = ndi.center_of_mass(labels == i)
         dashes.append((cx, cy))
 dashes.sort()
-path = [(290, 552)] + dashes + [(1490, 640)]
+path = dashes                              # from the first golden dash to the last
 
 with open(JAVA, "w") as f:
     f.write("package dev.tinyrelics.client;\n\n")
