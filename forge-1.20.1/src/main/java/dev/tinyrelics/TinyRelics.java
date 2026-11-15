@@ -159,6 +159,10 @@ public class TinyRelics {
             () -> new Block(BlockBehaviour.Properties.of().noOcclusion().noLootTable()));
     public static final RegistryObject<Block> SPOOLER_REEL = BLOCKS.register("spooler_reel",
             () -> new Block(BlockBehaviour.Properties.of().noOcclusion().noLootTable()));
+    public static final RegistryObject<Block> SPOOLER_CRANK = BLOCKS.register("spooler_crank",
+            () -> new Block(BlockBehaviour.Properties.of().noOcclusion().noLootTable()));
+    public static final RegistryObject<Block> LOOM_SPOOL = BLOCKS.register("loom_spool",
+            () -> new Block(BlockBehaviour.Properties.of().noOcclusion().noLootTable()));
     public static final RegistryObject<BlockEntityType<ShadowMachineBlockEntity>> SHADOW_MACHINE_ENTITY = BLOCK_ENTITIES.register("shadow_machine",
             () -> BlockEntityType.Builder.of(ShadowMachineBlockEntity::new, SHADOW_LOOM.get(), PHANTOM_SPOOLER.get()).build(null));
     public static final RegistryObject<MenuType<ShadowMachineMenu>> SHADOW_LOOM_MENU = MENUS.register("shadow_loom",

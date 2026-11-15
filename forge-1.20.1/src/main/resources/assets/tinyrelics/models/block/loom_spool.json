@@ -1,0 +1,516 @@
+{
+ "parent": "minecraft:block/block",
+ "render_type": "minecraft:cutout",
+ "textures": {
+  "shuttle": "tinyrelics:block/shuttle_wood",
+  "thread": "tinyrelics:block/shuttle_thread",
+  "steel": "tinyrelics:block/shadow_steel",
+  "side": "tinyrelics:block/shuttle_wood",
+  "particle": "tinyrelics:block/shuttle_wood"
+ },
+ "elements": [
+  {
+   "from": [
+    6.75,
+    6.75,
+    5.5
+   ],
+   "to": [
+    9.25,
+    9.25,
+    10.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      2.5,
+      2.5
+     ]
+    },
+    "south": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      2.5,
+      2.5
+     ]
+    },
+    "west": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      5.0,
+      2.5
+     ]
+    },
+    "east": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      5.0,
+      2.5
+     ]
+    },
+    "up": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      2.5,
+      5.0
+     ]
+    },
+    "down": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      2.5,
+      5.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    6.75,
+    6.75,
+    5.5
+   ],
+   "to": [
+    9.25,
+    9.25,
+    10.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      2.5,
+      2.5
+     ]
+    },
+    "south": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      2.5,
+      2.5
+     ]
+    },
+    "west": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      5.0,
+      2.5
+     ]
+    },
+    "east": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      5.0,
+      2.5
+     ]
+    },
+    "up": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      2.5,
+      5.0
+     ]
+    },
+    "down": {
+     "texture": "#thread",
+     "uv": [
+      0,
+      0,
+      2.5,
+      5.0
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     8,
+     8
+    ],
+    "axis": "z",
+    "angle": 45
+   }
+  },
+  {
+   "from": [
+    6.2,
+    6.2,
+    4.8
+   ],
+   "to": [
+    9.8,
+    9.8,
+    5.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      3.6
+     ]
+    },
+    "south": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      3.6
+     ]
+    },
+    "west": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      1,
+      3.6
+     ]
+    },
+    "east": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      1,
+      3.6
+     ]
+    },
+    "up": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      1
+     ]
+    },
+    "down": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    6.2,
+    6.2,
+    4.8
+   ],
+   "to": [
+    9.8,
+    9.8,
+    5.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      3.6
+     ]
+    },
+    "south": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      3.6
+     ]
+    },
+    "west": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      1,
+      3.6
+     ]
+    },
+    "east": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      1,
+      3.6
+     ]
+    },
+    "up": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      1
+     ]
+    },
+    "down": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      1
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     8,
+     8
+    ],
+    "axis": "z",
+    "angle": 45
+   }
+  },
+  {
+   "from": [
+    6.2,
+    6.2,
+    10.5
+   ],
+   "to": [
+    9.8,
+    9.8,
+    11.2
+   ],
+   "faces": {
+    "north": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      3.6
+     ]
+    },
+    "south": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      3.6
+     ]
+    },
+    "west": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      1,
+      3.6
+     ]
+    },
+    "east": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      1,
+      3.6
+     ]
+    },
+    "up": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      1
+     ]
+    },
+    "down": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    6.2,
+    6.2,
+    10.5
+   ],
+   "to": [
+    9.8,
+    9.8,
+    11.2
+   ],
+   "faces": {
+    "north": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      3.6
+     ]
+    },
+    "south": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      3.6
+     ]
+    },
+    "west": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      1,
+      3.6
+     ]
+    },
+    "east": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      1,
+      3.6
+     ]
+    },
+    "up": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      1
+     ]
+    },
+    "down": {
+     "texture": "#shuttle",
+     "uv": [
+      0,
+      0,
+      3.6,
+      1
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     8,
+     8
+    ],
+    "axis": "z",
+    "angle": 45
+   }
+  },
+  {
+   "from": [
+    7.6,
+    7.6,
+    4.5
+   ],
+   "to": [
+    8.4,
+    8.4,
+    11.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel",
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ]
+    },
+    "south": {
+     "texture": "#steel",
+     "uv": [
+      0,
+      0,
+      1,
+      1
+     ]
+    },
+    "west": {
+     "texture": "#steel",
+     "uv": [
+      0,
+      0,
+      7.0,
+      1
+     ]
+    },
+    "east": {
+     "texture": "#steel",
+     "uv": [
+      0,
+      0,
+      7.0,
+      1
+     ]
+    },
+    "up": {
+     "texture": "#steel",
+     "uv": [
+      0,
+      0,
+      1,
+      7.0
+     ]
+    },
+    "down": {
+     "texture": "#steel",
+     "uv": [
+      0,
+      0,
+      1,
+      7.0
+     ]
+    }
+   }
+  }
+ ]
+}

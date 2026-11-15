@@ -14,9 +14,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * The parts of the shadow loom and the phantom spooler that move: the shuttle that runs across the loom
- * and the reel, with its crank, that turns in the spooler. Each is the model of a block of its own
- * (loom_shuttle, spooler_reel) that is never placed, drawn here.
+ * The parts of the shadow loom and the phantom spooler that move: the loom's shuttle and its two spools,
+ * the spooler's reel and its crank. Each is the model of a block of its own (loom_shuttle, loom_spool,
+ * spooler_reel, spooler_crank) that is never placed, drawn here.
  */
 public class ShadowMachineRenderer implements BlockEntityRenderer<ShadowMachineBlockEntity> {
     /** The shuttle's place above the loom, in sixteenths of a block from the middle of the block: up, and towards the back. */
@@ -27,6 +27,9 @@ public class ShadowMachineRenderer implements BlockEntityRenderer<ShadowMachineB
     private static final float SHUTTLE_TICKS = 36.0F;
     /** Degrees a tick. */
     private static final float REEL_SPEED = 9.0F;
+    /** The loom's two spools: how far from the middle of the block to each side, and how far below it. */
+    private static final float SPOOL_OUT = 6.0F;
+    private static final float SPOOL_UP = -0.25F;
 
     public ShadowMachineRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -46,13 +49,31 @@ public class ShadowMachineRenderer implements BlockEntityRenderer<ShadowMachineB
         pose.translate(0.5F, 0.5F, 0.5F);
         pose.mulPose(Axis.YP.rotationDegrees(-(state.getValue(ShadowMachineBlock.FACING).toYRot() + 180.0F)));
         pose.translate(-0.5F, -0.5F, -0.5F);
+        float turn = working ? time * REEL_SPEED : 0.0F;
         if (state.is(TinyRelics.PHANTOM_SPOOLER.get())) {
-            // the reel lies along x through the middle of its block: turn it about that axle
-            pose.translate(0.0F, 0.5F, 0.5F);
-            pose.mulPose(Axis.XP.rotationDegrees(working ? time * REEL_SPEED : 0.0F));
-            pose.translate(0.0F, -0.5F, -0.5F);
+            // the reel stands upright in the middle of the block and turns about its axle
+            pose.pushPose();
+            pose.translate(0.5F, 0.0F, 0.5F);
+            pose.mulPose(Axis.YP.rotationDegrees(turn));
+            pose.translate(-0.5F, 0.0F, -0.5F);
             Minecraft.getInstance().getBlockRenderer().renderSingleBlock(TinyRelics.SPOOLER_REEL.get().defaultBlockState(), pose, buffers, lit, overlay);
+            pose.popPose();
+            // the crank on the side turns about the axle that runs across the block
+            pose.translate(0.0F, 0.5F, 0.5F);
+            pose.mulPose(Axis.XP.rotationDegrees(turn));
+            pose.translate(0.0F, -0.5F, -0.5F);
+            Minecraft.getInstance().getBlockRenderer().renderSingleBlock(TinyRelics.SPOOLER_CRANK.get().defaultBlockState(), pose, buffers, lit, overlay);
         } else {
+            // a spool of thread in the niche on each side, unwinding
+            for (int side = -1; side <= 1; side += 2) {
+                pose.pushPose();
+                pose.translate(0.5F + side * SPOOL_OUT / 16.0F, 0.5F + SPOOL_UP / 16.0F, 0.0F);
+                pose.mulPose(Axis.ZP.rotationDegrees(side * turn));
+                pose.translate(-0.5F, -0.5F, 0.0F);
+                Minecraft.getInstance().getBlockRenderer().renderSingleBlock(TinyRelics.LOOM_SPOOL.get().defaultBlockState(), pose, buffers,
+                        LevelRenderer.getLightColor(level, machine.getBlockPos()), overlay);
+                pose.popPose();
+            }
             float run = working ? (time % SHUTTLE_TICKS) / SHUTTLE_TICKS : 0.0F;
             float across = run < 0.5F ? run * 2.0F : 2.0F - run * 2.0F;
             pose.translate((across * 2.0F - 1.0F) * SHUTTLE_RUN / 16.0F, SHUTTLE_UP / 16.0F, SHUTTLE_BACK / 16.0F);

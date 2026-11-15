@@ -39,6 +39,14 @@ public class ShadowMachineScreen extends AbstractContainerScreen<ShadowMachineMe
         graphics.blit(this.texture, this.leftPos + x, this.topPos + y, width, height, (float) u, (float) v, width * 2, height * 2, SHEET, SHEET);
     }
 
+    /** The moon in its socket. The sockets are an odd number of pixels across, so the moon sits on a half pixel. */
+    private void moon(GuiGraphics graphics, float x, float y, int size, int u, int v) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(x - (int) x, y - (int) y, 0.0F);
+        part(graphics, (int) x, (int) y, size, size, u, v);
+        graphics.pose().popPose();
+    }
+
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         part(graphics, 0, 0, this.imageWidth, this.imageHeight, 0, 0);
@@ -53,7 +61,7 @@ public class ShadowMachineScreen extends AbstractContainerScreen<ShadowMachineMe
 
     private void loom(GuiGraphics graphics, long now, float t, boolean working) {
         if (this.menu.night()) {
-            part(graphics, 79, 5, 20, 20, 430, 110);
+            moon(graphics, 79.0F, 5.5F, 20, 430, 110);
         }
         if (!this.menu.loaded()) {
             return;
@@ -82,7 +90,7 @@ public class ShadowMachineScreen extends AbstractContainerScreen<ShadowMachineMe
 
     private void spooler(GuiGraphics graphics, long now, float t, boolean working) {
         if (this.menu.night()) {
-            part(graphics, 76, 6, 22, 22, 446, 50);
+            moon(graphics, 77.0F, 6.5F, 22, 446, 50);
         }
         // the reel: empty, and over it the full one, showing through more and more as the thread winds on
         int frame = working ? (int) (now / 70L % 4L) : 0;
