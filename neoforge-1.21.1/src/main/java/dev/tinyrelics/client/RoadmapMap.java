@@ -48,6 +48,8 @@ final class RoadmapMap {
     private static final double SHOT = 5.8D;
     /** The raccoon runs the path up to this golden dash, over open sea, slips there and falls in. */
     private static final int SLIP_DASH = 13;
+    /** Where he lands in the water: forward, towards the viewer, in open sea before the rock with the tree. */
+    private static final float[] SPLASH_AT = {1030, 742};
     private static final int[][] WAVES = {WAVE0, WAVE1, WAVE2};
     private static final int[][] BANNERS = {BANNER0, BANNER1, BANNER2};
     private static final float[][] POLES = {BANNER0_POLE, BANNER1_POLE, BANNER2_POLE};
@@ -531,16 +533,18 @@ final class RoadmapMap {
         } else if (c >= 12.6D && c < 14.2D) {
             float x = px(PATH[SLIP_DASH][0]);
             float y = py(PATH[SLIP_DASH][1]) + 1.5F;
-            float water = py(700);
+            float wx = px(SPLASH_AT[0]);
+            float wy = py(SPLASH_AT[1]);
             if (c < 13.1D) {
                 coon(COON_SLIP, x + (float) (c - 12.6D) * 6.0F, y);
             } else {
                 float u = (float) ((c - 13.1D) / 0.7D);
+                float from = x + 3.0F;
                 if (u < 1.0F) {
-                    coon(COON_DIVE, x + 3.0F + u * 3.0F, y + (water - y) * u * u);
+                    coon(COON_DIVE, from + (wx - from) * u, y + (wy - y) * u * u);
                 } else {
                     int[] s = SPLASHES[Math.min(2, (int) ((c - 13.8D) / 0.13D))];
-                    sprite(s, x + 6.0F - w(s) / 2, water - h(s) + 1.0F);
+                    sprite(s, wx - w(s) / 2, wy - h(s) + 1.0F);
                 }
             }
         }
