@@ -1,0 +1,329 @@
+{
+ "parent": "minecraft:block/block",
+ "render_type": "minecraft:cutout",
+ "textures": {
+  "thread": "tinyrelics:block/spooler_thread",
+  "steel": "tinyrelics:block/shadow_steel",
+  "crank": "tinyrelics:block/spooler_crank",
+  "grip": "tinyrelics:block/shuttle_wood",
+  "side": "tinyrelics:block/shadow_steel",
+  "particle": "tinyrelics:block/shadow_steel"
+ },
+ "elements": [
+  {
+   "from": [
+    4.5,
+    5.5,
+    5.5
+   ],
+   "to": [
+    11.5,
+    10.5,
+    10.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#thread"
+    },
+    "south": {
+     "texture": "#thread"
+    },
+    "west": {
+     "texture": "#thread"
+    },
+    "east": {
+     "texture": "#thread"
+    },
+    "up": {
+     "texture": "#thread"
+    },
+    "down": {
+     "texture": "#thread"
+    }
+   }
+  },
+  {
+   "from": [
+    4.5,
+    5.5,
+    5.5
+   ],
+   "to": [
+    11.5,
+    10.5,
+    10.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#thread"
+    },
+    "south": {
+     "texture": "#thread"
+    },
+    "west": {
+     "texture": "#thread"
+    },
+    "east": {
+     "texture": "#thread"
+    },
+    "up": {
+     "texture": "#thread"
+    },
+    "down": {
+     "texture": "#thread"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     8,
+     8
+    ],
+    "axis": "x",
+    "angle": 45
+   }
+  },
+  {
+   "from": [
+    3.5,
+    4.5,
+    4.5
+   ],
+   "to": [
+    4.5,
+    11.5,
+    11.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel"
+    },
+    "south": {
+     "texture": "#steel"
+    },
+    "west": {
+     "texture": "#steel"
+    },
+    "east": {
+     "texture": "#steel"
+    },
+    "up": {
+     "texture": "#steel"
+    },
+    "down": {
+     "texture": "#steel"
+    }
+   }
+  },
+  {
+   "from": [
+    3.5,
+    4.5,
+    4.5
+   ],
+   "to": [
+    4.5,
+    11.5,
+    11.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel"
+    },
+    "south": {
+     "texture": "#steel"
+    },
+    "west": {
+     "texture": "#steel"
+    },
+    "east": {
+     "texture": "#steel"
+    },
+    "up": {
+     "texture": "#steel"
+    },
+    "down": {
+     "texture": "#steel"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     8,
+     8
+    ],
+    "axis": "x",
+    "angle": 45
+   }
+  },
+  {
+   "from": [
+    11.5,
+    4.5,
+    4.5
+   ],
+   "to": [
+    12.5,
+    11.5,
+    11.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel"
+    },
+    "south": {
+     "texture": "#steel"
+    },
+    "west": {
+     "texture": "#steel"
+    },
+    "east": {
+     "texture": "#steel"
+    },
+    "up": {
+     "texture": "#steel"
+    },
+    "down": {
+     "texture": "#steel"
+    }
+   }
+  },
+  {
+   "from": [
+    11.5,
+    4.5,
+    4.5
+   ],
+   "to": [
+    12.5,
+    11.5,
+    11.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel"
+    },
+    "south": {
+     "texture": "#steel"
+    },
+    "west": {
+     "texture": "#steel"
+    },
+    "east": {
+     "texture": "#steel"
+    },
+    "up": {
+     "texture": "#steel"
+    },
+    "down": {
+     "texture": "#steel"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     8,
+     8
+    ],
+    "axis": "x",
+    "angle": 45
+   }
+  },
+  {
+   "from": [
+    1.5,
+    7.5,
+    7.5
+   ],
+   "to": [
+    16,
+    8.5,
+    8.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel"
+    },
+    "south": {
+     "texture": "#steel"
+    },
+    "west": {
+     "texture": "#steel"
+    },
+    "east": {
+     "texture": "#steel"
+    },
+    "up": {
+     "texture": "#steel"
+    },
+    "down": {
+     "texture": "#steel"
+    }
+   }
+  },
+  {
+   "from": [
+    16,
+    3,
+    3
+   ],
+   "to": [
+    16.4,
+    13,
+    13
+   ],
+   "faces": {
+    "east": {
+     "texture": "#crank",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#crank",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    16.4,
+    7.4,
+    11.3
+   ],
+   "to": [
+    18.6,
+    8.6,
+    12.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#grip"
+    },
+    "south": {
+     "texture": "#grip"
+    },
+    "west": {
+     "texture": "#grip"
+    },
+    "east": {
+     "texture": "#grip"
+    },
+    "up": {
+     "texture": "#grip"
+    },
+    "down": {
+     "texture": "#grip"
+    }
+   }
+  }
+ ]
+}

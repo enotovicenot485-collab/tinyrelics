@@ -122,5 +122,15 @@
   "block.tinyrelics.soul_press": "Пресс",
   "container.tinyrelics.bone_crusher": "Дробилка",
   "container.tinyrelics.soul_press": "Пресс",
-  "container.tinyrelics.machine.fuel": "Порох: хватит ещё на %s из %s работ"
+  "container.tinyrelics.machine.fuel": "Порох: хватит ещё на %s из %s работ",
+  "item.tinyrelics.ender_skin": "Кожа эндермена",
+  "item.tinyrelics.chaos_cloth": "Ткань хаоса",
+  "item.tinyrelics.phantom_wing": "Кусок крыла фантома",
+  "item.tinyrelics.phantom_thread": "Нить фантома",
+  "block.tinyrelics.shadow_loom": "Станок теней",
+  "block.tinyrelics.phantom_spooler": "Намотчик",
+  "container.tinyrelics.shadow_loom": "Станок теней",
+  "container.tinyrelics.phantom_spooler": "Намотчик",
+  "container.tinyrelics.shadow.night": "Ночь: станок работает",
+  "container.tinyrelics.shadow.day": "День: станок ждёт ночи"
 }

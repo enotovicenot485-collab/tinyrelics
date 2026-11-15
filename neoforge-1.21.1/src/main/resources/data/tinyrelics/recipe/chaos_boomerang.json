@@ -2,16 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    "EAE",
-    "NSN",
-    "EXE"
+    "AAA",
+    "AEA",
+    "AAA"
   ],
   "key": {
-    "E": { "item": "minecraft:ender_eye" },
-    "A": { "item": "minecraft:amethyst_block" },
-    "N": { "item": "minecraft:netherite_ingot" },
-    "S": { "item": "minecraft:nether_star" },
-    "X": { "item": "minecraft:echo_shard" }
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    }
   },
   "result": {
     "id": "tinyrelics:chaos_boomerang",

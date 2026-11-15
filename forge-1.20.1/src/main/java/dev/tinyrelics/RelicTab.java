@@ -56,7 +56,8 @@ public final class RelicTab {
         row(output, nextGap,
                 TinyRelics.CHAOS_HELMET.get(), TinyRelics.CHAOS_CHESTPLATE.get(),
                 TinyRelics.CHAOS_LEGGINGS.get(), TinyRelics.CHAOS_BOOTS.get(),
-                TinyRelics.CHAOS_BOOMERANG.get());
+                TinyRelics.CHAOS_BOOMERANG.get(), TinyRelics.CHAOS_CLOTH.get(), TinyRelics.PHANTOM_THREAD.get(),
+                TinyRelics.SHADOW_LOOM_ITEM.get(), TinyRelics.PHANTOM_SPOOLER_ITEM.get());
         banner(output, BLOOD);
         row(output, nextGap,
                 TinyRelics.BLOOD_HELMET.get(), TinyRelics.BLOOD_CHESTPLATE.get(),

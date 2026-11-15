@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "tinyrelics:blood_altar"
+    "tinyrelics:shadow_loom",
+    "tinyrelics:phantom_spooler"
   ]
 }

@@ -420,5 +420,6 @@ def icons():
         save(icon, f"{OUT}/textures/item/{name}.png")
         write_json(f"{OUT}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "tinyrelics:item/" + name}})
 
-crusher_window(); press_window(); crusher_block(); press_block(); icons()
-print(json.dumps(LAYOUT))
+if __name__ == "__main__":
+    crusher_window(); press_window(); crusher_block(); press_block(); icons()
+    print(json.dumps(LAYOUT))

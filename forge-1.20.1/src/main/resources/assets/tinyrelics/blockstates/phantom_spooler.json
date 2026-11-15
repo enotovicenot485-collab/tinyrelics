@@ -1,0 +1,19 @@
+{
+ "variants": {
+  "facing=north": {
+   "model": "tinyrelics:block/phantom_spooler"
+  },
+  "facing=east": {
+   "model": "tinyrelics:block/phantom_spooler",
+   "y": 90
+  },
+  "facing=south": {
+   "model": "tinyrelics:block/phantom_spooler",
+   "y": 180
+  },
+  "facing=west": {
+   "model": "tinyrelics:block/phantom_spooler",
+   "y": 270
+  }
+ }
+}

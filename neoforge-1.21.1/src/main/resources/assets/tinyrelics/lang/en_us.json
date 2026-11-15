@@ -122,5 +122,15 @@
   "block.tinyrelics.soul_press": "Soul Press",
   "container.tinyrelics.bone_crusher": "Bone Crusher",
   "container.tinyrelics.soul_press": "Soul Press",
-  "container.tinyrelics.machine.fuel": "Gunpowder: enough for %s of %s more jobs"
+  "container.tinyrelics.machine.fuel": "Gunpowder: enough for %s of %s more jobs",
+  "item.tinyrelics.ender_skin": "Enderman Skin",
+  "item.tinyrelics.chaos_cloth": "Chaos Cloth",
+  "item.tinyrelics.phantom_wing": "Piece of Phantom Wing",
+  "item.tinyrelics.phantom_thread": "Phantom Thread",
+  "block.tinyrelics.shadow_loom": "Shadow Loom",
+  "block.tinyrelics.phantom_spooler": "Phantom Spooler",
+  "container.tinyrelics.shadow_loom": "Shadow Loom",
+  "container.tinyrelics.phantom_spooler": "Phantom Spooler",
+  "container.tinyrelics.shadow.night": "Night: the machine is working",
+  "container.tinyrelics.shadow.day": "Day: the machine waits for night"
 }

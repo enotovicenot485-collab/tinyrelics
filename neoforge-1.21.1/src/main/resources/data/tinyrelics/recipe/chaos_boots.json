@@ -2,18 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    "L L",
-    "IRI"
+    "T T",
+    "C C",
+    "C C"
   ],
   "key": {
-    "L": {
-      "item": "minecraft:leather"
+    "C": {
+      "item": "tinyrelics:chaos_cloth"
     },
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "R": {
-      "item": "minecraft:rabbit_foot"
+    "T": {
+      "item": "tinyrelics:phantom_thread"
     }
   },
   "result": {

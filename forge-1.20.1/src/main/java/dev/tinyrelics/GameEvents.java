@@ -210,6 +210,15 @@ public final class GameEvents {
                 || !level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT) || Minions.isMinion(victim)) {
             return;
         }
+        // endermen leave their skin half the time, phantoms always leave a piece of wing: the assassin's cloth and thread
+        if (victim instanceof net.minecraft.world.entity.monster.EnderMan && level.random.nextBoolean()) {
+            event.getDrops().add(new net.minecraft.world.entity.item.ItemEntity(level, victim.getX(), victim.getY() + 0.3D, victim.getZ(),
+                    new net.minecraft.world.item.ItemStack(TinyRelics.ENDER_SKIN.get())));
+        }
+        if (victim instanceof net.minecraft.world.entity.monster.Phantom) {
+            event.getDrops().add(new net.minecraft.world.entity.item.ItemEntity(level, victim.getX(), victim.getY() + 0.3D, victim.getZ(),
+                    new net.minecraft.world.item.ItemStack(TinyRelics.PHANTOM_WING.get())));
+        }
         net.minecraft.world.item.Item blood = BloodSet.bloodOf(victim);
         if (blood == null) {
             return;

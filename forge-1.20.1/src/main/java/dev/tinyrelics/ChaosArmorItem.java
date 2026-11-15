@@ -93,7 +93,7 @@ public class ChaosArmorItem extends ArmorItem {
 
         @Override
         public Ingredient getRepairIngredient() {
-            return Ingredient.of(Items.AMETHYST_SHARD);
+            return Ingredient.of(TinyRelics.CHAOS_CLOTH.get());
         }
 
         @Override

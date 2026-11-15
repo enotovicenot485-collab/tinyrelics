@@ -117,7 +117,7 @@ public class TinyRelics {
                     }),
                     15,
                     SoundEvents.ARMOR_EQUIP_NETHERITE,
-                    () -> Ingredient.of(Items.AMETHYST_SHARD),
+                    () -> Ingredient.of(TinyRelics.CHAOS_CLOTH.get()),
                     List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(MODID, "chaos"))),
                     1.0F,
                     0.0F));
@@ -229,6 +229,35 @@ public class TinyRelics {
             () -> new BlockItem(BONE_CRUSHER.get(), new Item.Properties()));
     public static final DeferredItem<BlockItem> SOUL_PRESS_ITEM = ITEMS.register("soul_press",
             () -> new BlockItem(SOUL_PRESS.get(), new Item.Properties()));
+
+    // ---- Shadow: the chaos assassin's two machines, what goes into them and what they make.
+    public static final DeferredHolder<Block, ShadowMachineBlock> SHADOW_LOOM = BLOCKS.register("shadow_loom", () -> shadowMachine(7));
+    public static final DeferredHolder<Block, ShadowMachineBlock> PHANTOM_SPOOLER = BLOCKS.register("phantom_spooler", () -> shadowMachine(0));
+    /** Never placed: ShadowMachineRenderer draws their models, moving, on the two machines. */
+    public static final DeferredHolder<Block, Block> LOOM_SHUTTLE = BLOCKS.register("loom_shuttle",
+            () -> new Block(BlockBehaviour.Properties.of().noOcclusion().noLootTable()));
+    public static final DeferredHolder<Block, Block> SPOOLER_REEL = BLOCKS.register("spooler_reel",
+            () -> new Block(BlockBehaviour.Properties.of().noOcclusion().noLootTable()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ShadowMachineBlockEntity>> SHADOW_MACHINE_ENTITY = BLOCK_ENTITIES.register("shadow_machine",
+            () -> BlockEntityType.Builder.of(ShadowMachineBlockEntity::new, SHADOW_LOOM.get(), PHANTOM_SPOOLER.get()).build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<ShadowMachineMenu>> SHADOW_LOOM_MENU = MENUS.register("shadow_loom",
+            () -> IMenuTypeExtension.create((id, inventory, extra) -> new ShadowMachineMenu(id, inventory, false)));
+    public static final DeferredHolder<MenuType<?>, MenuType<ShadowMachineMenu>> PHANTOM_SPOOLER_MENU = MENUS.register("phantom_spooler",
+            () -> IMenuTypeExtension.create((id, inventory, extra) -> new ShadowMachineMenu(id, inventory, true)));
+    public static final DeferredItem<Item> ENDER_SKIN = ITEMS.register("ender_skin", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CHAOS_CLOTH = ITEMS.register("chaos_cloth", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> PHANTOM_WING = ITEMS.register("phantom_wing", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> PHANTOM_THREAD = ITEMS.register("phantom_thread", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<BlockItem> SHADOW_LOOM_ITEM = ITEMS.register("shadow_loom",
+            () -> new BlockItem(SHADOW_LOOM.get(), new Item.Properties()));
+    public static final DeferredItem<BlockItem> PHANTOM_SPOOLER_ITEM = ITEMS.register("phantom_spooler",
+            () -> new BlockItem(PHANTOM_SPOOLER.get(), new Item.Properties()));
+
+    /** Not a full cube; the loom's threads glow a little while it weaves. */
+    private static ShadowMachineBlock shadowMachine(int glow) {
+        return new ShadowMachineBlock(BlockBehaviour.Properties.of().strength(2.5F).sound(SoundType.WOOD).noOcclusion()
+                .lightLevel(state -> state.getValue(ShadowMachineBlock.LIT) ? glow : 0));
+    }
 
     /** Not a full cube, and it glows while its fire burns. */
     private static BoneMachineBlock machine() {

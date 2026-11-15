@@ -1,0 +1,76 @@
+{
+ "parent": "minecraft:block/block",
+ "render_type": "minecraft:cutout",
+ "textures": {
+  "shuttle": "tinyrelics:block/shuttle_wood",
+  "thread": "tinyrelics:block/shuttle_thread",
+  "side": "tinyrelics:block/shuttle_wood",
+  "particle": "tinyrelics:block/shuttle_wood"
+ },
+ "elements": [
+  {
+   "from": [
+    5.5,
+    7.6,
+    7.3
+   ],
+   "to": [
+    10.5,
+    8.4,
+    8.7
+   ],
+   "faces": {
+    "north": {
+     "texture": "#shuttle"
+    },
+    "south": {
+     "texture": "#shuttle"
+    },
+    "west": {
+     "texture": "#shuttle"
+    },
+    "east": {
+     "texture": "#shuttle"
+    },
+    "up": {
+     "texture": "#shuttle"
+    },
+    "down": {
+     "texture": "#shuttle"
+    }
+   }
+  },
+  {
+   "from": [
+    6.5,
+    7.5,
+    7.5
+   ],
+   "to": [
+    9.5,
+    8.5,
+    8.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#thread"
+    },
+    "south": {
+     "texture": "#thread"
+    },
+    "west": {
+     "texture": "#thread"
+    },
+    "east": {
+     "texture": "#thread"
+    },
+    "up": {
+     "texture": "#thread"
+    },
+    "down": {
+     "texture": "#thread"
+    }
+   }
+  }
+ ]
+}

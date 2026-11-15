@@ -35,6 +35,8 @@ public final class ClientSetup {
             MenuScreens.register(TinyRelics.BLOOD_ALTAR_MENU.get(), BloodAltarScreen::new);
             MenuScreens.register(TinyRelics.BONE_CRUSHER_MENU.get(), BoneMachineScreen::new);
             MenuScreens.register(TinyRelics.SOUL_PRESS_MENU.get(), BoneMachineScreen::new);
+            MenuScreens.register(TinyRelics.SHADOW_LOOM_MENU.get(), ShadowMachineScreen::new);
+            MenuScreens.register(TinyRelics.PHANTOM_SPOOLER_MENU.get(), ShadowMachineScreen::new);
         });
     }
 
@@ -123,5 +125,6 @@ public final class ClientSetup {
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(TinyRelics.THROWN_RELIC.get(), ThrownRelicRenderer::new);
         event.registerBlockEntityRenderer(TinyRelics.BONE_MACHINE_ENTITY.get(), BoneMachineRenderer::new);
+        event.registerBlockEntityRenderer(TinyRelics.SHADOW_MACHINE_ENTITY.get(), ShadowMachineRenderer::new);
     }
 }
