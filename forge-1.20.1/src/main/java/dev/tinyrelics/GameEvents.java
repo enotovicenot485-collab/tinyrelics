@@ -223,6 +223,7 @@ public final class GameEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onBloodDamage(LivingDamageEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
+            ThorSet.strikeBack(player, event.getSource());
             event.setAmount(BloodSet.absorb(player, event.getAmount()));
         }
     }

@@ -107,8 +107,12 @@
   "block.tinyrelics.blood_altar": "Кровавый алтарь",
   "container.tinyrelics.blood_altar": "Кровавый алтарь",
   "container.tinyrelics.blood_altar.water": "Вода: %s из %s бутылок",
-  "item.tinyrelics.thor_chestplate": "Мантия Громовержца",
-  "item.tinyrelics.thor_leggings": "Поножи Громовержца",
-  "item.tinyrelics.thor_boots": "Сапоги Громовержца",
-  "item.tinyrelics.thor_armor.tooltip": "Броня Громовержца"
+  "item.tinyrelics.thor_chestplate": "Мантия Тора",
+  "item.tinyrelics.thor_leggings": "Поножи Тора",
+  "item.tinyrelics.thor_boots": "Сапоги Тора",
+  "item.tinyrelics.thor_armor.tooltip": "Броня Тора · неразрушаемая",
+  "item.tinyrelics.thor_armor.tooltip2": "Полный комплект: ударившего бьёт молния",
+  "screen.tinyrelics.name.thor_armor": "Броня Тора",
+  "screen.tinyrelics.stats.thor_armor": "1000 брони · неразрушаемая",
+  "screen.tinyrelics.desc.thor_armor": "Мантия 400, поножи 350, сапоги 250, шлема нет. Не крафтится и не ломается. Когда надеты все три части, любого, кто ранит владельца, в ответ бьёт молния, не чаще раза в полсекунды. Настроек у брони нет."
 }

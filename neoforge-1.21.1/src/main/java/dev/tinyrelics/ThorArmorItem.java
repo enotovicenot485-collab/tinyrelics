@@ -14,10 +14,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
-/** One piece of the Storm God armor that goes with Thor's hammer: chestplate with mantle and cloak, leggings, boots. No helmet. */
+/** One piece of the armor of Thor: chestplate with mantle and cloak, leggings, boots. No helmet.
+ * It cannot be crafted and never breaks; see ThorSet for what the full set does. */
 public class ThorArmorItem extends ArmorItem {
     public ThorArmorItem(Type type, Properties properties) {
-        super(TinyRelics.THOR_MATERIAL, type, properties.durability(type.getDurability(37)));
+        super(TinyRelics.THOR_MATERIAL, type, properties);
     }
 
     /** Frames of the shimmer that runs over the blue runes. */
@@ -47,5 +48,6 @@ public class ThorArmorItem extends ArmorItem {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.tinyrelics.thor_armor.tooltip").withStyle(ChatFormatting.AQUA));
+        tooltip.add(Component.translatable("item.tinyrelics.thor_armor.tooltip2").withStyle(ChatFormatting.AQUA));
     }
 }

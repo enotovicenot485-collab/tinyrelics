@@ -21,7 +21,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
-/** One piece of the Storm God armor that goes with Thor's hammer: chestplate with mantle and cloak, leggings, boots. No helmet. */
+/** One piece of the armor of Thor: chestplate with mantle and cloak, leggings, boots. No helmet.
+ * It cannot be crafted and never breaks; see ThorSet for what the full set does. */
 public class ThorArmorItem extends ArmorItem {
     public ThorArmorItem(Type type, Properties properties) {
         super(Material.INSTANCE, type, properties);
@@ -58,6 +59,7 @@ public class ThorArmorItem extends ArmorItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.tinyrelics.thor_armor.tooltip").withStyle(ChatFormatting.AQUA));
+        tooltip.add(Component.translatable("item.tinyrelics.thor_armor.tooltip2").withStyle(ChatFormatting.AQUA));
     }
 
     private enum Material implements ArmorMaterial {
@@ -71,16 +73,17 @@ public class ThorArmorItem extends ArmorItem {
                 case LEGGINGS -> 15;
                 case BOOTS -> 13;
             };
-            return base * 37;
+            // no durability: the armor never breaks
+            return base * 0;
         }
 
         @Override
         public int getDefenseForType(Type type) {
             return switch (type) {
                 case HELMET -> 3;
-                case CHESTPLATE -> 8;
-                case LEGGINGS -> 6;
-                case BOOTS -> 3;
+                case CHESTPLATE -> 400;
+                case LEGGINGS -> 350;
+                case BOOTS -> 250;
             };
         }
 
@@ -106,7 +109,7 @@ public class ThorArmorItem extends ArmorItem {
 
         @Override
         public float getToughness() {
-            return 1.0F;
+            return 20.0F;
         }
 
         @Override

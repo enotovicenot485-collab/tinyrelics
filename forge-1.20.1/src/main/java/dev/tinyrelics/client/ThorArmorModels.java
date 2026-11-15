@@ -71,9 +71,30 @@ public final class ThorArmorModels {
                 PartDefinition right_leg = root.addOrReplaceChild("right_leg", CubeListBuilder.create(), PartPose.offset(-1.9F, 12.0F, 0.0F));
                 PartDefinition left_leg = root.addOrReplaceChild("left_leg", CubeListBuilder.create(), PartPose.offset(1.9F, 12.0F, 0.0F));
                 PartDefinition cloak = body.addOrReplaceChild("cloak", CubeListBuilder.create()
-                        .texOffs(0, 40).addBox(-7.0F, 0.0F, 0.0F, 14.0F, 11.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.4F, 3.0F));
+                        .texOffs(0, 40).addBox(-7.0F, 0.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(0, 42).addBox(-7.0F, 1.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(0, 44).addBox(-7.0F, 2.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(30, 44).addBox(-7.0F, 3.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(60, 44).addBox(-7.0F, 4.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(0, 46).addBox(-7.0F, 5.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(30, 46).addBox(-7.0F, 6.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(60, 46).addBox(-7.0F, 7.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(0, 48).addBox(-7.0F, 8.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(30, 48).addBox(-7.0F, 9.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(30, 42).addBox(-6.0F, 10.0F, 0.0F, 12.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.4F, 3.0F));
                 PartDefinition cloak_low = cloak.addOrReplaceChild("cloak_low", CubeListBuilder.create()
-                        .texOffs(30, 44).addBox(-7.0F, 0.0F, 0.0F, 14.0F, 12.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 11.0F, 0.0F));
+                        .texOffs(60, 48).addBox(-6.0F, 0.0F, 0.0F, 12.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(0, 50).addBox(-6.0F, 1.0F, 0.0F, 12.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(26, 50).addBox(-6.0F, 2.0F, 0.0F, 12.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(52, 50).addBox(-7.0F, 3.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(0, 52).addBox(-7.0F, 4.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(30, 52).addBox(-7.0F, 5.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(60, 52).addBox(-7.0F, 6.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(0, 54).addBox(-7.0F, 7.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(30, 54).addBox(-7.0F, 8.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(60, 54).addBox(-7.0F, 9.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(0, 56).addBox(-7.0F, 10.0F, 0.0F, 14.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                        .texOffs(30, 56).addBox(-5.0F, 11.0F, 0.0F, 10.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 11.0F, 0.0F));
             }
             case LEGS -> {
                 PartDefinition head = root.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);

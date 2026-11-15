@@ -20,9 +20,9 @@ public class RelicsScreen extends Screen {
     private static final int PANEL_WIDTH = 400;
     private static final int PANEL_HEIGHT = 232;
     private static final int TAB_WIDTH = 140;
-    private static final int TAB_HEIGHT = 22;
+    private static final int TAB_HEIGHT = 20;
     private static final int RIGHT_WIDTH = 234;
-    private static final String[] IDS = {"keeping_charm", "thor_hammer", "chaos_boomerang", "blood_blade", "undead_staff", "necro_armor", "chaos_armor", "blood_armor"};
+    private static final String[] IDS = {"keeping_charm", "thor_hammer", "chaos_boomerang", "blood_blade", "undead_staff", "necro_armor", "chaos_armor", "blood_armor", "thor_armor"};
 
     private final RelicConfig edit;
     private final ItemStack[] icons;
@@ -42,6 +42,7 @@ public class RelicsScreen extends Screen {
                 new ItemStack(TinyRelics.NECRO_CHESTPLATE.get()),
                 new ItemStack(TinyRelics.CHAOS_CHESTPLATE.get()),
                 new ItemStack(TinyRelics.BLOOD_CHESTPLATE.get()),
+                new ItemStack(TinyRelics.THOR_CHESTPLATE.get()),
         };
     }
 
@@ -98,6 +99,9 @@ public class RelicsScreen extends Screen {
                 addSlider(1, "rain_radius", RelicConfig.MIN_RAIN_RADIUS, RelicConfig.MAX_RAIN_RADIUS,
                         () -> this.edit.rainRadius, value -> this.edit.rainRadius = value);
                 addToggle(2, "craft", this.edit.bloodCraft, value -> this.edit.bloodCraft = value);
+            }
+            case 8 -> {
+                // the armor of Thor has nothing to set up: no recipe, no ability key
             }
             default -> {
                 addSlider(0, "staff_kills", RelicConfig.MIN_KILLS, RelicConfig.MAX_KILLS,
@@ -163,7 +167,7 @@ public class RelicsScreen extends Screen {
         graphics.drawCenteredString(this.font, this.title, this.width / 2, this.top + 9, 0xFFFFFF);
 
         for (int i = 0; i < IDS.length; i++) {
-            graphics.renderItem(this.icons[i], this.left + 11, this.top + 26 + i * (TAB_HEIGHT + 2) + 3);
+            graphics.renderItem(this.icons[i], this.left + 11, this.top + 26 + i * (TAB_HEIGHT + 2) + 2);
         }
 
         int x = rightX();

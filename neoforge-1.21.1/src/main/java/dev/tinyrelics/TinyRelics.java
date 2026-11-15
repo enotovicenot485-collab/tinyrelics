@@ -139,21 +139,21 @@ public class TinyRelics {
                     1.0F,
                     0.0F));
 
-    /** 8 + 6 + 3 = 17 armor points for the three pieces; the set has no helmet. */
+    /** 400 + 350 + 250 = 1000 armor points for the three pieces (the game itself counts no more than 30); no helmet. */
     public static final DeferredHolder<ArmorMaterial, ArmorMaterial> THOR_MATERIAL = ARMOR_MATERIALS.register("thor",
             () -> new ArmorMaterial(
                     Util.make(new EnumMap<>(ArmorItem.Type.class), defense -> {
                         defense.put(ArmorItem.Type.HELMET, 3);
-                        defense.put(ArmorItem.Type.CHESTPLATE, 8);
-                        defense.put(ArmorItem.Type.LEGGINGS, 6);
-                        defense.put(ArmorItem.Type.BOOTS, 3);
-                        defense.put(ArmorItem.Type.BODY, 8);
+                        defense.put(ArmorItem.Type.CHESTPLATE, 400);
+                        defense.put(ArmorItem.Type.LEGGINGS, 350);
+                        defense.put(ArmorItem.Type.BOOTS, 250);
+                        defense.put(ArmorItem.Type.BODY, 400);
                     }),
                     15,
                     SoundEvents.ARMOR_EQUIP_NETHERITE,
                     () -> Ingredient.of(Items.IRON_INGOT),
                     List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(MODID, "thor"))),
-                    1.0F,
+                    20.0F,
                     0.0F));
 
     public static final DeferredItem<NecroArmorItem> NECRO_HELMET = ITEMS.register("necro_helmet",
@@ -184,11 +184,11 @@ public class TinyRelics {
             () -> new BloodArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
 
     public static final DeferredItem<ThorArmorItem> THOR_CHESTPLATE = ITEMS.register("thor_chestplate",
-            () -> new ThorArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+            () -> new ThorArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
     public static final DeferredItem<ThorArmorItem> THOR_LEGGINGS = ITEMS.register("thor_leggings",
-            () -> new ThorArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+            () -> new ThorArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
     public static final DeferredItem<ThorArmorItem> THOR_BOOTS = ITEMS.register("thor_boots",
-            () -> new ThorArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC).fireResistant()));
+            () -> new ThorArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
     /** Invisible: fills the cells of the creative tab that hold a banner picture or nothing at all. */
     public static final DeferredItem<Item> TAB_FILLER = ITEMS.register("tab_filler",
